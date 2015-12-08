@@ -71,15 +71,13 @@ class MWBot {
 
                 .then((response) => {
 
-                    //console.log(' ');
-                    //console.log('FIRST LOGIN');
-                    //console.log(response);
+                    if (!response.login || !response.login.result) {
+                        let err = new Error('Invalid response from API');
+                        err.response = response;
+                        return reject(err) ;
+                    }
 
                     this.state = this.merge(this.state, response.login);
-
-                    if (!response.login || !response.login.result) {
-                        return reject('Invalid response from API: ' + JSON.parse(response));
-                    }
 
                     // Add token and re-submit login request
                     loginRequest.qs.lgtoken = response.login.token;
@@ -112,8 +110,13 @@ class MWBot {
                         return rp(getEditToken);
 
                     } else {
-                        // More verbose error handling?
-                        return reject('Could not login: ' + JSON.stringify(response)) ;
+                        let reason = 'Unknown reason';
+                        if (response.login && response.login.result) {
+                            reason = response.login.result
+                        }
+                        let err = new Error('Could not login: ' + reason);
+                        err.response = response;
+                        return reject(err) ;
                     }
 
                 }).then((response) => {
