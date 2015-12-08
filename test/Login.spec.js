@@ -5,11 +5,7 @@
 const MWBot = require('../src/');
 const expect = require('chai').expect;
 
-const validCredentials = {
-    apiUrl: 'http://localhost:8080/wiki01/api.php',
-    username: 'Admin',
-    password: 'puppet'
-};
+const loginCredentials = require('./mocking/loginCredentials.json');
 
 describe('MWBot Login', function() {
 
@@ -18,7 +14,7 @@ describe('MWBot Login', function() {
         let bot = new MWBot();
         exports.bot = bot;
 
-        bot.login(validCredentials).then((response) => {
+        bot.login(loginCredentials.valid).then((response) => {
             expect(response).to.be.an('object');
             done();
         });
@@ -29,10 +25,7 @@ describe('MWBot Login', function() {
 
         let bot = new MWBot();
 
-        let invalidCredentials = validCredentials;
-        invalidCredentials.username = 'InvalidUsername';
-
-        bot.login(invalidCredentials).catch((err) => {
+        bot.login(loginCredentials.invalid).catch((err) => {
             expect(err.message).to.include('Could not login');
             done();
         });
@@ -46,7 +39,8 @@ describe('MWBot Login', function() {
             }
         });
 
-        bot.login(validCredentials).catch((err) => {
+        bot.login(loginCredentials.valid).catch((err) => {
+
             expect(err).to.be.an.instanceof(Error);
             expect(err.message).to.include('ETIMEDOUT');
             done();
@@ -55,12 +49,11 @@ describe('MWBot Login', function() {
 
     it('crashes with invalid API URL', function(done) {
 
-        let invalidCredentials = validCredentials;
-        invalidCredentials.apiUrl = 'google.de/wiki/api.php';
+        let bot = new MWBot();
 
-        bot.login(invalidCredentials).catch((err) => {
+        bot.login(loginCredentials.invalidApiUrl).catch((err) => {
             expect(err).to.be.an.instanceof(Error);
-            expect(err.message).to.include('Invalid URI');
+            expect(err.message).to.include('301');
             done();
         });
     });

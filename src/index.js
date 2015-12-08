@@ -6,6 +6,11 @@ const Promise = require('bluebird');
 
 class MWBot {
 
+
+    //////////////////////////////////////////
+    // CONSTRUCTOR                          //
+    //////////////////////////////////////////
+
     constructor(options) {
 
         this.state = false;
@@ -31,11 +36,20 @@ class MWBot {
 
     }
 
+
+    //////////////////////////////////////////
+    // GETTER & SETTER                      //
+    //////////////////////////////////////////
+
     get version() {
         let packageJson = require('../package.json');
         return packageJson.version;
     }
 
+
+    //////////////////////////////////////////
+    // CORE FUNCTIONS                       //
+    //////////////////////////////////////////
 
     login(loginOptions) {
 
@@ -54,11 +68,6 @@ class MWBot {
 
             this.defaultRequestOptions.url = loginOptions.apiUrl;
 
-            //console.log(' ');
-            //console.log('LOGIN-OPTIONS');
-            //console.log(loginOptions);
-
-
             let loginRequest = this.merge(this.defaultRequestOptions, {
                 qs: {
                     action: 'login',
@@ -67,86 +76,71 @@ class MWBot {
                 }
             });
 
-            rp(loginRequest)
+            rp(loginRequest).then((response) => {
 
-                .then((response) => {
+                if (!response.login || !response.login.result) {
+                    let err = new Error('Invalid response from API');
+                    err.response = response;
+                    return reject(err) ;
+                }
 
-                    if (!response.login || !response.login.result) {
-                        let err = new Error('Invalid response from API');
-                        err.response = response;
-                        return reject(err) ;
-                    }
+                this.state = this.merge(this.state, response.login);
 
-                    this.state = this.merge(this.state, response.login);
+                // Add token and re-submit login request
+                loginRequest.qs.lgtoken = response.login.token;
 
-                    // Add token and re-submit login request
-                    loginRequest.qs.lgtoken = response.login.token;
+                return rp(loginRequest);
 
-                    return rp(loginRequest);
+            }).then((response) => {
 
-                }).then((response) => {
 
-                    //console.log(' ');
-                    //console.log('SECOND LOGIN');
-                    //console.log(response);
+                if (!response.login || !response.login.result) {
+                    return reject('Invalid response from API: ' + JSON.stringify(response));
+                }
 
-                    if (!response.login || !response.login.result) {
-                        return reject('Invalid response from API: ' + JSON.stringify(response));
-                    }
+                this.state = this.merge(this.state, response.login);
 
-                    this.state = this.merge(this.state, response.login);
+                if (response.login && response.login.result === 'Success') {
 
-                    if (response.login && response.login.result === 'Success') {
-
-                        // MW 1.8 - 1.19
-                        let getEditToken = this.merge(this.defaultRequestOptions, {
-                            qs: {
-                                action: 'query',
-                                meta: 'tokens',
-                                type: 'csrf'
-                            }
-                        });
-
-                        return rp(getEditToken);
-
-                    } else {
-                        let reason = 'Unknown reason';
-                        if (response.login && response.login.result) {
-                            reason = response.login.result
+                    // MW 1.8 - 1.19
+                    let getEditToken = this.merge(this.defaultRequestOptions, {
+                        qs: {
+                            action: 'query',
+                            meta: 'tokens',
+                            type: 'csrf'
                         }
-                        let err = new Error('Could not login: ' + reason);
-                        err.response = response;
-                        return reject(err) ;
+                    });
+
+                    return rp(getEditToken);
+
+                } else {
+                    let reason = 'Unknown reason';
+                    if (response.login && response.login.result) {
+                        reason = response.login.result
                     }
+                    let err = new Error('Could not login: ' + reason);
+                    err.response = response;
+                    return reject(err) ;
+                }
 
-                }).then((response) => {
+            }).then((response) => {
 
-                    //console.log(' ');
-                    //console.log('EDIT TOKEN');
-                    //console.log(response);
+                if (response.query && response.query.tokens && response.query.tokens.csrftoken) {
 
-                    if (response.query && response.query.tokens && response.query.tokens.csrftoken) {
-                        this.defaultRequestOptions.form.token = response.query.tokens.csrftoken;
-                        this.state = this.merge(this.state, response.query.tokens);
-                        this.loggedIn = true;
+                    // SUCCESS
+                    this.defaultRequestOptions.form.token = response.query.tokens.csrftoken;
+                    this.state = this.merge(this.state, response.query.tokens);
+                    this.loggedIn = true;
 
-                        return resolve(this.state);
-                    } else {
-                        return reject('Could not get edit token: ' + JSON.stringify(response)) ;
-                    }
+                    return resolve(this.state);
 
+                } else {
+                    return reject('Could not get edit token: ' + JSON.stringify(response)) ;
+                }
 
-
-                    //console.log(' ');
-                    //console.log('LOGIN STATE');
-                    //console.dir(this.state);
-
-
-                })
-                .catch((err) => {
-                    reject(err);
-                })
-            ;
+            }).catch((err) => {
+                reject(err);
+            });
 
         });
 
@@ -178,13 +172,10 @@ class MWBot {
 
             requestObj.qs = this.merge(requestObj.qs, qs);
 
-            console.log(' ');
-            console.log('NEW REQUEST');
-            console.dir(requestObj);
-
             rp(requestObj).then((response) => {
-
                 resolve(response);
+            }).catch((err) => {
+                reject(err);
             });
 
 
@@ -193,7 +184,40 @@ class MWBot {
 
 
     //////////////////////////////////////////
-    // Helper Functions                     //
+    // CONVENIENCE FUNCTIONS                //
+    //////////////////////////////////////////
+
+    edit(title, content, summary, requestOptions) {
+
+        return new Promise((resolve, reject) => {
+
+            let qs = {
+                action: 'edit',
+                title: title,
+                text: content,
+                summary: summary
+            };
+
+            this.request(qs, requestOptions).then((response) => {
+
+                if (response && response.edit && response.edit.result === 'Success') {
+                    return resolve(response);
+                } else {
+                    let err = new Error('Could not edit page: ' + title);
+                    err.response = response;
+                    return reject(err);
+                }
+
+            }).catch((err) => {
+                return reject(err);
+            });
+
+        });
+    }
+
+
+    //////////////////////////////////////////
+    // HELPER FUNCTIONS                     //
     //////////////////////////////////////////
 
     merge(parent, child) {
