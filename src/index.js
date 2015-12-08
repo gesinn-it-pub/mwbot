@@ -200,14 +200,48 @@ class MWBot {
 
             this.request(qs, requestOptions).then((response) => {
 
-                if (response && response.edit && response.edit.result === 'Success') {
-                    return resolve(response);
-                } else {
-                    let err = new Error('Could not edit page: ' + title);
+                if (response.error) {
+                    let err = new Error('Could not edit page: ' + title + ' :: ' + response.error.code);
+                    err.target = title;
                     err.response = response;
                     return reject(err);
                 }
 
+                if (response && response.edit && response.edit.result === 'Success') {
+                    return resolve(response);
+                } else {
+                    let err = new Error('Could not edit page: ' + title);
+                    err.target = title;
+                    err.response = response;
+                    return reject(err);
+                }
+
+            }).catch((err) => {
+                return reject(err);
+            });
+
+        });
+    };
+
+    delete(title, reason, requestOptions) {
+
+        return new Promise((resolve, reject) => {
+
+            let qs = {
+                action: 'delete',
+                title: title,
+                reason: reason
+            };
+
+            this.request(qs, requestOptions).then((response) => {
+                if (response.error) {
+                    let err = new Error('Could not delete page: ' + title + ' :: ' + response.error.code);
+                    err.target = title;
+                    err.response = response;
+                    return reject(err);
+                } else {
+                    return resolve(response);
+                }
             }).catch((err) => {
                 return reject(err);
             });
@@ -222,6 +256,10 @@ class MWBot {
 
     merge(parent, child) {
         return _.merge(_.cloneDeep(parent), _.cloneDeep(child));
+    };
+
+    handleApiResponse(response, msg, reject) {
+
     };
 }
 

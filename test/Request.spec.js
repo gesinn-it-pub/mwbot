@@ -33,7 +33,7 @@ describe('MWBot Request', function() {
         let bot = new MWBot();
 
         bot.login(loginCredentials.valid).then(() => {
-            return bot.edit('Main Page', '=Some more Wikitext=', 'Test Upload');
+            return bot.edit('Test Page', '=Some more Wikitext=', 'Test Upload');
         }).then((response) => {
             expect(response.edit.result).to.equal('Success');
             done();
@@ -41,6 +41,30 @@ describe('MWBot Request', function() {
     });
 
 
+    it('successfully deletes a page with delete()', function(done) {
+
+        let bot = new MWBot();
+
+        bot.login(loginCredentials.valid).then(() => {
+            return bot.delete('Test Page', 'Test Reasons');
+        }).then((response) => {
+            expect(response.delete.logid).to.be.a.number;
+            done();
+        });
+    });
+
+    it('rejects deleting a non-existing page with delete()', function(done) {
+
+        let bot = new MWBot();
+
+        bot.login(loginCredentials.valid).then(() => {
+            return bot.delete('Non-Existing Page', 'Test Reasons');
+        }).catch((err) => {
+            expect(err).to.be.an.instanceof(Error);
+            expect(err.message).to.include('Could not delete page');
+            done();
+        });
+    });
 
 
 
