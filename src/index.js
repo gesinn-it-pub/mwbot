@@ -70,7 +70,9 @@ class MWBot {
 
             let loginRequest = this.merge(this.defaultRequestOptions, {
                 qs: {
-                    action: 'login',
+                    action: 'login'
+                },
+                form: {
                     lgname: loginOptions.username,
                     lgpassword: loginOptions.password
                 }
@@ -87,7 +89,7 @@ class MWBot {
                 this.state = this.merge(this.state, response.login);
 
                 // Add token and re-submit login request
-                loginRequest.qs.lgtoken = response.login.token;
+                loginRequest.form.lgtoken = response.login.token;
 
                 return rp(loginRequest);
 
