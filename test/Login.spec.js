@@ -3,41 +3,40 @@
 /*global describe, it*/
 
 const MWBot = require('../src/');
-const expect = require('chai');
+const expect = require('chai').expect;
 
-describe('MWBot', function() {
+//const chai = require('chai-as-promised');
 
-    it('can be constructed', function() {
-        let bot = new MWBot({});
-    });
+describe('MWBot Login', function() {
 
-    it('respond with matching records', function(done) {
-
+    it('succeeds with valid credentials', function(done) {
 
         let bot = new MWBot();
+        exports.bot = bot;
 
         bot.login({
             apiUrl: 'http://localhost:8080/wiki01/api.php',
             username: 'Admin',
             password: 'puppet'
-        }).then((data) => {
-            console.dir(data);
-
-            return bot.request({
-                action: 'edit',
-                title: 'Main_Page',
-                text: '=Some Wikitext=',
-                summary: 'Test Edit'
-
-            });
-        }).then((data) => {
-            console.dir(data);
-
+        }).then((response) => {
+            expect(response).to.be.an('object');
             done();
         });
 
     });
 
+    it('crashes with invalid credentials', function(done) {
 
+        let bot = new MWBot();
+
+        bot.login({
+            apiUrl: 'http://localhost:8080/wiki01/api.php',
+            username: 'InvalidUserName',
+            password: 'puppet'
+        }).catch((err) => {
+            expect(err).to.include('Could not login');
+            done();
+        });
+    });
 
 });

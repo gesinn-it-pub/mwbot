@@ -9,8 +9,9 @@ class MWBot {
     constructor(options) {
 
         this.state = false;
+        this.loggedIn = false;
 
-        this.customSettings = options;
+        this.customSettings = options || {};
 
         this.defaultRequestOptions = {
             method: 'POST',
@@ -24,10 +25,15 @@ class MWBot {
             json: true
         };
 
-        if (options && options.request) {
+        if (this.customSettings.request) {
             this.defaultRequestOptions = this.merge(this.defaultRequestOptions, options.request)
         }
 
+    }
+
+    get version() {
+        let packageJson = require('../package.json');
+        return packageJson.version;
     }
 
 
@@ -48,9 +54,9 @@ class MWBot {
 
             this.defaultRequestOptions.url = loginOptions.apiUrl;
 
-            console.log(' ');
-            console.log('LOGIN-OPTIONS');
-            console.log(loginOptions);
+            //console.log(' ');
+            //console.log('LOGIN-OPTIONS');
+            //console.log(loginOptions);
 
 
             let loginRequest = this.merge(this.defaultRequestOptions, {
@@ -65,22 +71,31 @@ class MWBot {
 
                 .then((response) => {
 
-                    console.log(' ');
-                    console.log('FIRST LOGIN');
-                    console.log(response);
+                    //console.log(' ');
+                    //console.log('FIRST LOGIN');
+                    //console.log(response);
+
                     this.state = this.merge(this.state, response.login);
+
+                    if (!response.login || !response.login.result) {
+                        return reject('Invalid response from API: ' + JSON.parse(response));
+                    }
 
                     // Add token and re-submit login request
                     loginRequest.qs.lgtoken = response.login.token;
 
                     return rp(loginRequest);
-                })
 
-                .then((response) => {
+                }).then((response) => {
 
-                    console.log(' ');
-                    console.log('SECOND LOGIN');
-                    console.log(response);
+                    //console.log(' ');
+                    //console.log('SECOND LOGIN');
+                    //console.log(response);
+
+                    if (!response.login || !response.login.result) {
+                        return reject('Invalid response from API: ' + JSON.stringify(response));
+                    }
+
                     this.state = this.merge(this.state, response.login);
 
                     if (response.login && response.login.result === 'Success') {
@@ -96,30 +111,34 @@ class MWBot {
 
                         return rp(getEditToken);
 
-
                     } else {
-                        console.log('Could not login!');
+                        // More verbose error handling?
+                        return reject('Could not login: ' + JSON.stringify(response)) ;
                     }
 
-                })
-                .then((response) => {
-                    console.log(' ');
-                    console.log('EDIT TOKEN');
-                    console.log(response);
+                }).then((response) => {
+
+                    //console.log(' ');
+                    //console.log('EDIT TOKEN');
+                    //console.log(response);
 
                     if (response.query && response.query.tokens && response.query.tokens.csrftoken) {
                         this.defaultRequestOptions.form.token = response.query.tokens.csrftoken;
+                        this.state = this.merge(this.state, response.query.tokens);
+                        this.loggedIn = true;
+
+                        return resolve(this.state);
+                    } else {
+                        return reject('Could not get edit token: ' + JSON.stringify(response)) ;
                     }
 
-                    this.state = this.merge(this.state, response.query.tokens);
 
 
-                    console.log(' ');
-                    console.log(' ');
-                    console.log('LOGIN STATE');
-                    console.dir(this.state);
+                    //console.log(' ');
+                    //console.log('LOGIN STATE');
+                    //console.dir(this.state);
 
-                    resolve(response);
+
                 })
                 .catch((err) => {
                     reject(err);
@@ -142,6 +161,14 @@ class MWBot {
 
         return new Promise((resolve, reject) => {
 
+            if (!qs) {
+                return reject('No parameters given!');
+            }
+
+            if (!this.loggedIn) {
+                return reject('Must be logged in!');
+            }
+
             requestOptions = requestOptions || {};
 
             let requestObj = this.merge(this.defaultRequestOptions, requestOptions);
@@ -162,6 +189,9 @@ class MWBot {
     };
 
 
+    //////////////////////////////////////////
+    // Helper Functions                     //
+    //////////////////////////////////////////
 
     merge(parent, child) {
         return _.merge(_.cloneDeep(parent), _.cloneDeep(child));
