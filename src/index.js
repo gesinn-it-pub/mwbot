@@ -156,11 +156,11 @@ class MWBot {
     };
 
 
-    request(qs, requestOptions) {
+    request(params, requestOptions) {
 
         return new Promise((resolve, reject) => {
 
-            if (!qs) {
+            if (!params) {
                 return reject('No parameters given!');
             }
 
@@ -172,7 +172,7 @@ class MWBot {
 
             let requestObj = this.merge(this.defaultRequestOptions, requestOptions);
 
-            requestObj.qs = this.merge(requestObj.qs, qs);
+            requestObj.form = this.merge(requestObj.form, params);
 
             rp(requestObj).then((response) => {
                 resolve(response);
