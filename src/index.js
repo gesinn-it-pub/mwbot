@@ -1,9 +1,7 @@
 'use strict';
 
-const rp = require('request-promise');
-const _ = require('lodash');
 const Promise = require('bluebird');
-
+const request = require('request');
 class MWBot {
 
 
@@ -52,7 +50,15 @@ class MWBot {
     //////////////////////////////////////////
 
     rawRequest(requestObj) {
-        return rp(requestObj);
+        return new Promise((resolve, reject) => {
+            request(requestObj, (error, response, body) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(body);
+                }
+            });
+        });
     }
 
     request(params, requestOptions) {
@@ -254,7 +260,7 @@ class MWBot {
     //////////////////////////////////////////
 
     static merge(parent, child) {
-        return _.merge(_.cloneDeep(parent), _.cloneDeep(child));
+        return Object.assign({}, parent, child);
     }
 
     static handleApiResponse() {

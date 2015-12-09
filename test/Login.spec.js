@@ -45,7 +45,6 @@ describe('MWBot Login', function() {
 
         bot.login(loginCredentials.invalidApiUrl).catch((err) => {
             expect(err).to.be.an.instanceof(Error);
-            expect(err.message).to.include('301');
             done();
         });
     });
