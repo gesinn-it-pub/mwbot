@@ -68,7 +68,7 @@ describe('MWBot Login', function() {
             expect(response.result).to.equal('Success');
             expect(response).to.include.key('csrftoken');
             done();
-        })
+        });
     });
 
 });

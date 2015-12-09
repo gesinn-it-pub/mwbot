@@ -31,7 +31,7 @@ class MWBot {
         };
 
         if (this.options.request) {
-            this.defaultRequestOptions = this.merge(this.defaultRequestOptions, options.request)
+            this.defaultRequestOptions = MWBot.merge(this.defaultRequestOptions, options.request);
         }
 
     }
@@ -53,7 +53,7 @@ class MWBot {
 
     rawRequest(requestObj) {
         return rp(requestObj);
-    };
+    }
 
     request(params, requestOptions) {
 
@@ -65,9 +65,9 @@ class MWBot {
 
             requestOptions = requestOptions || {};
 
-            let requestObj = this.merge(this.defaultRequestOptions, requestOptions);
+            let requestObj = MWBot.merge(this.defaultRequestOptions, requestOptions);
 
-            requestObj.form = this.merge(requestObj.form, params);
+            requestObj.form = MWBot.merge(requestObj.form, params);
 
             this.rawRequest(requestObj).then((response) => {
                 resolve(response);
@@ -76,7 +76,7 @@ class MWBot {
             });
 
         });
-    };
+    }
 
     login(loginOptions) {
 
@@ -107,7 +107,7 @@ class MWBot {
                     err.response = response;
                     return reject(err) ;
                 } else {
-                    this.state = this.merge(this.state, response.login);
+                    this.state = MWBot.merge(this.state, response.login);
                     // Add token and re-submit login request
                     loginRequest.lgtoken = response.login.token;
                     return this.request(loginRequest);
@@ -116,12 +116,12 @@ class MWBot {
             }).then((response) => {
 
                 if (response.login && response.login.result === 'Success') {
-                    this.state = this.merge(this.state, response.login);
+                    this.state = MWBot.merge(this.state, response.login);
                     return resolve(this.state);
                 } else {
                     let reason = 'Unknown reason';
                     if (response.login && response.login.result) {
-                        reason = response.login.result
+                        reason = response.login.result;
                     }
                     let err = new Error('Could not login: ' + reason);
                     err.response = response;
@@ -136,7 +136,7 @@ class MWBot {
 
         return this.loginPromise;
 
-    };
+    }
 
     getEditToken() {
 
@@ -152,7 +152,7 @@ class MWBot {
 
                     // SUCCESS
                     this.defaultRequestOptions.form.token = response.query.tokens.csrftoken;
-                    this.state = this.merge(this.state, response.query.tokens);
+                    this.state = MWBot.merge(this.state, response.query.tokens);
                     this.loggedIn = true;
 
                     return resolve(this.state);
@@ -165,7 +165,7 @@ class MWBot {
             });
         });
 
-    };
+    }
 
 
     //////////////////////////////////////////
@@ -176,7 +176,7 @@ class MWBot {
         return this.login(loginOptions).then(() => {
             return this.getEditToken();
         });
-    };
+    }
 
     edit(title, content, summary, requestOptions) {
 
@@ -216,15 +216,15 @@ class MWBot {
             });
 
         });
-    };
+    }
 
     delete(title, reason, requestOptions) {
 
-        if (!this.loggedIn) {
-            return reject('Must be logged in!');
-        }
-
         return new Promise((resolve, reject) => {
+
+            if (!this.loggedIn) {
+                return reject('Must be logged in!');
+            }
 
             let qs = {
                 action: 'delete',
@@ -253,13 +253,14 @@ class MWBot {
     // HELPER FUNCTIONS                     //
     //////////////////////////////////////////
 
-    merge(parent, child) {
+    static merge(parent, child) {
         return _.merge(_.cloneDeep(parent), _.cloneDeep(child));
-    };
+    }
 
-    handleApiResponse(response, msg, reject) {
+    static handleApiResponse() {
+        // TODO
 
-    };
+    }
 }
 
 module.exports = MWBot;
