@@ -13,7 +13,7 @@ describe('MWBot Request', function() {
 
         let bot = new MWBot();
 
-        bot.login(loginCredentials.valid).then(() => {
+        bot.loginGetEditToken(loginCredentials.valid).then(() => {
             return bot.request({
                 action: 'edit',
                 title: 'Main_Page',
@@ -32,7 +32,7 @@ describe('MWBot Request', function() {
 
         let bot = new MWBot();
 
-        bot.login(loginCredentials.valid).then(() => {
+        bot.loginGetEditToken(loginCredentials.valid).then(() => {
             return bot.edit('Test Page', '=Some more Wikitext=', 'Test Upload');
         }).then((response) => {
             expect(response.edit.result).to.equal('Success');
@@ -45,7 +45,7 @@ describe('MWBot Request', function() {
 
         let bot = new MWBot();
 
-        bot.login(loginCredentials.valid).then(() => {
+        bot.loginGetEditToken(loginCredentials.valid).then(() => {
             return bot.delete('Test Page', 'Test Reasons');
         }).then((response) => {
             expect(response.delete.logid).to.be.a.number;
@@ -57,7 +57,7 @@ describe('MWBot Request', function() {
 
         let bot = new MWBot();
 
-        bot.login(loginCredentials.valid).then(() => {
+        bot.loginGetEditToken(loginCredentials.valid).then(() => {
             return bot.delete('Non-Existing Page', 'Test Reasons');
         }).catch((err) => {
             expect(err).to.be.an.instanceof(Error);

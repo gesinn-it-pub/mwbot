@@ -13,10 +13,10 @@ class MWBot {
 
     constructor(options) {
 
-        this.state = false;
+        this.state = {};
         this.loggedIn = false;
 
-        this.customSettings = options || {};
+        this.options = options || {};
 
         this.defaultRequestOptions = {
             method: 'POST',
@@ -30,7 +30,7 @@ class MWBot {
             json: true
         };
 
-        if (this.customSettings.request) {
+        if (this.options.request) {
             this.defaultRequestOptions = this.merge(this.defaultRequestOptions, options.request)
         }
 
@@ -51,9 +51,34 @@ class MWBot {
     // CORE FUNCTIONS                       //
     //////////////////////////////////////////
 
-    login(loginOptions) {
+    rawRequest(requestObj) {
+        return rp(requestObj);
+    };
 
-        this.state = {};
+    request(params, requestOptions) {
+
+        return new Promise((resolve, reject) => {
+
+            if (!params) {
+                return reject('No parameters given!');
+            }
+
+            requestOptions = requestOptions || {};
+
+            let requestObj = this.merge(this.defaultRequestOptions, requestOptions);
+
+            requestObj.form = this.merge(requestObj.form, params);
+
+            this.rawRequest(requestObj).then((response) => {
+                resolve(response);
+            }).catch((err) => {
+                reject(err);
+            });
+
+        });
+    };
+
+    login(loginOptions) {
 
         this.loginPromise = new Promise((resolve, reject) => {
 
@@ -66,55 +91,33 @@ class MWBot {
                 return reject('No password provided!');
             }
 
+            // Set API URL
             this.defaultRequestOptions.url = loginOptions.apiUrl;
 
-            let loginRequest = this.merge(this.defaultRequestOptions, {
-                qs: {
-                    action: 'login'
-                },
-                form: {
-                    lgname: loginOptions.username,
-                    lgpassword: loginOptions.password
-                }
-            });
+            let loginRequest = {
+                action: 'login',
+                lgname: loginOptions.username,
+                lgpassword: loginOptions.password
+            };
 
-            rp(loginRequest).then((response) => {
+            this.request(loginRequest).then((response) => {
 
                 if (!response.login || !response.login.result) {
                     let err = new Error('Invalid response from API');
                     err.response = response;
                     return reject(err) ;
+                } else {
+                    this.state = this.merge(this.state, response.login);
+                    // Add token and re-submit login request
+                    loginRequest.lgtoken = response.login.token;
+                    return this.request(loginRequest);
                 }
-
-                this.state = this.merge(this.state, response.login);
-
-                // Add token and re-submit login request
-                loginRequest.form.lgtoken = response.login.token;
-
-                return rp(loginRequest);
 
             }).then((response) => {
 
-
-                if (!response.login || !response.login.result) {
-                    return reject('Invalid response from API: ' + JSON.stringify(response));
-                }
-
-                this.state = this.merge(this.state, response.login);
-
                 if (response.login && response.login.result === 'Success') {
-
-                    // MW 1.8 - 1.19
-                    let getEditToken = this.merge(this.defaultRequestOptions, {
-                        qs: {
-                            action: 'query',
-                            meta: 'tokens',
-                            type: 'csrf'
-                        }
-                    });
-
-                    return rp(getEditToken);
-
+                    this.state = this.merge(this.state, response.login);
+                    return resolve(this.state);
                 } else {
                     let reason = 'Unknown reason';
                     if (response.login && response.login.result) {
@@ -123,21 +126,6 @@ class MWBot {
                     let err = new Error('Could not login: ' + reason);
                     err.response = response;
                     return reject(err) ;
-                }
-
-            }).then((response) => {
-
-                if (response.query && response.query.tokens && response.query.tokens.csrftoken) {
-
-                    // SUCCESS
-                    this.defaultRequestOptions.form.token = response.query.tokens.csrftoken;
-                    this.state = this.merge(this.state, response.query.tokens);
-                    this.loggedIn = true;
-
-                    return resolve(this.state);
-
-                } else {
-                    return reject('Could not get edit token: ' + JSON.stringify(response)) ;
                 }
 
             }).catch((err) => {
@@ -150,38 +138,33 @@ class MWBot {
 
     };
 
-
-    rawRequest(requestOptions) {
-        return rp(requestOptions);
-    };
-
-
-    request(params, requestOptions) {
+    getEditToken() {
 
         return new Promise((resolve, reject) => {
 
-            if (!params) {
-                return reject('No parameters given!');
-            }
+            // MW >= 1.24
+            this.request({
+                action: 'query',
+                meta: 'tokens',
+                type: 'csrf'
+            }).then((response) => {
+                if (response.query && response.query.tokens && response.query.tokens.csrftoken) {
 
-            if (!this.loggedIn) {
-                return reject('Must be logged in!');
-            }
+                    // SUCCESS
+                    this.defaultRequestOptions.form.token = response.query.tokens.csrftoken;
+                    this.state = this.merge(this.state, response.query.tokens);
+                    this.loggedIn = true;
 
-            requestOptions = requestOptions || {};
+                    return resolve(this.state);
 
-            let requestObj = this.merge(this.defaultRequestOptions, requestOptions);
-
-            requestObj.form = this.merge(requestObj.form, params);
-
-            rp(requestObj).then((response) => {
-                resolve(response);
+                } else {
+                    return reject('Could not get edit token: ' + JSON.stringify(response)) ;
+                }
             }).catch((err) => {
-                reject(err);
+                return reject(err);
             });
-
-
         });
+
     };
 
 
@@ -189,9 +172,19 @@ class MWBot {
     // CONVENIENCE FUNCTIONS                //
     //////////////////////////////////////////
 
+    loginGetEditToken(loginOptions) {
+        return this.login(loginOptions).then(() => {
+            return this.getEditToken();
+        });
+    };
+
     edit(title, content, summary, requestOptions) {
 
         return new Promise((resolve, reject) => {
+
+            if (!this.loggedIn) {
+                return reject('Must be logged in!');
+            }
 
             let qs = {
                 action: 'edit',
@@ -226,6 +219,10 @@ class MWBot {
     };
 
     delete(title, reason, requestOptions) {
+
+        if (!this.loggedIn) {
+            return reject('Must be logged in!');
+        }
 
         return new Promise((resolve, reject) => {
 
