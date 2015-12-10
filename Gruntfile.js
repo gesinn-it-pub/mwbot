@@ -50,6 +50,12 @@ module.exports = function(grunt) {
                 }
             }
         },
+        jsdoc: {
+            src: {
+                src: ['src/*.js', 'test/*.js'],
+                dest: 'doc'
+            }
+        },
         release: {
             options: {
 
@@ -60,8 +66,9 @@ module.exports = function(grunt) {
     // Default task.
     grunt.registerTask('lint', ['eslint', 'jscs']);
     grunt.registerTask('test', ['mochacli']);
+    grunt.registerTask('doc', ['jsdoc']);
     grunt.registerTask('coverage', ['mocha_istanbul:coverage']);
-    grunt.registerTask('default', ['lint', 'coverage']);
+    grunt.registerTask('default', ['lint', 'coverage', 'doc']);
     grunt.registerTask('publish', ['release']);
 
     grunt.event.on('coverage', function(content, done) {

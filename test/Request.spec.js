@@ -67,6 +67,8 @@ describe('MWBot Request', function() {
 
         bot.loginGetEditToken(loginCredentials.valid).then(() => {
             return bot.update('Test Page', '=Some more Wikitext=', 'Test Upload');
+        }).then(() => {
+            return bot.update('Test Page', '=Some more Wikitext=');
         }).then((response) => {
             expect(response.edit.result).to.equal('Success');
             done();
@@ -79,7 +81,9 @@ describe('MWBot Request', function() {
         let bot = new MWBot();
 
         bot.loginGetEditToken(loginCredentials.valid).then(() => {
-            return bot.edit('Test Page', '=Some more Wikitext=', 'Test Upload');
+            return bot.edit('Test Page', '=Some more Wikitext=', 'Some summary');
+        }).then(() => {
+            return bot.edit('Test Page', '=Some more Wikitext=');
         }).then((response) => {
             expect(response.edit.result).to.equal('Success');
             done();
