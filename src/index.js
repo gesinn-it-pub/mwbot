@@ -224,7 +224,8 @@ class MWBot {
      * Combines Login  with GetEditToken
      *
      * @param loginOptions
-     * @returns {*}
+     *
+     * @returns {bluebird}
      */
     loginGetEditToken(loginOptions) {
         return this.login(loginOptions).then(() => {
@@ -232,50 +233,98 @@ class MWBot {
         });
     }
 
-    create(title, content, summary, requestOptions) {
+    /**
+     * Creates a new wiki pages. Does not edit existing ones
+     *
+     * @param {string}  title
+     * @param {string}  content
+     * @param {string}  [summary]
+     * @param {{}}      [customRequestOptions]
+     *
+     * @returns {bluebird}
+     */
+    create(title, content, summary, customRequestOptions) {
         return this.request({
             action: 'edit',
             title: title,
             text: content,
-            summary: summary,
+            summary: summary || '',
             createonly: true
-        }, requestOptions);
+        }, customRequestOptions);
     }
 
-    read(title, requestOptions) {
+    /**
+     * Reads the content / and meta-data of one (or many) wikipages
+     *
+     *
+     * @param {string}  title    For multiple Pages use: PageA|PageB|PageC
+     * @param {{}}      [customRequestOptions]
+     *
+     * @returns {bluebird}
+     */
+    read(title, customRequestOptions) {
         return this.request({
             action: 'query',
             prop: 'revisions',
             rvprop: 'content',
             titles: title
-        }, requestOptions);
+        }, customRequestOptions);
     }
 
-    update(title, content, summary, requestOptions) {
+    /**
+     * Updates existing new wiki pages. Does not create new ones
+     *
+     * @param {string}  title
+     * @param {string}  content
+     * @param {string}  [summary]
+     * @param {{}}      [customRequestOptions]
+     *
+     * @returns {bluebird}
+     */
+    update(title, content, summary, customRequestOptions) {
         return this.request({
             action: 'edit',
             title: title,
             text: content,
-            summary: summary,
+            summary: summary || '',
             nocreate: true
-        }, requestOptions);
+        }, customRequestOptions);
     }
 
-    delete(title, reason, requestOptions) {
+    /**
+     * Deletes a new wiki page
+     *
+     * @param {string}  title
+     * @param {string}  [reason]
+     * @param {{}}      [customRequestOptions]
+     *
+     * @returns {bluebird}
+     */
+    delete(title, reason, customRequestOptions) {
         return this.request({
             action: 'delete',
             title: title,
-            reason: reason
-        }, requestOptions);
+            reason: reason || ''
+        }, customRequestOptions);
     }
 
-    edit(title, content, summary, requestOptions) {
+    /**
+     * Edits a new wiki pages. Creates a new page if it does not exist yet
+     *
+     * @param {string}  title
+     * @param {string}  content
+     * @param {string}  [summary]
+     * @param {{}}      [customRequestOptions]
+     *
+     * @returns {bluebird}
+     */
+    edit(title, content, summary, customRequestOptions) {
         return this.request({
             action: 'edit',
             title: title,
             text: content,
-            summary: summary
-        }, requestOptions);
+            summary: summary || ''
+        }, customRequestOptions);
     }
 
 
@@ -283,6 +332,14 @@ class MWBot {
     // HELPER FUNCTIONS                     //
     //////////////////////////////////////////
 
+    /**
+     * Merges two objects
+     *
+     * @param {{}} parent
+     * @param {{}} child
+     *
+     * @returns {{}}
+     */
     static merge(parent, child) {
         parent = parent || {};
         child = child || {};
