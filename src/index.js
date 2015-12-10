@@ -83,8 +83,6 @@ class MWBot {
                 return reject(new Error('No API URL provided!'));
             }
             request(requestOptions, (error, response, body) => {
-
-                //console.log(JSON.stringify(response, null, 4));
                 if (error) {
                     return reject(error);
                 } else {
@@ -115,6 +113,7 @@ class MWBot {
                 if (response.error) { // See https://www.mediawiki.org/wiki/API:Errors_and_warnings#Errors
                     let err = new Error(response.error.code + ': ' + response.error.info);
                     err.response = response;
+                    err.request = requestOptions;
                     return reject(err) ;
                 } else {
                     resolve(response);

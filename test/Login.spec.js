@@ -10,9 +10,12 @@ const loginCredentials = require('./mocking/loginCredentials.json');
 describe('MWBot Login', function() {
 
     it('succeeds with valid credentials', function(done) {
-        new MWBot().login(loginCredentials.valid).then((response) => {
+        let bot = new MWBot();
+        expect(bot.loggedIn).to.equal(false);
+        bot.login(loginCredentials.valid).then((response) => {
             expect(response).to.be.an('object');
             expect(response.result).to.equal('Success');
+            expect(bot.loggedIn).to.equal(true);
             done();
         });
     });
