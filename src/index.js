@@ -2,6 +2,7 @@
 
 const Promise = require('bluebird');
 const request = require('request');
+
 class MWBot {
 
 
@@ -9,34 +10,39 @@ class MWBot {
     // CONSTRUCTOR                          //
     //////////////////////////////////////////
 
-    constructor(options) {
+    constructor(customOptions) {
 
+        // STATE
         this.state = {};
         this.loggedIn = false;
 
-        this.options = options || {};
+        // OPTIONS
+        this.defaultOptions = {
+            verbose: false
+        };
+        this.customOptions = customOptions || {};
+        this.options = MWBot.merge(this.defaultOptions, this.customOptions);
 
+        // REQUEST OPTIONS
         this.defaultRequestOptions = {
             method: 'POST',
-            jar: true,
             qs: {
                 format: 'json'
             },
             form: {
 
             },
+            jar: true,
+            time: true,
             json: true
         };
-
-        if (this.options.request) {
-            this.defaultRequestOptions = MWBot.merge(this.defaultRequestOptions, options.request);
-        }
-
+        this.customRequestOptions = this.options.request || {};
+        this.globalRequestOptions = MWBot.merge(this.defaultRequestOptions, this.customRequestOptions);
     }
 
 
     //////////////////////////////////////////
-    // GETTER & SETTER                      //
+    // GETTER & SETTER                      //]
     //////////////////////////////////////////
 
     get version() {
@@ -44,39 +50,69 @@ class MWBot {
         return packageJson.version;
     }
 
+    setOptions(customOptions) {
+        this.options = MWBot.merge(this.options, customOptions);
+    }
+
+    setGlobalRequestOptions(customRequestOptions) {
+        this.options = MWBot.merge(this.globalRequestOptions, customRequestOptions);
+    }
+
 
     //////////////////////////////////////////
     // CORE FUNCTIONS                       //
     //////////////////////////////////////////
 
-    rawRequest(requestObj) {
+    /**
+     * Executes a promisified raw request
+     * Uses the npm request library
+     *
+     * @param {{}} requestOptions
+     *
+     * @returns {bluebird}
+     */
+    rawRequest(requestOptions) {
         return new Promise((resolve, reject) => {
-            request(requestObj, (error, response, body) => {
+            if (!requestOptions.uri) {
+                return reject(new Error('No API URL provided!'));
+            }
+            request(requestOptions, (error, response, body) => {
+
+                //console.log(JSON.stringify(response, null, 4));
                 if (error) {
-                    reject(error);
+                    return reject(error);
                 } else {
-                    resolve(body);
+                    return resolve(body);
                 }
             });
         });
     }
 
-    request(params, requestOptions) {
 
+    /**
+     *Executes a request with the ability to use custom parameters and custom request options
+     *
+     * @param {{}} params               Request Parameters
+     * @param {{}} customRequestOptions Custom request options
+     *
+     * @returns {bluebird}
+     */
+    request(params, customRequestOptions) {
         return new Promise((resolve, reject) => {
 
-            if (!params) {
-                return reject('No parameters given!');
-            }
+            this.globalRequestOptions.uri = this.options.apiUrl;
 
-            requestOptions = requestOptions || {};
+            let requestOptions = MWBot.merge(this.globalRequestOptions, customRequestOptions);
+            requestOptions.form = MWBot.merge(requestOptions.form, params);
 
-            let requestObj = MWBot.merge(this.defaultRequestOptions, requestOptions);
-
-            requestObj.form = MWBot.merge(requestObj.form, params);
-
-            this.rawRequest(requestObj).then((response) => {
-                resolve(response);
+            this.rawRequest(requestOptions).then((response) => {
+                if (response.error) { // See https://www.mediawiki.org/wiki/API:Errors_and_warnings#Errors
+                    let err = new Error(response.error.code + ': ' + response.error.info);
+                    err.response = response;
+                    return reject(err) ;
+                } else {
+                    resolve(response);
+                }
             }).catch((err) => {
                 reject(err);
             });
@@ -84,26 +120,23 @@ class MWBot {
         });
     }
 
+    /**
+     * Executes a Login
+     *
+     * @param {{}} [loginOptions]
+     *
+     * @returns {bluebird}
+     */
     login(loginOptions) {
 
         this.loginPromise = new Promise((resolve, reject) => {
 
-            // TODO: Better Validation
-            if (!loginOptions.apiUrl) {
-                return reject('No apiUrl provided!');
-            } else if (!loginOptions.username ) {
-                return reject('No username provided!');
-            } else if (!loginOptions.password) {
-                return reject('No password provided!');
-            }
-
-            // Set API URL
-            this.defaultRequestOptions.url = loginOptions.apiUrl;
+            this.options = MWBot.merge(this.options, loginOptions);
 
             let loginRequest = {
                 action: 'login',
-                lgname: loginOptions.username,
-                lgpassword: loginOptions.password
+                lgname: this.options.username,
+                lgpassword: this.options.password
             };
 
             this.request(loginRequest).then((response) => {
@@ -124,6 +157,7 @@ class MWBot {
                 if (response.login && response.login.result === 'Success') {
                     this.state = MWBot.merge(this.state, response.login);
                     return resolve(this.state);
+                    this.loggedIn = true;
                 } else {
                     let reason = 'Unknown reason';
                     if (response.login && response.login.result) {
@@ -144,8 +178,13 @@ class MWBot {
 
     }
 
+    /**
+     * Gets an edit token
+     * This is currently only compatible with MW >= 1.24
+     *
+     * @returns {bluebird}
+     */
     getEditToken() {
-
         return new Promise((resolve, reject) => {
 
             // MW >= 1.24
@@ -155,22 +194,19 @@ class MWBot {
                 type: 'csrf'
             }).then((response) => {
                 if (response.query && response.query.tokens && response.query.tokens.csrftoken) {
-
-                    // SUCCESS
-                    this.defaultRequestOptions.form.token = response.query.tokens.csrftoken;
+                    this.editToken = response.query.tokens.csrftoken;
+                    this.globalRequestOptions.form.token = this.editToken;
                     this.state = MWBot.merge(this.state, response.query.tokens);
-                    this.loggedIn = true;
-
                     return resolve(this.state);
-
                 } else {
-                    return reject('Could not get edit token: ' + JSON.stringify(response)) ;
+                    let err = new Error('Could not get edit token');
+                    err.response = response;
+                    return reject(err) ;
                 }
             }).catch((err) => {
                 return reject(err);
             });
         });
-
     }
 
 
@@ -178,80 +214,42 @@ class MWBot {
     // CONVENIENCE FUNCTIONS                //
     //////////////////////////////////////////
 
+    /**
+     * Combines Login  with GetEditToken
+     *
+     * @param loginOptions
+     * @returns {*}
+     */
     loginGetEditToken(loginOptions) {
         return this.login(loginOptions).then(() => {
             return this.getEditToken();
         });
     }
 
+    read(title, requestOptions) {
+        return this.request({
+            action: 'query',
+            prop: 'revisions',
+            rvprop: 'content',
+            titles: title
+        }, requestOptions);
+    }
+
     edit(title, content, summary, requestOptions) {
-
-        return new Promise((resolve, reject) => {
-
-            if (!this.loggedIn) {
-                return reject('Must be logged in!');
-            }
-
-            let qs = {
-                action: 'edit',
-                title: title,
-                text: content,
-                summary: summary
-            };
-
-            this.request(qs, requestOptions).then((response) => {
-
-                if (response.error) {
-                    let err = new Error('Could not edit page: ' + title + ' :: ' + response.error.code);
-                    err.target = title;
-                    err.response = response;
-                    return reject(err);
-                }
-
-                if (response && response.edit && response.edit.result === 'Success') {
-                    return resolve(response);
-                } else {
-                    let err = new Error('Could not edit page: ' + title);
-                    err.target = title;
-                    err.response = response;
-                    return reject(err);
-                }
-
-            }).catch((err) => {
-                return reject(err);
-            });
-
-        });
+        return this.request({
+            action: 'edit',
+            title: title,
+            text: content,
+            summary: summary
+        }, requestOptions);
     }
 
     delete(title, reason, requestOptions) {
-
-        return new Promise((resolve, reject) => {
-
-            if (!this.loggedIn) {
-                return reject('Must be logged in!');
-            }
-
-            let qs = {
-                action: 'delete',
-                title: title,
-                reason: reason
-            };
-
-            this.request(qs, requestOptions).then((response) => {
-                if (response.error) {
-                    let err = new Error('Could not delete page: ' + title + ' :: ' + response.error.code);
-                    err.target = title;
-                    err.response = response;
-                    return reject(err);
-                } else {
-                    return resolve(response);
-                }
-            }).catch((err) => {
-                return reject(err);
-            });
-
-        });
+        return this.request({
+            action: 'delete',
+            title: title,
+            reason: reason
+        }, requestOptions);
     }
 
 
@@ -260,12 +258,9 @@ class MWBot {
     //////////////////////////////////////////
 
     static merge(parent, child) {
+        parent = parent || {};
+        child = child || {};
         return Object.assign({}, parent, child);
-    }
-
-    static handleApiResponse() {
-        // TODO
-
     }
 }
 

@@ -3,11 +3,18 @@
 /*global describe, it*/
 
 const MWBot = require('../src/');
-const expect = require('chai').expect;
+//const expect = require('chai').expect;
+
+const chai = require('chai');
+const chaiAsPromised = require('chai-as-promised');
+chai.use(chaiAsPromised);
+chai.expect();
+const expect = chai.expect;
 
 const loginCredentials = require('./mocking/loginCredentials.json');
 
 describe('MWBot Request', function() {
+
 
     it('successfully editing a page with request()', function(done) {
 
@@ -23,6 +30,19 @@ describe('MWBot Request', function() {
 
         }).then((response) => {
             expect(response.edit.result).to.equal('Success');
+            done();
+        });
+
+    });
+    it('successfully reads a page read()', function(done) {
+
+        let bot = new MWBot();
+
+        bot.login(loginCredentials.valid).then(() => {
+            return bot.read('Main Page');
+        }).then((response) => {
+            expect(response).to.have.any.keys('query');
+            expect(response.query).to.have.any.keys('pages');
             done();
         });
 
@@ -61,19 +81,17 @@ describe('MWBot Request', function() {
             return bot.delete('Non-Existing Page', 'Test Reasons');
         }).catch((err) => {
             expect(err).to.be.an.instanceof(Error);
-            expect(err.message).to.include('Could not delete page');
+            expect(err.message).to.include('missingtitle');
             done();
         });
     });
 
 
 
-    it('cannot edit a page without beeing logged in', function(done) {
-
-        let bot = new MWBot();
-
-        bot.edit('Main Page', '=Some more Wikitext=', 'Test Upload').catch((err) => {
-            expect(err).to.include('Must be logged in');
+    it('cannot edit a page without providing API URL / Login', function(done) {
+        new MWBot().edit('Main Page', '=Some more Wikitext=', 'Test Upload').catch((err) => {
+            expect(err).to.be.an.instanceof(Error);
+            expect(err.message).to.include('No API URL');
             done();
         });
     });
