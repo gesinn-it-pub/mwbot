@@ -3,6 +3,11 @@
 const Promise = require('bluebird');
 const request = require('request');
 
+/**
+ * MWBot library
+ *
+ * @author Simon Heimler
+ */
 class MWBot {
 
 
@@ -27,6 +32,7 @@ class MWBot {
         this.defaultRequestOptions = {
             method: 'POST',
             qs: {
+                bot: true,
                 format: 'json'
             },
             form: {
@@ -55,7 +61,7 @@ class MWBot {
     }
 
     setGlobalRequestOptions(customRequestOptions) {
-        this.options = MWBot.merge(this.globalRequestOptions, customRequestOptions);
+        this.globalRequestOptions = MWBot.merge(this.globalRequestOptions, customRequestOptions);
     }
 
 
@@ -156,8 +162,8 @@ class MWBot {
 
                 if (response.login && response.login.result === 'Success') {
                     this.state = MWBot.merge(this.state, response.login);
-                    return resolve(this.state);
                     this.loggedIn = true;
+                    return resolve(this.state);
                 } else {
                     let reason = 'Unknown reason';
                     if (response.login && response.login.result) {
@@ -226,6 +232,16 @@ class MWBot {
         });
     }
 
+    create(title, content, summary, requestOptions) {
+        return this.request({
+            action: 'edit',
+            title: title,
+            text: content,
+            summary: summary,
+            createonly: true
+        }, requestOptions);
+    }
+
     read(title, requestOptions) {
         return this.request({
             action: 'query',
@@ -235,12 +251,13 @@ class MWBot {
         }, requestOptions);
     }
 
-    edit(title, content, summary, requestOptions) {
+    update(title, content, summary, requestOptions) {
         return this.request({
             action: 'edit',
             title: title,
             text: content,
-            summary: summary
+            summary: summary,
+            nocreate: true
         }, requestOptions);
     }
 
@@ -249,6 +266,15 @@ class MWBot {
             action: 'delete',
             title: title,
             reason: reason
+        }, requestOptions);
+    }
+
+    edit(title, content, summary, requestOptions) {
+        return this.request({
+            action: 'edit',
+            title: title,
+            text: content,
+            summary: summary
         }, requestOptions);
     }
 

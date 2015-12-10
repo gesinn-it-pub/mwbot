@@ -34,6 +34,20 @@ describe('MWBot Request', function() {
         });
 
     });
+
+
+    it('successfully creates a page with create()', function(done) {
+
+        let bot = new MWBot();
+
+        bot.loginGetEditToken(loginCredentials.valid).then(() => {
+            return bot.create('Test Page', '=Some more Wikitext=', 'Test Upload');
+        }).then((response) => {
+            expect(response.edit.result).to.equal('Success');
+            done();
+        });
+    });
+
     it('successfully reads a page read()', function(done) {
 
         let bot = new MWBot();
@@ -45,8 +59,20 @@ describe('MWBot Request', function() {
             expect(response.query).to.have.any.keys('pages');
             done();
         });
-
     });
+
+    it('successfully updates a page with update()', function(done) {
+
+        let bot = new MWBot();
+
+        bot.loginGetEditToken(loginCredentials.valid).then(() => {
+            return bot.update('Test Page', '=Some more Wikitext=', 'Test Upload');
+        }).then((response) => {
+            expect(response.edit.result).to.equal('Success');
+            done();
+        });
+    });
+
 
     it('successfully editing a page with edit()', function(done) {
 

@@ -50,16 +50,6 @@ module.exports = function(grunt) {
                 }
             }
         },
-        watch: {
-            js: {
-                files: '<%= jshint.js.src %>',
-                tasks: ['lint', 'test']
-            },
-            test: {
-                files: '<%= jshint.test.src %>',
-                tasks: ['lint', 'test']
-            }
-        },
         release: {
             options: {
 
