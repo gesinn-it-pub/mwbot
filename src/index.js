@@ -110,14 +110,21 @@ class MWBot {
             requestOptions.form = MWBot.merge(requestOptions.form, params);
 
             this.rawRequest(requestOptions).then((response) => {
+
+                if (typeof response !== 'object') {
+                    let err = new Error('invalidjson: No valid JSON response');
+                    err.response = response;
+                    return reject(err) ;
+                }
+
                 if (response.error) { // See https://www.mediawiki.org/wiki/API:Errors_and_warnings#Errors
                     let err = new Error(response.error.code + ': ' + response.error.info);
                     err.response = response;
                     err.request = requestOptions;
                     return reject(err) ;
-                } else {
-                    resolve(response);
                 }
+                return resolve(response);
+
             }).catch((err) => {
                 reject(err);
             });
