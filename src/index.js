@@ -361,10 +361,10 @@ class MWBot {
     /**
      * Batch Operation
      *
-     * @param {{}|[]}   jobs
+     * @param {object|array}   jobs
      * @param {string}  [summary]
      * @param {number}  [concurrency]
-     * @param {{}}      [customRequestOptions]
+     * @param {object}      [customRequestOptions]
      */
     batch(jobs, summary, concurrency, customRequestOptions) {
 
