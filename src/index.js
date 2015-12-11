@@ -32,7 +32,9 @@ class MWBot {
         // OPTIONS
         this.defaultOptions = {
             verbose: false,
-            defaultSummary: 'MWBot'
+            silent: false,
+            defaultSummary: 'MWBot',
+            concurrency: 2
         };
         this.customOptions = customOptions || {};
         this.options = MWBot.merge(this.defaultOptions, this.customOptions);
@@ -41,7 +43,6 @@ class MWBot {
         this.defaultRequestOptions = {
             method: 'POST',
             qs: {
-                bot: true,
                 format: 'json'
             },
             form: {
@@ -53,6 +54,9 @@ class MWBot {
         };
         this.customRequestOptions = this.options.request || {};
         this.globalRequestOptions = MWBot.merge(this.defaultRequestOptions, this.customRequestOptions);
+
+        // SEMLOG OPTIONS
+        semlog.updateConfig(this.options.semlog || {});
     }
 
 
@@ -134,6 +138,9 @@ class MWBot {
 
                 if (response.error) { // See https://www.mediawiki.org/wiki/API:Errors_and_warnings#Errors
                     let err = new Error(response.error.code + ': ' + response.error.info);
+                    err.errorResponse = true;
+                    err.code = response.error.code;
+                    err.info = response.error.info;
                     err.response = response;
                     err.request = requestOptions;
                     return reject(err) ;
@@ -222,7 +229,6 @@ class MWBot {
             }).then((response) => {
                 if (response.query && response.query.tokens && response.query.tokens.csrftoken) {
                     this.editToken = response.query.tokens.csrftoken;
-                    this.globalRequestOptions.form.token = this.editToken;
                     this.state = MWBot.merge(this.state, response.query.tokens);
                     return resolve(this.state);
                 } else {
@@ -270,7 +276,8 @@ class MWBot {
             title: title,
             text: content,
             summary: summary || this.options.defaultSummary,
-            createonly: true
+            createonly: true,
+            token: this.editToken
         }, customRequestOptions);
     }
 
@@ -308,7 +315,8 @@ class MWBot {
             title: title,
             text: content,
             summary: summary || this.options.defaultSummary,
-            nocreate: true
+            nocreate: true,
+            token: this.editToken
         }, customRequestOptions);
     }
 
@@ -325,7 +333,8 @@ class MWBot {
         return this.request({
             action: 'delete',
             title: title,
-            reason: reason || this.options.defaultSummary
+            reason: reason || this.options.defaultSummary,
+            token: this.editToken
         }, customRequestOptions);
     }
 
@@ -344,12 +353,115 @@ class MWBot {
             action: 'edit',
             title: title,
             text: content,
-            summary: summary || this.options.defaultSummary
+            summary: summary || this.options.defaultSummary,
+            token: this.editToken
         }, customRequestOptions);
     }
 
-    batch(jobs, summary, customRequestOptions) {
+    /**
+     * Batch Operation
+     *
+     * @param {{}|[]}   jobs
+     * @param {string}  [summary]
+     * @param {number}  [concurrency]
+     * @param {{}}      [customRequestOptions]
+     */
+    batch(jobs, summary, concurrency, customRequestOptions) {
 
+        return new Promise((resolve, reject) => {
+
+            summary = summary || this.options.defaultSummary;
+            concurrency = concurrency || this.options.concurrency;
+
+            let jobQueue = [];
+            let results = [];
+
+            if (Array.isArray(jobs)) {
+                jobQueue = jobs;
+            } else {
+                for (let operation in jobs) {
+                    let operationJobs = jobs[operation];
+                    if (Array.isArray(operationJobs)) {
+                        for (let pageName of operationJobs) {
+                            jobQueue.push([operation, pageName, summary, customRequestOptions]);
+                        }
+
+                    } else {
+                        for (let pageName in operationJobs) {
+                            let pageContent = operationJobs[pageName];
+                            jobQueue.push([operation, pageName, pageContent, summary, customRequestOptions]);
+                        }
+                    }
+                }
+            }
+
+            let currentCounter = 0;
+            let totalCounter = jobQueue.length;
+
+            Promise.map(jobQueue, (job) => {
+
+                let operation = job[0];
+                let pageName  = job[1];
+
+                if (!this[operation]) {
+                    return reject(new Error('Unsupported operation: ' + operation));
+                }
+
+                return this[operation](pageName, job[2], job[3], job[4]).then((response) => {
+                    currentCounter += 1;
+
+                    let status = '[U] ';
+                    let reason = '';
+
+                    if (operation === 'delete') {
+                        status = '[-] ';
+                    } else if (response.edit && response.edit.new === '') {
+                        status = '[+] ';
+                    } else if (response.edit && response.edit.newrevid) {
+                        status = '[C] ';
+                    } else if (response.query && response.query.pages && response.query.pages['-1']) {
+                        status = '[W] ';
+                        reason = 'missing';
+                    } else if (response.query && response.query.pages) {
+                        status = '[S] ';
+                    }
+
+                    MWBot.logStatus(status, currentCounter, totalCounter, operation, pageName, reason);
+                    results.push(response);
+
+                }).catch((err) => {
+                    currentCounter += 1;
+
+                    let status = '[E] ';
+                    let reason = '';
+
+                    if (err.response && err.response.error && err.response.error.code) {
+                        let code = err.response.error.code;
+                        if (code === 'articleexists' || code === 'missingtitle') {
+                            status = '[W] ';
+                            reason = code;
+                        }
+                    }
+
+                    MWBot.logStatus(status, currentCounter, totalCounter, operation, pageName, reason);
+
+                    if (status === '[E] ') {
+                        log(err);
+                    } else if (this.options.verbose && err.response && err.response.error && err.response.error.info) {
+                        log('[D] ' + err.response.error.info);
+                    }
+                    results.push(err);
+                });
+
+            }, {
+                concurrency: concurrency
+            }).then(() => {
+                return resolve(results);
+            }).catch((err) => {
+                return reject(err);
+            });
+
+        });
     }
 
 
@@ -367,6 +479,32 @@ class MWBot {
      */
     static merge(parent, child) {
         return Object.assign({}, (parent || {}), (child || {}));
+    }
+
+    /**
+     * Prints status information about a completed request
+     *
+     * @param status
+     * @param currentCounter
+     * @param totalCounter
+     * @param operation
+     * @param pageName
+     * @param reason
+     */
+    static logStatus(status, currentCounter, totalCounter, operation, pageName, reason) {
+
+        operation = operation || '';
+        if (operation) {
+            operation = ' [' + operation.toUpperCase() + ']';
+            operation = (operation + '          ').substring(0, 10); // Right space padding: http://stackoverflow.com/a/24398129
+        }
+
+        reason = reason || '';
+        if (reason) {
+            reason = ' (' + reason + ')';
+        }
+
+        log(status + '[' + semlog.pad(currentCounter, 4) + '/' + semlog.pad(totalCounter, 4) + ']' + operation + pageName + reason);
     }
 }
 

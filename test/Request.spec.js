@@ -26,7 +26,8 @@ describe('MWBot Request', function() {
                 action: 'edit',
                 title: 'Main_Page',
                 text: '=Some Wikitext 2=',
-                summary: 'Test Edit'
+                summary: 'Test Edit',
+                token: bot.editToken
             });
 
         }).then((response) => {
