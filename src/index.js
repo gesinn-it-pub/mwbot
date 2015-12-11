@@ -2,6 +2,8 @@
 
 const Promise = require('bluebird');
 const request = require('request');
+const semlog  = require('semlog');
+const log     = semlog.log;
 
 /**
  * MWBot library
@@ -20,10 +22,17 @@ class MWBot {
         // STATE
         this.state = {};
         this.loggedIn = false;
+        this.counter = {
+            total: 0,
+            resolved: 0,
+            fulfilled: 0,
+            rejected: 0
+        };
 
         // OPTIONS
         this.defaultOptions = {
-            verbose: false
+            verbose: false,
+            defaultSummary: 'MWBot'
         };
         this.customOptions = customOptions || {};
         this.options = MWBot.merge(this.defaultOptions, this.customOptions);
@@ -78,14 +87,20 @@ class MWBot {
      * @returns {bluebird}
      */
     rawRequest(requestOptions) {
+        this.counter.total += 1;
         return new Promise((resolve, reject) => {
+            this.counter.resolved +=1;
+
             if (!requestOptions.uri) {
+                this.counter.rejected +=1;
                 return reject(new Error('No API URL provided!'));
             }
             request(requestOptions, (error, response, body) => {
                 if (error) {
+                    this.counter.rejected +=1;
                     return reject(error);
                 } else {
+                    this.counter.fulfilled +=1;
                     return resolve(body);
                 }
             });
@@ -254,7 +269,7 @@ class MWBot {
             action: 'edit',
             title: title,
             text: content,
-            summary: summary || '',
+            summary: summary || this.options.defaultSummary,
             createonly: true
         }, customRequestOptions);
     }
@@ -292,7 +307,7 @@ class MWBot {
             action: 'edit',
             title: title,
             text: content,
-            summary: summary || '',
+            summary: summary || this.options.defaultSummary,
             nocreate: true
         }, customRequestOptions);
     }
@@ -310,7 +325,7 @@ class MWBot {
         return this.request({
             action: 'delete',
             title: title,
-            reason: reason || ''
+            reason: reason || this.options.defaultSummary
         }, customRequestOptions);
     }
 
@@ -329,8 +344,12 @@ class MWBot {
             action: 'edit',
             title: title,
             text: content,
-            summary: summary || ''
+            summary: summary || this.options.defaultSummary
         }, customRequestOptions);
+    }
+
+    batch(jobs, summary, customRequestOptions) {
+
     }
 
 
@@ -339,17 +358,15 @@ class MWBot {
     //////////////////////////////////////////
 
     /**
-     * Merges two objects
+     * Recursively merges two objects
      *
-     * @param {{}} parent
-     * @param {{}} child
+     * @param {{}} parent   Parent Object
+     * @param {{}} child    Child Object; overwrites parent properties
      *
-     * @returns {{}}
+     * @returns {{}}        Merged Object
      */
     static merge(parent, child) {
-        parent = parent || {};
-        child = child || {};
-        return Object.assign({}, parent, child);
+        return Object.assign({}, (parent || {}), (child || {}));
     }
 }
 

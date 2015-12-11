@@ -6,10 +6,11 @@ const MWBot = require('../src/');
 //const expect = require('chai').expect;
 
 const chai = require('chai');
+const expect = chai.expect;
+
 const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 chai.expect();
-const expect = chai.expect;
 
 const loginCredentials = require('./mocking/loginCredentials.json');
 
@@ -71,6 +72,7 @@ describe('MWBot Request', function() {
             return bot.update('Test Page', '=Some more Wikitext=');
         }).then((response) => {
             expect(response.edit.result).to.equal('Success');
+            expect(bot.counter.fulfilled).to.equal(5);
             done();
         });
     });
