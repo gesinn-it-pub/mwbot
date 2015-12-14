@@ -438,7 +438,7 @@ class MWBot {
                     if (err.response && err.response.error && err.response.error.code) {
                         let code = err.response.error.code;
                         if (code === 'articleexists' || code === 'missingtitle') {
-                            status = '[W] ';
+                            status = '[U] ';
                             reason = code;
                         }
                     }
