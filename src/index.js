@@ -61,7 +61,7 @@ class MWBot {
 
 
     //////////////////////////////////////////
-    // GETTER & SETTER                      //]
+    // GETTER & SETTER                      //
     //////////////////////////////////////////
 
     get version() {
@@ -447,6 +447,9 @@ class MWBot {
 
                     if (status === '[E] ') {
                         log(err);
+                        if (err.response) {
+                            log(err.response);
+                        }
                     } else if (this.options.verbose && err.response && err.response.error && err.response.error.info) {
                         log('[D] ' + err.response.error.info);
                     }
