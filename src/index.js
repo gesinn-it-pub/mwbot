@@ -179,7 +179,7 @@ class MWBot {
                 if (!response.login || !response.login.result) {
                     let err = new Error('Invalid response from API');
                     err.response = response;
-                    log('[E] Login failed with invalid response: ' + loginString);
+                    log('[E] [UPLOAD] Login failed with invalid response: ' + loginString);
                     return reject(err) ;
                 } else {
                     this.state = MWBot.merge(this.state, response.login);
@@ -193,7 +193,7 @@ class MWBot {
                 if (response.login && response.login.result === 'Success') {
                     this.state = MWBot.merge(this.state, response.login);
                     this.loggedIn = true;
-                    log('[S] Login successful: ' + loginString);
+                    log('[S] [UPLOAD] Login successful: ' + loginString);
                     return resolve(this.state);
                 } else {
                     let reason = 'Unknown reason';
@@ -202,7 +202,7 @@ class MWBot {
                     }
                     let err = new Error('Could not login: ' + reason);
                     err.response = response;
-                    log('[E] Login failed: ' + loginString);
+                    log('[E] [UPLOAD] Login failed: ' + loginString);
                     return reject(err) ;
                 }
 
