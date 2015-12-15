@@ -172,6 +172,7 @@ class MWBot {
                 lgname: this.options.username,
                 lgpassword: this.options.password
             };
+            let loginString = this.options.username + '@' + this.options.apiUrl.split('/api.php').join('');
 
             this.request(loginRequest).then((response) => {
 
@@ -191,6 +192,7 @@ class MWBot {
                 if (response.login && response.login.result === 'Success') {
                     this.state = MWBot.merge(this.state, response.login);
                     this.loggedIn = true;
+                    log('[S] Login successful: ' + loginString);
                     return resolve(this.state);
                 } else {
                     let reason = 'Unknown reason';
@@ -199,6 +201,7 @@ class MWBot {
                     }
                     let err = new Error('Could not login: ' + reason);
                     err.response = response;
+                    log('[E] Login failed: ' + loginString);
                     return reject(err) ;
                 }
 
@@ -410,7 +413,7 @@ class MWBot {
                 return this[operation](pageName, job[2], job[3], job[4]).then((response) => {
                     currentCounter += 1;
 
-                    let status = '[U] ';
+                    let status = '[=] ';
                     let reason = '';
 
                     if (operation === 'delete') {
@@ -420,7 +423,7 @@ class MWBot {
                     } else if (response.edit && response.edit.newrevid) {
                         status = '[C] ';
                     } else if (response.query && response.query.pages && response.query.pages['-1']) {
-                        status = '[W] ';
+                        status = '[?] ';
                         reason = 'missing';
                     } else if (response.query && response.query.pages) {
                         status = '[S] ';
@@ -437,8 +440,11 @@ class MWBot {
 
                     if (err.response && err.response.error && err.response.error.code) {
                         let code = err.response.error.code;
-                        if (code === 'articleexists' || code === 'missingtitle') {
-                            status = '[U] ';
+                        if (code === 'articleexists') {
+                            status = '[/] ';
+                            reason = code;
+                        } else if (code === 'missingtitle') {
+                            status = '[?] ';
                             reason = code;
                         }
                     }

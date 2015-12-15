@@ -30,7 +30,8 @@ describe('MWBot Batch Request', function() {
                     'TestPage2'
                 ],
                 edit: {
-                    'TestPage2': 'TestContent2'
+                    'TestPage2': 'TestContent2',
+                    'TestPage3': Math.random()
                 }
             }, 'Batch Upload Reason');
 
