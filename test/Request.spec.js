@@ -3,18 +3,20 @@
 /*global describe, it*/
 
 const MWBot = require('../src/');
-//const expect = require('chai').expect;
+const log = require('semlog').log;
 
 const chai = require('chai');
 const expect = chai.expect;
 
-const chaiAsPromised = require('chai-as-promised');
-chai.use(chaiAsPromised);
-chai.expect();
 
 const loginCredentials = require('./mocking/loginCredentials.json');
 
 describe('MWBot Request', function() {
+
+
+    //////////////////////////////////////////
+    // SUCESSFULL                           //
+    //////////////////////////////////////////
 
 
     it('successfully editing a page with request()', function(done) {
@@ -105,6 +107,27 @@ describe('MWBot Request', function() {
             done();
         });
     });
+
+    it('successfully uploads an image with upload()', function(done) {
+        this.timeout(5000);
+
+        let bot = new MWBot();
+
+        bot.loginGetEditToken(loginCredentials.valid).then(() => {
+            return bot.upload('ExampleImage.png', __dirname + '/mocking/ExampleImage.png', 'Test Reasons');
+        }).then((response) => {
+            log(response);
+            done();
+        }).catch((err) => {
+            log(err);
+            done();
+        });
+    });
+
+
+    //////////////////////////////////////////
+    // UNSUCESSFULL                         //
+    //////////////////////////////////////////
 
     it('rejects deleting a non-existing page with delete()', function(done) {
 

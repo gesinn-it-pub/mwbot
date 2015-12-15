@@ -1,5 +1,6 @@
 'use strict';
 
+const fs      = require('fs');
 const Promise = require('bluebird');
 const request = require('request');
 const semlog  = require('semlog');
@@ -225,6 +226,9 @@ class MWBot {
     getEditToken() {
         return new Promise((resolve, reject) => {
 
+            if (this.editToken) {
+                return resolve(this.state);
+            }
             // MW >= 1.24
             this.request({
                 action: 'query',
@@ -360,6 +364,73 @@ class MWBot {
             summary: summary || this.options.defaultSummary,
             token: this.editToken
         }, customRequestOptions);
+    }
+
+    /**
+     * Edits a new wiki pages. Creates a new page if it does not exist yet
+     *
+     * @param {string}  title
+     * @param {string}  path
+     * @param {string}  [comment]
+     * @param {string}  [text]
+     * @param {{}}      [customRequestOptions]
+     *
+     * @returns {bluebird}
+     */
+    upload(title, path, comment, text, customRequestOptions) {
+
+        try {
+            return this.rawRequest({
+                method: 'POST',
+                uri: this.options.apiUrl,
+                jar: true,
+                har: {
+                    postData: {
+                        mimeType: 'multipart/form-data',
+                        params: [
+                            {
+                                name: 'action',
+                                value: 'upload'
+                            },
+                            {
+                                name: 'ignorewarnings',
+                                value: ''
+                            },
+                            {
+                                name: 'filename',
+                                value: title
+                            },
+                            {
+                                name: 'file',
+                                value: fs.createReadStream(path)
+                            },
+                            {
+                                name: 'comment',
+                                value: comment
+                            },
+                            {
+                                name: 'text',
+                                value: text || ''
+                            },
+                            {
+                                name: 'token',
+                                value: this.editToken
+                            },
+                            {
+                                name: 'format',
+                                value: 'json'
+                            }
+                        ]
+                    }
+                },
+                json: true
+            });
+
+        } catch (e) {
+            log('[E] [UPLOAD] Cound not read file: ' + path);
+            return Promise.reject(e);
+        }
+
     }
 
     /**
