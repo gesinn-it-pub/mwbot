@@ -179,6 +179,7 @@ class MWBot {
                 if (!response.login || !response.login.result) {
                     let err = new Error('Invalid response from API');
                     err.response = response;
+                    log('[E] Login failed with invalid response: ' + loginString);
                     return reject(err) ;
                 } else {
                     this.state = MWBot.merge(this.state, response.login);
