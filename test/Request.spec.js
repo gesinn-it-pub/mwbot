@@ -116,10 +116,8 @@ describe('MWBot Request', function() {
         bot.loginGetEditToken(loginCredentials.valid).then(() => {
             return bot.upload('ExampleImage.png', __dirname + '/mocking/ExampleImage.png', 'Test Reasons');
         }).then((response) => {
-            log(response);
             done();
         }).catch((err) => {
-            log(err);
             done();
         });
     });
