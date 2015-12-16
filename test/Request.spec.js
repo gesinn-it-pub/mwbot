@@ -13,6 +13,8 @@ const loginCredentials = require('./mocking/loginCredentials.json');
 
 describe('MWBot Request', function() {
 
+    'use strict';
+
 
     //////////////////////////////////////////
     // SUCESSFULL                           //

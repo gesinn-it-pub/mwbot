@@ -37,7 +37,8 @@ class MWBot {
             verbose: false,
             silent: false,
             defaultSummary: 'MWBot',
-            concurrency: 2
+            concurrency: 2,
+            sparqlEndpoint: 'https://query.wikidata.org/bigdata/namespace/wdq/sparql' // Wikidata
         };
         this.customOptions = customOptions || {};
         this.options = MWBot.merge(this.defaultOptions, this.customOptions);
@@ -82,7 +83,7 @@ class MWBot {
 
 
     //////////////////////////////////////////
-    // CORE FUNCTIONS                       //
+    // CORE REQUESTS                        //
     //////////////////////////////////////////
 
     /**
@@ -156,6 +157,28 @@ class MWBot {
 
         });
     }
+
+    sparqlQuery(query, endpointUrl, customRequestOptions) {
+
+        endpointUrl = endpointUrl || this.options.sparqlEndpoint;
+
+        let requestOptions = MWBot.merge({
+            method: 'GET',
+            uri: endpointUrl,
+            json: true,
+            qs: {
+                format: 'json',
+                query: query
+            }
+        }, customRequestOptions);
+
+        return this.rawRequest(requestOptions);
+    }
+
+
+    //////////////////////////////////////////
+    // CORE FUNCTIONS                       //
+    //////////////////////////////////////////
 
     /**
      * Executes a Login
