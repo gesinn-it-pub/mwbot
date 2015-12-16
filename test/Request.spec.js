@@ -20,9 +20,7 @@ describe('MWBot Request', function() {
 
 
     it('successfully editing a page with request()', function(done) {
-
         let bot = new MWBot();
-
         bot.loginGetEditToken(loginCredentials.valid).then(() => {
             return bot.request({
                 action: 'edit',
@@ -36,14 +34,11 @@ describe('MWBot Request', function() {
             expect(response.edit.result).to.equal('Success');
             done();
         });
-
     });
 
 
     it('successfully creates a page with create()', function(done) {
-
         let bot = new MWBot();
-
         bot.loginGetEditToken(loginCredentials.valid).then(() => {
             return bot.create('Test Page', '=Some more Wikitext=', 'Test Upload');
         }).then((response) => {
@@ -53,9 +48,7 @@ describe('MWBot Request', function() {
     });
 
     it('successfully reads a page read()', function(done) {
-
         let bot = new MWBot();
-
         bot.login(loginCredentials.valid).then(() => {
             return bot.read('Main Page');
         }).then((response) => {
@@ -66,9 +59,7 @@ describe('MWBot Request', function() {
     });
 
     it('successfully updates a page with update()', function(done) {
-
         let bot = new MWBot();
-
         bot.loginGetEditToken(loginCredentials.valid).then(() => {
             return bot.update('Test Page', '=Some more Wikitext=', 'Test Upload');
         }).then(() => {
@@ -82,9 +73,7 @@ describe('MWBot Request', function() {
 
 
     it('successfully editing a page with edit()', function(done) {
-
         let bot = new MWBot();
-
         bot.loginGetEditToken(loginCredentials.valid).then(() => {
             return bot.edit('Test Page', '=Some more Wikitext=', 'Some summary');
         }).then(() => {
@@ -97,9 +86,7 @@ describe('MWBot Request', function() {
 
 
     it('successfully deletes a page with delete()', function(done) {
-
         let bot = new MWBot();
-
         bot.loginGetEditToken(loginCredentials.valid).then(() => {
             return bot.delete('Test Page', 'Test Reasons');
         }).then((response) => {
@@ -108,16 +95,37 @@ describe('MWBot Request', function() {
         });
     });
 
-    it('successfully uploads an image with upload()', function(done) {
-        this.timeout(5000);
-
+    it('successfully uploads and overwrites an image with upload()', function(done) {
+        this.timeout(3000);
         let bot = new MWBot();
-
         bot.loginGetEditToken(loginCredentials.valid).then(() => {
-            return bot.upload('ExampleImage.png', __dirname + '/mocking/ExampleImage.png', 'Test Reasons');
+            return bot.upload(__dirname + '/mocking/ExampleImage.png', 'ExampleImage.png', 'Test Reasons', true);
         }).then((response) => {
+            expect(response.upload.result).to.equal('Success');
             done();
-        }).catch((err) => {
+        });
+    });
+
+    it('successfully uploads without providing a filename with upload()', function(done) {
+        this.timeout(3000);
+        let bot = new MWBot();
+        bot.loginGetEditToken(loginCredentials.valid).then(() => {
+            return bot.upload(__dirname + '/mocking/ExampleImage.png');
+        }).then((response) => {
+            expect(response.upload.result).to.equal('Warning');
+            done();
+        }).catch((e) => {
+            log(e);
+        });
+    });
+
+    it('successfully skips an upload of an image duplicate with upload()', function(done) {
+        this.timeout(3000);
+        let bot = new MWBot();
+        bot.loginGetEditToken(loginCredentials.valid).then(() => {
+            return bot.upload(__dirname + '/mocking/ExampleImage.png', 'ExampleImage.png', 'Test Reasons', false);
+        }).then((response) => {
+            expect(response.upload.result).to.equal('Warning');
             done();
         });
     });

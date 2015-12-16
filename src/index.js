@@ -1,6 +1,7 @@
 'use strict';
 
 const fs      = require('fs');
+const path    = require('path');
 const Promise = require('bluebird');
 const request = require('request');
 const semlog  = require('semlog');
@@ -369,62 +370,49 @@ class MWBot {
     /**
      * Edits a new wiki pages. Creates a new page if it does not exist yet
      *
-     * @param {string}  title
-     * @param {string}  path
+     * @param {string}  pathToFile
+     * @param {string}  [title]
      * @param {string}  [comment]
+     * @param {bool}    [overwrite]
      * @param {string}  [text]
      * @param {{}}      [customRequestOptions]
      *
      * @returns {bluebird}
      */
-    upload(title, path, comment, text, customRequestOptions) {
+    upload(pathToFile, title, comment, overwrite, text, customRequestOptions) {
 
-        return this.rawRequest({
-            method: 'POST',
-            uri: this.options.apiUrl,
-            jar: true,
-            har: {
-                postData: {
-                    mimeType: 'multipart/form-data',
-                    params: [
-                        {
-                            name: 'action',
-                            value: 'upload'
-                        },
-                        {
-                            name: 'ignorewarnings',
-                            value: ''
-                        },
-                        {
-                            name: 'filename',
-                            value: title
-                        },
-                        {
-                            name: 'file',
-                            value: fs.createReadStream(path)
-                        },
-                        {
-                            name: 'comment',
-                            value: comment
-                        },
-                        {
-                            name: 'text',
-                            value: text || ''
-                        },
-                        {
-                            name: 'token',
-                            value: this.editToken
-                        },
-                        {
-                            name: 'format',
-                            value: 'json'
-                        }
-                    ]
+        try {
+            let file = fs.createReadStream(pathToFile);
+
+            let uploadRequestOptions = MWBot.merge(this.globalRequestOptions, {
+                har: {
+                    postData: {
+                        mimeType: 'multipart/form-data',
+                        params: [
+                            { name: 'action', value: 'upload' },
+                            { name: 'filename', value: title || path.basename(pathToFile)},
+                            { name: 'file', value: file},
+                            { name: 'comment', value: comment || ''},
+                            { name: 'token', value: this.editToken }
+                        ]
+                    }
                 }
-            },
-            json: true
-        });
+            });
 
+            if (overwrite) {
+                uploadRequestOptions.har.postData.params.push({ name: 'ignorewarnings', value: '' });
+            }
+            if (text) {
+                uploadRequestOptions.har.postData.params.push({ name: 'text', value: text});
+            }
+
+            let requestOptions = MWBot.merge(uploadRequestOptions, customRequestOptions);
+
+            return this.request({}, requestOptions);
+
+        } catch (e) {
+            return Promise.reject(e);
+        }
     }
 
     /**
