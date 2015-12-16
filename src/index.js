@@ -463,7 +463,7 @@ class MWBot {
                     if (Array.isArray(operationJobs)) {
                         if (operation === 'upload' || operation === 'uploadOverwrite') {
                             for (let filePath of operationJobs) {
-                                jobQueue.push([operation, path.basename(filePath), filePath]);
+                                jobQueue.push([operation, path.basename(filePath), filePath, summary, false, customRequestOptions]);
                             }
                         } else {
                             for (let pageName of operationJobs) {
@@ -472,10 +472,18 @@ class MWBot {
                         }
 
                     } else {
-                        for (let pageName in operationJobs) {
-                            let content = operationJobs[pageName];
-                            jobQueue.push([operation, pageName, content, summary, customRequestOptions]);
+                        if (operation === 'upload' || operation === 'uploadOverwrite') {
+                            for (let fileName in operationJobs) {
+                                let filePath = operationJobs[fileName];
+                                jobQueue.push([operation, fileName, filePath, summary, false, customRequestOptions]);
+                            }
+                        } else {
+                            for (let pageName in operationJobs) {
+                                let content = operationJobs[pageName];
+                                jobQueue.push([operation, pageName, content, summary, customRequestOptions]);
+                            }
                         }
+
                     }
                 }
             }
