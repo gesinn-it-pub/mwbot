@@ -99,7 +99,7 @@ describe('MWBot Request', function() {
         this.timeout(3000);
         let bot = new MWBot();
         bot.loginGetEditToken(loginCredentials.valid).then(() => {
-            return bot.uploadOverwrite(__dirname + '/mocking/ExampleImage.png', 'ExampleImage.png', 'Test Reasons');
+            return bot.uploadOverwrite('ExampleImage.png', __dirname + '/mocking/example2.png', 'Test Reasons');
         }).then((response) => {
             expect(response.upload.result).to.equal('Success');
             done();
@@ -112,7 +112,7 @@ describe('MWBot Request', function() {
         this.timeout(3000);
         let bot = new MWBot();
         bot.loginGetEditToken(loginCredentials.valid).then(() => {
-            return bot.upload(__dirname + '/mocking/ExampleImage.png');
+            return bot.upload(false, __dirname + '/mocking/example1.png');
         }).then((response) => {
             expect(response.upload.result).to.equal('Warning');
             done();
@@ -125,7 +125,7 @@ describe('MWBot Request', function() {
         this.timeout(3000);
         let bot = new MWBot();
         bot.loginGetEditToken(loginCredentials.valid).then(() => {
-            return bot.upload(__dirname + '/mocking/ExampleImage.png', 'ExampleImage.png', 'Test Reasons');
+            return bot.upload('ExampleImage.png', __dirname + '/mocking/example1.png', 'Test Reasons');
         }).then((response) => {
             expect(response.upload.result).to.equal('Warning');
             done();
@@ -162,7 +162,7 @@ describe('MWBot Request', function() {
         this.timeout(3000);
         let bot = new MWBot();
         bot.loginGetEditToken(loginCredentials.valid).then(() => {
-            return bot.upload(__dirname + '/mocking/NonExistingImage.png');
+            return bot.upload(false, __dirname + '/mocking/NonExistingImage.png');
         }).catch((e) => {
             expect(e).to.be.an.instanceof(Error);
             expect(e.message).to.include('ENOENT');

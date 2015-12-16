@@ -65,6 +65,32 @@ describe('MWBot Batch Request', function() {
     });
 
 
+    it('upload and uploadOverwrite', function(done) {
+
+        let bot = new MWBot();
+
+        bot.loginGetEditToken(loginCredentials.valid).then(() => {
+            return bot.batch({
+                upload: [
+                    __dirname + '/mocking/example1.png',
+                    __dirname + '/mocking/example2.png',
+                    __dirname + '/mocking/example3.png',
+                    __dirname + '/mocking/NonExistingImage.png'
+                ],
+                uploadOverwrite: {
+                    'ExampleImage1.png': __dirname + '/mocking/example1.png',
+                    'ExampleImage2.png': __dirname + '/mocking/example2.png',
+                    'ExampleImage3.png': __dirname + '/mocking/example3.png'
+                }
+            });
+
+        }).then((response) => {
+            expect(response).to.be.instanceof(Array);
+            done();
+        });
+    });
+
+
     it('in raw format and concurrency 1', function(done) {
 
         let bot = new MWBot({

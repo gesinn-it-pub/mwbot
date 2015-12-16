@@ -24,6 +24,7 @@ class MWBot {
         // STATE
         this.state = {};
         this.loggedIn = false;
+        this.editToken = false;
         this.counter = {
             total: 0,
             resolved: 0,
@@ -370,15 +371,15 @@ class MWBot {
     /**
      * Edits a new wiki pages. Creates a new page if it does not exist yet
      *
-     * @param {string}  pathToFile
      * @param {string}  [title]
+     * @param {string}  pathToFile
      * @param {string}  [comment]
      * @param {object}  [customParams]
      * @param {object}  [customRequestOptions]
      *
      * @returns {bluebird}
      */
-    upload(pathToFile, title, comment, customParams, customRequestOptions) {
+    upload(title, pathToFile, comment, customParams, customRequestOptions) {
 
         try {
             let file = fs.createReadStream(pathToFile);
@@ -421,19 +422,19 @@ class MWBot {
     /**
      * Uploads a file and overwrites existing ones
      *
-     * @param {string}  pathToFile
      * @param {string}  [title]
+     * @param {string}  pathToFile
      * @param {string}  [comment]
      * @param {object}  [customParams]
      * @param {object}  [customRequestOptions]
      *
      * @returns {bluebird}
      */
-    uploadOverwrite(pathToFile, title, comment, customParams, customRequestOptions) {
+    uploadOverwrite(title, pathToFile, comment, customParams, customRequestOptions) {
         let params = MWBot.merge({
             ignorewarnings: ''
         }, customParams);
-        return this.upload(pathToFile, title, comment, params, customRequestOptions);
+        return this.upload(title, pathToFile, comment, params, customRequestOptions);
     }
 
     /**
@@ -460,14 +461,20 @@ class MWBot {
                 for (let operation in jobs) {
                     let operationJobs = jobs[operation];
                     if (Array.isArray(operationJobs)) {
-                        for (let pageName of operationJobs) {
-                            jobQueue.push([operation, pageName, summary, customRequestOptions]);
+                        if (operation === 'upload' || operation === 'uploadOverwrite') {
+                            for (let filePath of operationJobs) {
+                                jobQueue.push([operation, path.basename(filePath), filePath]);
+                            }
+                        } else {
+                            for (let pageName of operationJobs) {
+                                jobQueue.push([operation, pageName, summary, customRequestOptions]);
+                            }
                         }
 
                     } else {
                         for (let pageName in operationJobs) {
-                            let pageContent = operationJobs[pageName];
-                            jobQueue.push([operation, pageName, pageContent, summary, customRequestOptions]);
+                            let content = operationJobs[pageName];
+                            jobQueue.push([operation, pageName, content, summary, customRequestOptions]);
                         }
                     }
                 }
@@ -502,6 +509,10 @@ class MWBot {
                         reason = 'missing';
                     } else if (response.query && response.query.pages) {
                         status = '[S] ';
+                    } else if (response.upload && response.upload.result === 'Success') {
+                        status = '[S] ';
+                    } else if (response.upload && response.upload.result === 'Warning') {
+                        status = '[/] ';
                     }
 
                     MWBot.logStatus(status, currentCounter, totalCounter, operation, pageName, reason);
@@ -562,7 +573,9 @@ class MWBot {
      * @returns {{}}        Merged Object
      */
     static merge(parent, child) {
-        return Object.assign({}, (parent || {}), (child || {}));
+        parent = parent || {};
+        child = child || {};
+        return Object.assign({}, parent, child);
     }
 
     /**
@@ -578,9 +591,14 @@ class MWBot {
     static logStatus(status, currentCounter, totalCounter, operation, pageName, reason) {
 
         operation = operation || '';
+
+        if (operation === 'uploadOverwrite') {
+            operation = 'upload!';
+        }
+
         if (operation) {
             operation = ' [' + operation.toUpperCase() + ']';
-            operation = (operation + '          ').substring(0, 10); // Right space padding: http://stackoverflow.com/a/24398129
+            operation = (operation + '            ').substring(0, 12); // Right space padding: http://stackoverflow.com/a/24398129
         }
 
         reason = reason || '';
