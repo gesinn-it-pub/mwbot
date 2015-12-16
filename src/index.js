@@ -37,7 +37,7 @@ class MWBot {
             verbose: false,
             silent: false,
             defaultSummary: 'MWBot',
-            concurrency: 2,
+            concurrency: 4,
             sparqlEndpoint: 'https://query.wikidata.org/bigdata/namespace/wdq/sparql' // Wikidata
         };
         this.customOptions = customOptions || {};

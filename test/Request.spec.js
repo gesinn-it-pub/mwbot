@@ -155,7 +155,7 @@ describe('MWBot Request', function() {
     it('cannot edit a page without providing API URL / Login', function(done) {
         new MWBot().edit('Main Page', '=Some more Wikitext=', 'Test Upload').catch((e) => {
             expect(e).to.be.an.instanceof(Error);
-            expect(e.message).to.include('No API URL');
+            expect(e.message).to.include('No URI');
             done();
         });
     });
