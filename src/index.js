@@ -98,10 +98,9 @@ class MWBot {
         this.counter.total += 1;
         return new Promise((resolve, reject) => {
             this.counter.resolved +=1;
-
             if (!requestOptions.uri) {
                 this.counter.rejected +=1;
-                return reject(new Error('No API URL provided!'));
+                return reject(new Error('No URI provided!'));
             }
             request(requestOptions, (error, response, body) => {
                 if (error) {
