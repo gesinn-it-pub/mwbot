@@ -67,7 +67,9 @@ describe('MWBot Batch Request', function() {
 
     it('upload and uploadOverwrite', function(done) {
 
-        let bot = new MWBot();
+        let bot = new MWBot({
+            verbose: true
+        });
 
         bot.loginGetEditToken(loginCredentials.valid).then(() => {
             return bot.batch({

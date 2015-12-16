@@ -505,6 +505,7 @@ class MWBot {
 
                     let status = '[=] ';
                     let reason = '';
+                    let debugMessages = [];
 
                     if (operation === 'delete') {
                         status = '[-] ';
@@ -521,9 +522,22 @@ class MWBot {
                         status = '[S] ';
                     } else if (response.upload && response.upload.result === 'Warning') {
                         status = '[/] ';
+                        if (response.upload.warnings && response.upload.warnings.duplicate) {
+                            reason = 'duplicate';
+                            debugMessages.push('[D] [UPLOAD] Duplicate: ' + response.upload.warnings.duplicate.join(', '));
+                        }
+                        if (response.upload.warnings && response.upload.warnings.exists) {
+                            reason = 'exists';
+                            debugMessages.push('[D] [UPLOAD] Exists: ' + response.upload.warnings.exists);
+                        }
                     }
 
                     MWBot.logStatus(status, currentCounter, totalCounter, operation, pageName, reason);
+
+                    for (let msg of debugMessages) {
+                        log(msg);
+                    }
+
                     results.push(response);
 
                 }).catch((err) => {
