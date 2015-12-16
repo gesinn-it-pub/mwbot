@@ -158,6 +158,16 @@ class MWBot {
         });
     }
 
+    /**
+     * Make a SPARQL Query
+     * Defaults to use the wikidata endpoint
+     *
+     * @param {string} query
+     * @param {string} [endpointUrl]
+     * @param {object} [customRequestOptions]
+     *
+     * @returns {bluebird}
+     */
     sparqlQuery(query, endpointUrl, customRequestOptions) {
 
         endpointUrl = endpointUrl || this.options.sparqlEndpoint;
