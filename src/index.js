@@ -373,37 +373,40 @@ class MWBot {
      * @param {string}  pathToFile
      * @param {string}  [title]
      * @param {string}  [comment]
-     * @param {bool}    [overwrite]
-     * @param {string}  [text]
-     * @param {{}}      [customRequestOptions]
+     * @param {object}  [customParams]
+     * @param {object}  [customRequestOptions]
      *
      * @returns {bluebird}
      */
-    upload(pathToFile, title, comment, overwrite, text, customRequestOptions) {
+    upload(pathToFile, title, comment, customParams, customRequestOptions) {
 
         try {
             let file = fs.createReadStream(pathToFile);
+
+            let params = MWBot.merge({
+                action: 'upload',
+                filename: title || path.basename(pathToFile),
+                file: file,
+                comment: comment || '',
+                token: this.editToken
+            }, customParams);
 
             let uploadRequestOptions = MWBot.merge(this.globalRequestOptions, {
                 har: {
                     postData: {
                         mimeType: 'multipart/form-data',
-                        params: [
-                            { name: 'action', value: 'upload' },
-                            { name: 'filename', value: title || path.basename(pathToFile)},
-                            { name: 'file', value: file},
-                            { name: 'comment', value: comment || ''},
-                            { name: 'token', value: this.editToken }
-                        ]
+                        params: []
                     }
                 }
             });
 
-            if (overwrite) {
-                uploadRequestOptions.har.postData.params.push({ name: 'ignorewarnings', value: '' });
-            }
-            if (text) {
-                uploadRequestOptions.har.postData.params.push({ name: 'text', value: text});
+            // Convert params to HAR 1.2 notation
+            for (let paramName in params) {
+                let param = params[paramName];
+                uploadRequestOptions.har.postData.params.push({
+                    name: paramName,
+                    value: param
+                });
             }
 
             let requestOptions = MWBot.merge(uploadRequestOptions, customRequestOptions);
@@ -413,6 +416,24 @@ class MWBot {
         } catch (e) {
             return Promise.reject(e);
         }
+    }
+
+    /**
+     * Uploads a file and overwrites existing ones
+     *
+     * @param {string}  pathToFile
+     * @param {string}  [title]
+     * @param {string}  [comment]
+     * @param {object}  [customParams]
+     * @param {object}  [customRequestOptions]
+     *
+     * @returns {bluebird}
+     */
+    uploadOverwrite(pathToFile, title, comment, customParams, customRequestOptions) {
+        let params = MWBot.merge({
+            ignorewarnings: ''
+        }, customParams);
+        return this.upload(pathToFile, title, comment, params, customRequestOptions);
     }
 
     /**

@@ -95,14 +95,16 @@ describe('MWBot Request', function() {
         });
     });
 
-    it('successfully uploads and overwrites an image with upload()', function(done) {
+    it('successfully uploads and overwrites an image with uploadOverwrite()', function(done) {
         this.timeout(3000);
         let bot = new MWBot();
         bot.loginGetEditToken(loginCredentials.valid).then(() => {
-            return bot.upload(__dirname + '/mocking/ExampleImage.png', 'ExampleImage.png', 'Test Reasons', true);
+            return bot.uploadOverwrite(__dirname + '/mocking/ExampleImage.png', 'ExampleImage.png', 'Test Reasons');
         }).then((response) => {
             expect(response.upload.result).to.equal('Success');
             done();
+        }).catch((e) => {
+            log(e);
         });
     });
 
@@ -123,7 +125,7 @@ describe('MWBot Request', function() {
         this.timeout(3000);
         let bot = new MWBot();
         bot.loginGetEditToken(loginCredentials.valid).then(() => {
-            return bot.upload(__dirname + '/mocking/ExampleImage.png', 'ExampleImage.png', 'Test Reasons', false);
+            return bot.upload(__dirname + '/mocking/ExampleImage.png', 'ExampleImage.png', 'Test Reasons');
         }).then((response) => {
             expect(response.upload.result).to.equal('Warning');
             done();
@@ -141,19 +143,29 @@ describe('MWBot Request', function() {
 
         bot.loginGetEditToken(loginCredentials.valid).then(() => {
             return bot.delete('Non-Existing Page', 'Test Reasons');
-        }).catch((err) => {
-            expect(err).to.be.an.instanceof(Error);
-            expect(err.message).to.include('missingtitle');
+        }).catch((e) => {
+            expect(e).to.be.an.instanceof(Error);
+            expect(e.message).to.include('missingtitle');
             done();
         });
     });
 
-
-
     it('cannot edit a page without providing API URL / Login', function(done) {
-        new MWBot().edit('Main Page', '=Some more Wikitext=', 'Test Upload').catch((err) => {
-            expect(err).to.be.an.instanceof(Error);
-            expect(err.message).to.include('No API URL');
+        new MWBot().edit('Main Page', '=Some more Wikitext=', 'Test Upload').catch((e) => {
+            expect(e).to.be.an.instanceof(Error);
+            expect(e.message).to.include('No API URL');
+            done();
+        });
+    });
+
+    it('rejects to upload a non-existing file with upload()', function(done) {
+        this.timeout(3000);
+        let bot = new MWBot();
+        bot.loginGetEditToken(loginCredentials.valid).then(() => {
+            return bot.upload(__dirname + '/mocking/NonExistingImage.png');
+        }).catch((e) => {
+            expect(e).to.be.an.instanceof(Error);
+            expect(e.message).to.include('ENOENT');
             done();
         });
     });
