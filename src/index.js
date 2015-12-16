@@ -170,6 +170,10 @@ class MWBot {
 
             this.options = MWBot.merge(this.options, loginOptions);
 
+            if (!this.options.username || !this.options.password || !this.options.apiUrl) {
+                return reject(new Error('Incomplete login credentials!'));
+            }
+
             let loginRequest = {
                 action: 'login',
                 lgname: this.options.username,
