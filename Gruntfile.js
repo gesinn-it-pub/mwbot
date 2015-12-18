@@ -58,7 +58,7 @@ module.exports = function(grunt) {
                     'src': ['**/*.js']
                 }],
                 options: {
-                    destination: 'docs'
+                    destination: 'doc'
                 }
             }
         },
