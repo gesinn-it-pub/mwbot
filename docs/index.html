@@ -1,0 +1,884 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset='utf-8' />
+  <title>  | Documentation</title>
+  <meta name='viewport' content='width=device-width,initial-scale=1'>
+  <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Source+Code+Pro:400,500,700' rel='stylesheet' type='text/css'>
+  <link href='assets/bass.css' type='text/css' rel='stylesheet' />
+  <link href='assets/style.css' type='text/css' rel='stylesheet' />
+  <link href='assets/github.css' type='text/css' rel='stylesheet' />
+</head>
+<body class='documentation'>
+  <div class='container'>
+    <div class='clearfix md-mxn2'>
+      <div class='fixed md-show fix-3 overflow-auto max-height-100'>
+        <div class='py1 px2'>
+          <h3 class='mb0 no-anchor'></h3>
+          <div class='mb1'><code></code></div>
+          <input
+            placeholder='Filter'
+            id='filter-input'
+            class='col12 block field'
+            type='text' />
+          <div id='toc'>
+              <a
+                href='#MWBot'
+                class='block bold'>
+                MWBot
+              </a>
+                <a
+                  href='#MWBot.logStatus'
+                  class='regular block'>
+                  .logStatus
+                </a>
+                <a
+                  href='#MWBot.merge'
+                  class='regular block'>
+                  .merge
+                </a>
+                <a
+                  href='#MWBot.batch'
+                  class='regular block'>
+                  #batch
+                </a>
+                <a
+                  href='#MWBot.create'
+                  class='regular block'>
+                  #create
+                </a>
+                <a
+                  href='#MWBot.delete'
+                  class='regular block'>
+                  #delete
+                </a>
+                <a
+                  href='#MWBot.edit'
+                  class='regular block'>
+                  #edit
+                </a>
+                <a
+                  href='#MWBot.getEditToken'
+                  class='regular block'>
+                  #getEditToken
+                </a>
+                <a
+                  href='#MWBot.login'
+                  class='regular block'>
+                  #login
+                </a>
+                <a
+                  href='#MWBot.loginGetEditToken'
+                  class='regular block'>
+                  #loginGetEditToken
+                </a>
+                <a
+                  href='#MWBot.rawRequest'
+                  class='regular block'>
+                  #rawRequest
+                </a>
+                <a
+                  href='#MWBot.read'
+                  class='regular block'>
+                  #read
+                </a>
+                <a
+                  href='#MWBot.request'
+                  class='regular block'>
+                  #request
+                </a>
+                <a
+                  href='#MWBot.sparqlQuery'
+                  class='regular block'>
+                  #sparqlQuery
+                </a>
+                <a
+                  href='#MWBot.update'
+                  class='regular block'>
+                  #update
+                </a>
+                <a
+                  href='#MWBot.upload'
+                  class='regular block'>
+                  #upload
+                </a>
+                <a
+                  href='#MWBot.uploadOverwrite'
+                  class='regular block'>
+                  #uploadOverwrite
+                </a>
+          </div>
+        </div>
+      </div>
+      <div class='fix-margin-3'>
+        <div class='px2'>
+<div class='py1'><section class='py2 clearfix'>
+  <h2 id='MWBot' class='mt0'>
+    MWBot<span class='gray'>(customOptions)</span>
+  </h2>
+  <p>MWBot library</p>
+
+    <h4>Parameters</h4>
+    <ul class='suppress-p-margin'>
+        <li> <strong>customOptions</strong>
+          :
+          <div class='force-inline'>
+            
+          </div>
+        </li>
+    </ul>
+      <h4>Static members</h4>
+        <div class='collapsible' id='MWBot.logStatus'>
+          <a href='#MWBot.logStatus'>
+            <code>
+              .logStatus<span class='gray'>(status, currentCounter, totalCounter, operation, pageName, reason)</span>
+            </code>
+            <div class='force-inline'>
+              <p>Prints status information about a completed request</p>
+
+            </div>
+          </a>
+          <div class='collapser border px2 m2'>
+            <section class='py2 clearfix'>
+              <h2 id='MWBot.logStatus' class='mt0'>
+                logStatus<span class='gray'>(status, currentCounter, totalCounter, operation, pageName, reason)</span>
+              </h2>
+              <p>Prints status information about a completed request</p>
+            
+                <h4>Parameters</h4>
+                <ul class='suppress-p-margin'>
+                    <li> <strong>status</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                    <li> <strong>currentCounter</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                    <li> <strong>totalCounter</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                    <li> <strong>operation</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                    <li> <strong>pageName</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                    <li> <strong>reason</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                </ul>
+            </section>
+          </div>
+        </div>
+        <div class='collapsible' id='MWBot.merge'>
+          <a href='#MWBot.merge'>
+            <code>
+              .merge<span class='gray'>(parent, child)</span>
+            </code>
+            <div class='force-inline'>
+              <p>Recursively merges two objects</p>
+
+            </div>
+          </a>
+          <div class='collapser border px2 m2'>
+            <section class='py2 clearfix'>
+              <h2 id='MWBot.merge' class='mt0'>
+                merge<span class='gray'>(parent, child)</span>
+              </h2>
+              <p>Recursively merges two objects</p>
+            
+                <h4>Parameters</h4>
+                <ul class='suppress-p-margin'>
+                    <li><code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></code> <strong>parent</strong>
+                      :
+                      <div class='force-inline'>
+                        <p>Parent Object</p>
+            
+                      </div>
+                    </li>
+                    <li><code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></code> <strong>child</strong>
+                      :
+                      <div class='force-inline'>
+                        <p>Child Object; overwrites parent properties</p>
+            
+                      </div>
+                    </li>
+                </ul>
+                  <h4>Returns</h4>
+                  <code><code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></code></code>
+                  :
+                  <div class='force-inline'>
+                    <p>Merged Object</p>
+            
+                  </div>
+            </section>
+          </div>
+        </div>
+      <h4>Instance members</h4>
+        <div class='collapsible' id='MWBot.batch'>
+          <a href='#MWBot.batch'>
+            <code>
+              #batch<span class='gray'>(jobs, [summary], [concurrency], [customRequestOptions])</span>
+            </code>
+            <div class='force-inline'>
+              <p>Batch Operation</p>
+
+            </div>
+          </a>
+          <div class='collapser border px2'>
+            <section class='py2 clearfix'>
+              <h2 id='MWBot.batch' class='mt0'>
+                batch<span class='gray'>(jobs, [summary], [concurrency], [customRequestOptions])</span>
+              </h2>
+              <p>Batch Operation</p>
+            
+                <h4>Parameters</h4>
+                <ul class='suppress-p-margin'>
+                    <li><code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></code> or <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">array</a></code> <strong>jobs</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                    <li><code>[<code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>]</code> <strong>summary</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                    <li><code>[<code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></code>]</code> <strong>concurrency</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                    <li><code>[<code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></code>]</code> <strong>customRequestOptions</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                </ul>
+            </section>
+          </div>
+        </div>
+        <div class='collapsible' id='MWBot.create'>
+          <a href='#MWBot.create'>
+            <code>
+              #create<span class='gray'>(title, content, [summary], [customRequestOptions])</span>
+            </code>
+            <div class='force-inline'>
+              <p>Creates a new wiki pages. Does not edit existing ones</p>
+
+            </div>
+          </a>
+          <div class='collapser border px2'>
+            <section class='py2 clearfix'>
+              <h2 id='MWBot.create' class='mt0'>
+                create<span class='gray'>(title, content, [summary], [customRequestOptions])</span>
+              </h2>
+              <p>Creates a new wiki pages. Does not edit existing ones</p>
+            
+                <h4>Parameters</h4>
+                <ul class='suppress-p-margin'>
+                    <li><code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code> <strong>title</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                    <li><code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code> <strong>content</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                    <li><code>[<code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>]</code> <strong>summary</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                    <li><code>[<code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></code>]</code> <strong>customRequestOptions</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                </ul>
+                  <h4>Returns</h4>
+                  <code><code>bluebird</code></code>
+                  
+                  <div class='force-inline'>
+                    
+                  </div>
+            </section>
+          </div>
+        </div>
+        <div class='collapsible' id='MWBot.delete'>
+          <a href='#MWBot.delete'>
+            <code>
+              #delete<span class='gray'>(title, [reason], [customRequestOptions])</span>
+            </code>
+            <div class='force-inline'>
+              <p>Deletes a new wiki page</p>
+
+            </div>
+          </a>
+          <div class='collapser border px2'>
+            <section class='py2 clearfix'>
+              <h2 id='MWBot.delete' class='mt0'>
+                delete<span class='gray'>(title, [reason], [customRequestOptions])</span>
+              </h2>
+              <p>Deletes a new wiki page</p>
+            
+                <h4>Parameters</h4>
+                <ul class='suppress-p-margin'>
+                    <li><code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code> <strong>title</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                    <li><code>[<code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>]</code> <strong>reason</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                    <li><code>[<code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></code>]</code> <strong>customRequestOptions</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                </ul>
+                  <h4>Returns</h4>
+                  <code><code>bluebird</code></code>
+                  
+                  <div class='force-inline'>
+                    
+                  </div>
+            </section>
+          </div>
+        </div>
+        <div class='collapsible' id='MWBot.edit'>
+          <a href='#MWBot.edit'>
+            <code>
+              #edit<span class='gray'>(title, content, [summary], [customRequestOptions])</span>
+            </code>
+            <div class='force-inline'>
+              <p>Edits a new wiki pages. Creates a new page if it does not exist yet</p>
+
+            </div>
+          </a>
+          <div class='collapser border px2'>
+            <section class='py2 clearfix'>
+              <h2 id='MWBot.edit' class='mt0'>
+                edit<span class='gray'>(title, content, [summary], [customRequestOptions])</span>
+              </h2>
+              <p>Edits a new wiki pages. Creates a new page if it does not exist yet</p>
+            
+                <h4>Parameters</h4>
+                <ul class='suppress-p-margin'>
+                    <li><code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code> <strong>title</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                    <li><code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code> <strong>content</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                    <li><code>[<code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>]</code> <strong>summary</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                    <li><code>[<code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></code>]</code> <strong>customRequestOptions</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                </ul>
+                  <h4>Returns</h4>
+                  <code><code>bluebird</code></code>
+                  
+                  <div class='force-inline'>
+                    
+                  </div>
+            </section>
+          </div>
+        </div>
+        <div class='collapsible' id='MWBot.getEditToken'>
+          <a href='#MWBot.getEditToken'>
+            <code>
+              #getEditToken<span class='gray'></span>
+            </code>
+            <div class='force-inline'>
+              <p>Gets an edit token
+This is currently only compatible with MW &gt;= 1.24</p>
+
+            </div>
+          </a>
+          <div class='collapser border px2'>
+            <section class='py2 clearfix'>
+              <h2 id='MWBot.getEditToken' class='mt0'>
+                getEditToken<span class='gray'></span>
+              </h2>
+              <p>Gets an edit token
+            This is currently only compatible with MW &gt;= 1.24</p>
+            
+                  <h4>Returns</h4>
+                  <code><code>bluebird</code></code>
+                  
+                  <div class='force-inline'>
+                    
+                  </div>
+            </section>
+          </div>
+        </div>
+        <div class='collapsible' id='MWBot.login'>
+          <a href='#MWBot.login'>
+            <code>
+              #login<span class='gray'>([loginOptions])</span>
+            </code>
+            <div class='force-inline'>
+              <p>Executes a Login</p>
+
+            </div>
+          </a>
+          <div class='collapser border px2'>
+            <section class='py2 clearfix'>
+              <h2 id='MWBot.login' class='mt0'>
+                login<span class='gray'>([loginOptions])</span>
+              </h2>
+              <p>Executes a Login</p>
+            
+                <h4>Parameters</h4>
+                <ul class='suppress-p-margin'>
+                    <li><code>[<code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></code>]</code> <strong>loginOptions</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                </ul>
+                  <h4>Returns</h4>
+                  <code><code>bluebird</code></code>
+                  
+                  <div class='force-inline'>
+                    
+                  </div>
+            </section>
+          </div>
+        </div>
+        <div class='collapsible' id='MWBot.loginGetEditToken'>
+          <a href='#MWBot.loginGetEditToken'>
+            <code>
+              #loginGetEditToken<span class='gray'>(loginOptions)</span>
+            </code>
+            <div class='force-inline'>
+              <p>Combines Login  with GetEditToken</p>
+
+            </div>
+          </a>
+          <div class='collapser border px2'>
+            <section class='py2 clearfix'>
+              <h2 id='MWBot.loginGetEditToken' class='mt0'>
+                loginGetEditToken<span class='gray'>(loginOptions)</span>
+              </h2>
+              <p>Combines Login  with GetEditToken</p>
+            
+                <h4>Parameters</h4>
+                <ul class='suppress-p-margin'>
+                    <li> <strong>loginOptions</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                </ul>
+                  <h4>Returns</h4>
+                  <code><code>bluebird</code></code>
+                  
+                  <div class='force-inline'>
+                    
+                  </div>
+            </section>
+          </div>
+        </div>
+        <div class='collapsible' id='MWBot.rawRequest'>
+          <a href='#MWBot.rawRequest'>
+            <code>
+              #rawRequest<span class='gray'>(requestOptions)</span>
+            </code>
+            <div class='force-inline'>
+              <p>Executes a promisified raw request
+Uses the npm request library</p>
+
+            </div>
+          </a>
+          <div class='collapser border px2'>
+            <section class='py2 clearfix'>
+              <h2 id='MWBot.rawRequest' class='mt0'>
+                rawRequest<span class='gray'>(requestOptions)</span>
+              </h2>
+              <p>Executes a promisified raw request
+            Uses the npm request library</p>
+            
+                <h4>Parameters</h4>
+                <ul class='suppress-p-margin'>
+                    <li><code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></code> <strong>requestOptions</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                </ul>
+                  <h4>Returns</h4>
+                  <code><code>bluebird</code></code>
+                  
+                  <div class='force-inline'>
+                    
+                  </div>
+            </section>
+          </div>
+        </div>
+        <div class='collapsible' id='MWBot.read'>
+          <a href='#MWBot.read'>
+            <code>
+              #read<span class='gray'>(title, [customRequestOptions])</span>
+            </code>
+            <div class='force-inline'>
+              <p>Reads the content / and meta-data of one (or many) wikipages</p>
+
+            </div>
+          </a>
+          <div class='collapser border px2'>
+            <section class='py2 clearfix'>
+              <h2 id='MWBot.read' class='mt0'>
+                read<span class='gray'>(title, [customRequestOptions])</span>
+              </h2>
+              <p>Reads the content / and meta-data of one (or many) wikipages</p>
+            
+                <h4>Parameters</h4>
+                <ul class='suppress-p-margin'>
+                    <li><code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code> <strong>title</strong>
+                      :
+                      <div class='force-inline'>
+                        <p>For multiple Pages use: PageA|PageB|PageC</p>
+            
+                      </div>
+                    </li>
+                    <li><code>[<code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></code>]</code> <strong>customRequestOptions</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                </ul>
+                  <h4>Returns</h4>
+                  <code><code>bluebird</code></code>
+                  
+                  <div class='force-inline'>
+                    
+                  </div>
+            </section>
+          </div>
+        </div>
+        <div class='collapsible' id='MWBot.request'>
+          <a href='#MWBot.request'>
+            <code>
+              #request<span class='gray'>(params, customRequestOptions)</span>
+            </code>
+            <div class='force-inline'>
+              <p>Executes a request with the ability to use custom parameters and custom request options</p>
+
+            </div>
+          </a>
+          <div class='collapser border px2'>
+            <section class='py2 clearfix'>
+              <h2 id='MWBot.request' class='mt0'>
+                request<span class='gray'>(params, customRequestOptions)</span>
+              </h2>
+              <p>Executes a request with the ability to use custom parameters and custom request options</p>
+            
+                <h4>Parameters</h4>
+                <ul class='suppress-p-margin'>
+                    <li><code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></code> <strong>params</strong>
+                      :
+                      <div class='force-inline'>
+                        <p>Request Parameters</p>
+            
+                      </div>
+                    </li>
+                    <li><code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></code> <strong>customRequestOptions</strong>
+                      :
+                      <div class='force-inline'>
+                        <p>Custom request options</p>
+            
+                      </div>
+                    </li>
+                </ul>
+                  <h4>Returns</h4>
+                  <code><code>bluebird</code></code>
+                  
+                  <div class='force-inline'>
+                    
+                  </div>
+            </section>
+          </div>
+        </div>
+        <div class='collapsible' id='MWBot.sparqlQuery'>
+          <a href='#MWBot.sparqlQuery'>
+            <code>
+              #sparqlQuery<span class='gray'>(query, [endpointUrl], [customRequestOptions])</span>
+            </code>
+            <div class='force-inline'>
+              <p>Make a SPARQL Query
+Defaults to use the wikidata endpoint</p>
+
+            </div>
+          </a>
+          <div class='collapser border px2'>
+            <section class='py2 clearfix'>
+              <h2 id='MWBot.sparqlQuery' class='mt0'>
+                sparqlQuery<span class='gray'>(query, [endpointUrl], [customRequestOptions])</span>
+              </h2>
+              <p>Make a SPARQL Query
+            Defaults to use the wikidata endpoint</p>
+            
+                <h4>Parameters</h4>
+                <ul class='suppress-p-margin'>
+                    <li><code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code> <strong>query</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                    <li><code>[<code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>]</code> <strong>endpointUrl</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                    <li><code>[<code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></code>]</code> <strong>customRequestOptions</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                </ul>
+                  <h4>Returns</h4>
+                  <code><code>bluebird</code></code>
+                  
+                  <div class='force-inline'>
+                    
+                  </div>
+            </section>
+          </div>
+        </div>
+        <div class='collapsible' id='MWBot.update'>
+          <a href='#MWBot.update'>
+            <code>
+              #update<span class='gray'>(title, content, [summary], [customRequestOptions])</span>
+            </code>
+            <div class='force-inline'>
+              <p>Updates existing new wiki pages. Does not create new ones</p>
+
+            </div>
+          </a>
+          <div class='collapser border px2'>
+            <section class='py2 clearfix'>
+              <h2 id='MWBot.update' class='mt0'>
+                update<span class='gray'>(title, content, [summary], [customRequestOptions])</span>
+              </h2>
+              <p>Updates existing new wiki pages. Does not create new ones</p>
+            
+                <h4>Parameters</h4>
+                <ul class='suppress-p-margin'>
+                    <li><code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code> <strong>title</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                    <li><code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code> <strong>content</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                    <li><code>[<code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>]</code> <strong>summary</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                    <li><code>[<code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></code>]</code> <strong>customRequestOptions</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                </ul>
+                  <h4>Returns</h4>
+                  <code><code>bluebird</code></code>
+                  
+                  <div class='force-inline'>
+                    
+                  </div>
+            </section>
+          </div>
+        </div>
+        <div class='collapsible' id='MWBot.upload'>
+          <a href='#MWBot.upload'>
+            <code>
+              #upload<span class='gray'>([title], pathToFile, [comment], [customParams], [customRequestOptions])</span>
+            </code>
+            <div class='force-inline'>
+              <p>Edits a new wiki pages. Creates a new page if it does not exist yet</p>
+
+            </div>
+          </a>
+          <div class='collapser border px2'>
+            <section class='py2 clearfix'>
+              <h2 id='MWBot.upload' class='mt0'>
+                upload<span class='gray'>([title], pathToFile, [comment], [customParams], [customRequestOptions])</span>
+              </h2>
+              <p>Edits a new wiki pages. Creates a new page if it does not exist yet</p>
+            
+                <h4>Parameters</h4>
+                <ul class='suppress-p-margin'>
+                    <li><code>[<code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>]</code> <strong>title</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                    <li><code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code> <strong>pathToFile</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                    <li><code>[<code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>]</code> <strong>comment</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                    <li><code>[<code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></code>]</code> <strong>customParams</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                    <li><code>[<code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></code>]</code> <strong>customRequestOptions</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                </ul>
+                  <h4>Returns</h4>
+                  <code><code>bluebird</code></code>
+                  
+                  <div class='force-inline'>
+                    
+                  </div>
+            </section>
+          </div>
+        </div>
+        <div class='collapsible' id='MWBot.uploadOverwrite'>
+          <a href='#MWBot.uploadOverwrite'>
+            <code>
+              #uploadOverwrite<span class='gray'>([title], pathToFile, [comment], [customParams], [customRequestOptions])</span>
+            </code>
+            <div class='force-inline'>
+              <p>Uploads a file and overwrites existing ones</p>
+
+            </div>
+          </a>
+          <div class='collapser border px2'>
+            <section class='py2 clearfix'>
+              <h2 id='MWBot.uploadOverwrite' class='mt0'>
+                uploadOverwrite<span class='gray'>([title], pathToFile, [comment], [customParams], [customRequestOptions])</span>
+              </h2>
+              <p>Uploads a file and overwrites existing ones</p>
+            
+                <h4>Parameters</h4>
+                <ul class='suppress-p-margin'>
+                    <li><code>[<code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>]</code> <strong>title</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                    <li><code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code> <strong>pathToFile</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                    <li><code>[<code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>]</code> <strong>comment</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                    <li><code>[<code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></code>]</code> <strong>customParams</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                    <li><code>[<code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></code>]</code> <strong>customRequestOptions</strong>
+                      :
+                      <div class='force-inline'>
+                        
+                      </div>
+                    </li>
+                </ul>
+                  <h4>Returns</h4>
+                  <code><code>bluebird</code></code>
+                  
+                  <div class='force-inline'>
+                    
+                  </div>
+            </section>
+          </div>
+        </div>
+</section>
+</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src='assets/anchor.js'></script>
+  <script src='assets/site.js'></script>
+</body>
+</html>

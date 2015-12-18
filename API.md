@@ -26,7 +26,7 @@ Creates a new wiki pages. Does not edit existing ones
 -   `title` **string** 
 -   `content` **string** 
 -   `summary` **[string]** 
--   `customRequestOptions` **[undefined]** 
+-   `customRequestOptions` **[object]** 
 
 Returns **bluebird** 
 
@@ -38,7 +38,7 @@ Deletes a new wiki page
 
 -   `title` **string** 
 -   `reason` **[string]** 
--   `customRequestOptions` **[undefined]** 
+-   `customRequestOptions` **[object]** 
 
 Returns **bluebird** 
 
@@ -51,7 +51,7 @@ Edits a new wiki pages. Creates a new page if it does not exist yet
 -   `title` **string** 
 -   `content` **string** 
 -   `summary` **[string]** 
--   `customRequestOptions` **[undefined]** 
+-   `customRequestOptions` **[object]** 
 
 Returns **bluebird** 
 
@@ -68,7 +68,7 @@ Executes a Login
 
 **Parameters**
 
--   `loginOptions` **[undefined]** 
+-   `loginOptions` **[object]** 
 
 Returns **bluebird** 
 
@@ -89,7 +89,7 @@ Uses the npm request library
 
 **Parameters**
 
--   `requestOptions` **** 
+-   `requestOptions` **object** 
 
 Returns **bluebird** 
 
@@ -100,7 +100,7 @@ Reads the content / and meta-data of one (or many) wikipages
 **Parameters**
 
 -   `title` **string** For multiple Pages use: PageA|PageB|PageC
--   `customRequestOptions` **[undefined]** 
+-   `customRequestOptions` **[object]** 
 
 Returns **bluebird** 
 
@@ -110,8 +110,8 @@ Executes a request with the ability to use custom parameters and custom request 
 
 **Parameters**
 
--   `params` **** Request Parameters
--   `customRequestOptions` **** Custom request options
+-   `params` **object** Request Parameters
+-   `customRequestOptions` **object** Custom request options
 
 Returns **bluebird** 
 
@@ -137,7 +137,7 @@ Updates existing new wiki pages. Does not create new ones
 -   `title` **string** 
 -   `content` **string** 
 -   `summary` **[string]** 
--   `customRequestOptions` **[undefined]** 
+-   `customRequestOptions` **[object]** 
 
 Returns **bluebird** 
 
@@ -188,7 +188,7 @@ Recursively merges two objects
 
 **Parameters**
 
--   `parent` **** Parent Object
--   `child` **** Child Object; overwrites parent properties
+-   `parent` **object** Parent Object
+-   `child` **object** Child Object; overwrites parent properties
 
-Returns **** Merged Object
+Returns **object** Merged Object
