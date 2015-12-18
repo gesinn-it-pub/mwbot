@@ -24,3 +24,6 @@ bot.loginGetEditToken(loginCredentials.valid).then(() => {
 ```
 
 For more examples please take a look at the /test/ directory
+
+## API Documentation
+* [API Documenatation](API.md)

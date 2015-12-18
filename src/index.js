@@ -90,7 +90,7 @@ class MWBot {
      * Executes a promisified raw request
      * Uses the npm request library
      *
-     * @param {{}} requestOptions
+     * @param {object} requestOptions
      *
      * @returns {bluebird}
      */
@@ -118,8 +118,8 @@ class MWBot {
     /**
      *Executes a request with the ability to use custom parameters and custom request options
      *
-     * @param {{}} params               Request Parameters
-     * @param {{}} customRequestOptions Custom request options
+     * @param {object} params               Request Parameters
+     * @param {object} customRequestOptions Custom request options
      *
      * @returns {bluebird}
      */
@@ -192,7 +192,7 @@ class MWBot {
     /**
      * Executes a Login
      *
-     * @param {{}} [loginOptions]
+     * @param {object} [loginOptions]
      *
      * @returns {bluebird}
      */
@@ -312,7 +312,7 @@ class MWBot {
      * @param {string}  title
      * @param {string}  content
      * @param {string}  [summary]
-     * @param {{}}      [customRequestOptions]
+     * @param {object}      [customRequestOptions]
      *
      * @returns {bluebird}
      */
@@ -332,7 +332,7 @@ class MWBot {
      *
      *
      * @param {string}  title    For multiple Pages use: PageA|PageB|PageC
-     * @param {{}}      [customRequestOptions]
+     * @param {object}      [customRequestOptions]
      *
      * @returns {bluebird}
      */
@@ -351,7 +351,7 @@ class MWBot {
      * @param {string}  title
      * @param {string}  content
      * @param {string}  [summary]
-     * @param {{}}      [customRequestOptions]
+     * @param {object}      [customRequestOptions]
      *
      * @returns {bluebird}
      */
@@ -371,7 +371,7 @@ class MWBot {
      *
      * @param {string}  title
      * @param {string}  [reason]
-     * @param {{}}      [customRequestOptions]
+     * @param {object}      [customRequestOptions]
      *
      * @returns {bluebird}
      */
@@ -390,7 +390,7 @@ class MWBot {
      * @param {string}  title
      * @param {string}  content
      * @param {string}  [summary]
-     * @param {{}}      [customRequestOptions]
+     * @param {object}      [customRequestOptions]
      *
      * @returns {bluebird}
      */
@@ -479,7 +479,7 @@ class MWBot {
      * @param {object|array}   jobs
      * @param {string}  [summary]
      * @param {number}  [concurrency]
-     * @param {object}      [customRequestOptions]
+     * @param {object}  [customRequestOptions]
      */
     batch(jobs, summary, concurrency, customRequestOptions) {
 
@@ -625,10 +625,10 @@ class MWBot {
     /**
      * Recursively merges two objects
      *
-     * @param {{}} parent   Parent Object
-     * @param {{}} child    Child Object; overwrites parent properties
+     * @param {object} parent   Parent Object
+     * @param {object} child    Child Object; overwrites parent properties
      *
-     * @returns {{}}        Merged Object
+     * @returns {object}        Merged Object
      */
     static merge(parent, child) {
         parent = parent || {};
