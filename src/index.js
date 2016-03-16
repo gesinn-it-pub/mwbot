@@ -490,7 +490,7 @@ class MWBot {
             concurrency = concurrency || this.options.concurrency;
 
             let jobQueue = [];
-            let results = [];
+            let results = {};
 
             if (Array.isArray(jobs)) {
                 jobQueue = jobs;
@@ -575,7 +575,10 @@ class MWBot {
                         log(msg);
                     }
 
-                    results.push(response);
+                    if (!results[operation]) {
+                        results[operation] = {};
+                    }
+                    results[operation][pageName] = response;
 
                 }).catch((err) => {
                     currentCounter += 1;
@@ -604,7 +607,11 @@ class MWBot {
                     } else if (this.options.verbose && err.response && err.response.error && err.response.error.info) {
                         log('[D] ' + err.response.error.info);
                     }
-                    results.push(err);
+
+                    if (!results[operation]) {
+                        results[operation] = {};
+                    }
+                    results[operation][pageName] = err;
                 });
 
             }, {
