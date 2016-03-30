@@ -619,7 +619,11 @@ class MWBot {
             }).then(() => {
                 return resolve(results);
             }).catch((err) => {
-                return reject(err);
+                // If an error happens, return the results nonetheless, as it contains all the errors
+                // embedded in its data structure
+                log('[E] [UPLOAD] At least one exception occured during the batch job:');
+                log(err);
+                return reject(results);
             });
 
         });
