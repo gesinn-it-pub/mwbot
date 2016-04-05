@@ -342,7 +342,8 @@ class MWBot {
             action: 'query',
             prop: 'revisions',
             rvprop: 'content',
-            titles: title
+            titles: title,
+            redirects: 'yes'
         }, customRequestOptions);
     }
 
