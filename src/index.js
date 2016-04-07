@@ -219,7 +219,7 @@ class MWBot {
                 if (!response.login || !response.login.result) {
                     let err = new Error('Invalid response from API');
                     err.response = response;
-                    log('[E] [UPLOAD] Login failed with invalid response: ' + loginString);
+                    log('[E] [MWBOT] Login failed with invalid response: ' + loginString);
                     return reject(err) ;
                 } else {
                     this.state = MWBot.merge(this.state, response.login);
@@ -233,7 +233,7 @@ class MWBot {
                 if (response.login && response.login.result === 'Success') {
                     this.state = MWBot.merge(this.state, response.login);
                     this.loggedIn = true;
-                    log('[S] [UPLOAD] Login successful: ' + loginString);
+                    log('[S] [MWBOT] Login successful: ' + loginString);
                     return resolve(this.state);
                 } else {
                     let reason = 'Unknown reason';
@@ -242,7 +242,7 @@ class MWBot {
                     }
                     let err = new Error('Could not login: ' + reason);
                     err.response = response;
-                    log('[E] [UPLOAD] Login failed: ' + loginString);
+                    log('[E] [MWBOT] Login failed: ' + loginString);
                     return reject(err) ;
                 }
 
@@ -562,11 +562,11 @@ class MWBot {
                         status = '[/] ';
                         if (response.upload.warnings && response.upload.warnings.duplicate) {
                             reason = 'duplicate';
-                            debugMessages.push('[D] [UPLOAD] Duplicate: ' + response.upload.warnings.duplicate.join(', '));
+                            debugMessages.push('[D] [MWBOT] Duplicate: ' + response.upload.warnings.duplicate.join(', '));
                         }
                         if (response.upload.warnings && response.upload.warnings.exists) {
                             reason = 'exists';
-                            debugMessages.push('[D] [UPLOAD] Exists: ' + response.upload.warnings.exists);
+                            debugMessages.push('[D] [MWBOT] Exists: ' + response.upload.warnings.exists);
                         }
                     }
 
@@ -622,7 +622,7 @@ class MWBot {
             }).catch((err) => {
                 // If an error happens, return the results nonetheless, as it contains all the errors
                 // embedded in its data structure
-                log('[E] [UPLOAD] At least one exception occured during the batch job:');
+                log('[E] [MWBOT] At least one exception occured during the batch job:');
                 log(err);
                 return reject(results);
             });
