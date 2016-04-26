@@ -18,17 +18,29 @@ const MWBot = require('mwbot');
 
 let bot = new MWBot();
 
-bot.loginGetEditToken(loginCredentials.valid).then(() => {
+bot.loginGetEditToken({
+    apiUrl: settings.apiUrl,
+    username: settings.username,
+    password: settings.password
+}).then(() => {
     return bot.edit('Test Page', '=Some more Wikitext=', 'Test Upload');
 }).then((response) => {
     // Success
 }).catch((err) => {
     // Error
 });
+
+
 ```
 ### Batch Request
 ```js
-bot.loginGetEditToken(loginCredentials.valid).then(() => {
+let loginSettings = {
+    apiUrl: settings.apiUrl,
+    username: settings.username,
+    password: settings.password
+};
+
+bot.loginGetEditToken(loginSettings).then(() => {
     return bot.batch({
         create: {
             'TestPage1': 'TestContent1',
