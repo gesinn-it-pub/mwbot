@@ -1,7 +1,6 @@
 #MWBot
 ## Description
 MWBot is a Node.js NPM module for interacting with the MediaWiki API.
-It uses Promises and is written using modern ES6.
 The design goal is to be as flexible as possible, with the ability to overwrite any option at any point.
 The library also lets you choose the abstraction/convenience level on which you want to work.
 
