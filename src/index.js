@@ -492,6 +492,11 @@ class MWBot {
 
             let jobQueue = [];
             let results = {};
+            let operation = 'map';
+
+            if (!concurrency || concurrency === 1) {
+                operation = 'mapSeries';
+            }
 
             if (Array.isArray(jobs)) {
                 jobQueue = jobs;
@@ -529,7 +534,7 @@ class MWBot {
             let currentCounter = 0;
             let totalCounter = jobQueue.length;
 
-            Promise.map(jobQueue, (job) => {
+            Promise[operation](jobQueue, (job) => {
 
                 let operation = job[0];
                 let pageName  = job[1];
