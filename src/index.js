@@ -136,6 +136,8 @@ class MWBot {
 
                 if (typeof response !== 'object') {
                     let err = new Error('invalidjson: No valid JSON response');
+                    err.code = 'invalidjson';
+                    err.info = 'No valid JSON response';
                     err.response = response;
                     return reject(err) ;
                 }
