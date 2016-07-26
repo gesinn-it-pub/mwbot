@@ -409,7 +409,7 @@ class MWBot {
     }
 
     /**
-     * Edits a new wiki pages. Creates a new page if it does not exist yet
+     * Uploads a file
      *
      * @param {string}  [title]
      * @param {string}  pathToFile
