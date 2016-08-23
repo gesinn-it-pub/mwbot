@@ -114,7 +114,7 @@ describe('MWBot Request', function() {
                     log(err);
                 });
 
-            })
+            });
 
         }).then(() => {
             done();
