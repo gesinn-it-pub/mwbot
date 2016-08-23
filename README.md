@@ -20,6 +20,7 @@ The library uses the Promise Pattern, understanding it is essential.
 #### constructor(customOptions)
 #### setOptions(customOptions)
 #### setGlobalRequestOptions(customRequestOptions)
+#### setApiUrl(apiUrl)
 
 
 ### Login and Session Management
