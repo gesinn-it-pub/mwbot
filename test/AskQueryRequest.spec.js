@@ -34,8 +34,32 @@ describe('MWBot ASK Query Request', function() {
         }).catch((e) => {
             log(e);
         });
+    });
 
+    it('queries semantic-mediawiki for cities using setApiUrl()', function(done) {
+        this.timeout(8000);
 
+        let bot = new MWBot();
+
+        bot.setApiUrl('https://www.semantic-mediawiki.org/w/api.php');
+
+        let query = `
+            [[Category:City]]
+            [[Located in::Germany]] 
+            |?Population 
+            |?Area#km² = Size in km²
+        `;
+
+        bot.askQuery(query).then((response) => {
+            expect(response).to.be.instanceof(Object);
+            expect(response.query).to.be.instanceof(Object);
+            expect(response.query.printrequests).to.be.instanceof(Object);
+            expect(response.query.results).to.be.instanceof(Object);
+            expect(response.query.results['Demo:Berlin']).to.be.instanceof(Object);
+            done();
+        }).catch((e) => {
+            log(e);
+        });
     });
 });
 

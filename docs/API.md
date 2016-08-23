@@ -6,6 +6,17 @@ MWBot library
 
 -   **author**: Simon Heimler
 
+## constructor
+
+Constructs a new MWBot instance
+It is advised to create one bot instance for every API to use
+A bot instance has its own state (e.g. tokens) that is necessary for some operations
+
+**Parameters**
+
+-   `customOptions` **\[{}]** Custom options
+-   `customRequestOptions` **\[{}]** Custom request options
+
 ## version
 
 Get mwbot ersion number
@@ -26,15 +37,6 @@ See <https://www.npmjs.com/package/request>
 **Parameters**
 
 -   `customRequestOptions` **{}** 
-
-## setApiUrl
-
-Convenience Method to set the API URL
-This makes sense, when using requests that don't need a full login
-
-**Parameters**
-
--   `apiUrl` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** e.g. '<https://www.semantic-mediawiki.org/w/api.php>'
 
 ## rawRequest
 

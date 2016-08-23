@@ -105,6 +105,16 @@ class MWBot {
         this.globalRequestOptions = MWBot.merge(this.globalRequestOptions, customRequestOptions);
     }
 
+    /**
+     * Sets the API URL for MediaWiki requests
+     * This can be uses instead of a login, if no actions are used that require one.
+     *
+     * @param {String}  apiUrl  API Url to MediaWiki, e.g. 'https://www.semantic-mediawiki.org/w/api.php'
+     */
+    setApiUrl(apiUrl) {
+        this.options.apiUrl = apiUrl;
+    }
+
 
     //////////////////////////////////////////
     // CORE REQUESTS                        //

@@ -55,6 +55,12 @@
                       <li class='h5'><span>Instance members</span></li>
                       
                       <li><a
+                        href='#MWBot#constructor'
+                        class='regular pre-open'>
+                        #constructor
+                      </a></li>
+                      
+                      <li><a
                         href='#MWBot#version'
                         class='regular pre-open'>
                         #version
@@ -70,12 +76,6 @@
                         href='#MWBot#setGlobalRequestOptions'
                         class='regular pre-open'>
                         #setGlobalRequestOptions
-                      </a></li>
-                      
-                      <li><a
-                        href='#MWBot#setApiUrl'
-                        class='regular pre-open'>
-                        #setApiUrl
                       </a></li>
                       
                       <li><a
@@ -397,6 +397,74 @@
     <div class='py1 quiet mt1 prose-big'>Instance Members</div>
     <div class="clearfix">
   
+    <div class='border-bottom' id='MWBot#constructor'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>constructor([customOptions], [customRequestOptions])</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Constructs a new MWBot instance
+It is advised to create one bot instance for every API to use
+A bot instance has its own state (e.g. tokens) that is necessary for some operations</p>
+
+
+  <div class='pre p1 fill-light mt0'>constructor(customOptions: [{}], customRequestOptions: [{}])</div>
+
+  
+
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>customOptions</span> <code class='quiet'>([{}])</code> Custom options
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>customRequestOptions</span> <code class='quiet'>([{}])</code> Custom request options
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
     <div class='border-bottom' id='MWBot#version'>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
@@ -532,67 +600,6 @@ See <a href="https://www.npmjs.com/package/request">https://www.npmjs.com/packag
         <div class='space-bottom0'>
           <div>
             <span class='code bold'>customRequestOptions</span> <code class='quiet'>({})</code> 
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
-    <div class='border-bottom' id='MWBot#setApiUrl'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="py1 contain">
-            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>setApiUrl(apiUrl)</span>
-        </div>
-      </div>
-      <div class="clearfix display-none toggle-target">
-        <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-
-  <p>Convenience Method to set the API URL
-This makes sense, when using requests that don&#x27;t need a full login</p>
-
-
-  <div class='pre p1 fill-light mt0'>setApiUrl(apiUrl: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</div>
-
-  
-
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>apiUrl</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code> e.g. &#x27;
-<a href="https://www.semantic-mediawiki.org/w/api.php">https://www.semantic-mediawiki.org/w/api.php</a>
-&#x27;
-
           </div>
           
         </div>

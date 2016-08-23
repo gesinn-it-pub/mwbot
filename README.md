@@ -87,6 +87,9 @@ bot.setGlobalRequestOptions({
 ```
 
 ### Login and Session Management
+Login with user and password.
+This will be necessary for most bot actions. 
+A successful login will add the login token to the bot state.
 #### .login(loginOptions)
 ```js
 bot.login({
@@ -101,6 +104,7 @@ bot.login({
 ```
 
 #### .getEditToken()
+Fetches an edit token that is needed for certain MediaWiki API actions, like editing pages.
 ```js
 bot.getEditToken().then((response) => {
     // Success
@@ -111,6 +115,19 @@ bot.getEditToken().then((response) => {
 
 #### loginGetEditToken(loginOptions)
 Combines .login() and getEditToken() into one operation for convenience.
+
+#### setApiUrl(apiUrl)
+If no login is necessary for the bot actions, it is sufficient to just set the API URL instead of loggin in.
+```js
+bot.setApiUrl('https://www.semantic-mediawiki.org/w/api.php');
+```
+
+Note that it is also possible to set the API URL with the constructur:
+```js
+let bot = new MWBot({
+    apiUrl: 'https://www.semantic-mediawiki.org/w/api.php'
+});
+```
 
 ### CRUD Operations
 #### create(title, content, summary, customRequestOptions)
@@ -153,7 +170,7 @@ bot.update('Test Page', 'Test Content', 'Test Summary').then((response) => {
 Edits a wiki page. If the page does not exist yet, it will be created.
 * See https://www.mediawiki.org/wiki/API:Edit
 ```js
-bot.update('Test Page', 'Test Content', 'Test Summary').then((response) => {
+bot.edit('Test Page', 'Test Content', 'Test Summary').then((response) => {
     // Success
 }).catch((err) => {
     // Error: Could not get edit token
@@ -161,8 +178,18 @@ bot.update('Test Page', 'Test Content', 'Test Summary').then((response) => {
 ```
 
 #### upload(title, pathToFile, comment, customParams, customRequestOptions)
+Upload a file to the wiki. If the file exists, it will be skipped.
+Make sure your wiki is [configured correctly](https://www.mediawiki.org/wiki/Manual:Configuring_file_uploads) for file uploads
+```js
+bot.upload(false, __dirname + '/mocking/example1.png')}).then((response) => {
+  // Success
+}).catch((err) => {
+  // Error
+});
+```
 
 #### uploadOverwrite(title, pathToFile, comment, customParams, customRequestOptions)
+Like upload(), but will overwrite files on the server
 
 ### Convenience Operations
 #### batch(jobs, summary, concurrency, customRequestOptions)
