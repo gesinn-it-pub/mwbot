@@ -188,7 +188,12 @@ Returns **bluebird**
 
 ## batch
 
-Batch Operation
+Combines all standard CRUD operations into one concurrent batch operation
+The batch request will also print log messages about the current job status
+It includes some more detailed error handling
+
+If the concurrency is set to 1, it ensures a sequential order
+by switching from Promise.map to Promise.mapSeries
 
 **Parameters**
 
@@ -245,3 +250,15 @@ Prints status information about a completed request
 -   `operation`  
 -   `pageName`  
 -   `reason`  
+
+## Promise
+
+Provide bluebird.js Promise
+
+## map
+
+Provide bluebird.js Promise.map for concurrent batch requests
+
+## mapSeries
+
+Provide bluebird.js Promise.mapSeries for sequential batch requests

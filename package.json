@@ -21,7 +21,6 @@
     "grunt-cli": "^1.2.0",
     "grunt-documentation": "^1.2.0",
     "grunt-eslint": "^19.0.0",
-    "grunt-jscs": "^3.0.1",
     "grunt-mocha-cli": "^2.1.0",
     "grunt-mocha-istanbul": "^5.0.2",
     "grunt-release": "^0.14.0",

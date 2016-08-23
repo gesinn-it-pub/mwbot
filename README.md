@@ -312,11 +312,105 @@ bot.rawRequest({
 });
 ```
 
+### Helper Functions
+#### MWBot.logStatus(status, currentCounter, totalCounter, operation, pageName, reason)
+Static function that prints "pretty" upload status log messages.
+Is used internally to print .batch() status messages.
+```js
+MWBot.logStatus('[+] ', counter, total, 'USER', user.userName);
+```
+#### MWBot.Promise
+Injection of a bluebird.js Promise
+
+#### MWBot.map
+Injection of a bluebird.js Promise.map (for concurrent batch requests)
+
+#### MWBot.mapSeries
+Injection of a bluebird.js Promise.mapSeries (for sequential batch requests)
+
+
 ## Tips and Tricks
 Learn how to use the Promise Pattern! 
 It handles a lot, like concurrency, parallel or sequential requests, etc.
 
 I can recommend the [bluebird.js](http://bluebirdjs.com/) Promise library.
+This is the Promise library that mwbot is using internally, too.
+
 * If you want to do batch request concurrently, use [Promise.map](http://bluebirdjs.com/docs/api/promise.map.html)
 * If you want to do batch request in strictly sequential order, use [Promise.mapSeries](http://bluebirdjs.com/docs/api/mapseries.html)
 
+## Complete Examples
+### Fetch content of a page, change it and upload the changed page
+```js
+let bot = new MWBot();
+bot.loginGetEditToken({
+    apiUrl: "http://localhost:8080/wiki01/api.php",
+    username: "testuser",
+    password: "testpassword"
+}).then(() => {
+    return bot.read('Main Page');
+}).then((response) => {
+    let pageContent = response.query.pages['1']['revisions'][0]['*'];
+    pageContent += ' Appendix';
+    return bot.update('Main Page', pageContent);
+}).then((response) => {
+    // Success
+}).catch((err) => {
+    // Error
+});
+```
+
+### Concurrent execution of batch jobs with bluebird.js Promise.map
+This example takes a list of pages and executes a purge action on it.
+It also demonstrates how to (re)use the static MWBot.logStatus helper function
+* See http://bluebirdjs.com/docs/api/promise.map.html
+```js
+let bot = new MWBot();
+
+let pages = [
+    'Main Page',
+    'Test Page'
+];
+
+let pagesTotal = pages.length || 0;
+let pageCounter = 0;
+
+bot.loginGetEditToken({
+    apiUrl: "http://localhost:8080/wiki01/api.php",
+    username: "testuser",
+    password: "testpassword"
+}).then(() => {
+
+    MWBot.map(pages, (page) => {
+
+        pageCounter += 1;
+
+        return bot.request({
+            action: 'purge',
+            titles: page,
+            forcelinkupdate: true
+        }).then((response) => {
+
+            // Use MWBot.logStatus helper function
+            if (response.error) {
+                MWBot.logStatus('[E] ', pageCounter, pagesTotal, 'PURGE', response.purge[0].title);
+            } else {
+                MWBot.logStatus('[=] ', pageCounter, pagesTotal, 'PURGE', response.purge[0].title);
+            }
+        }).catch((err) => {
+            MWBot.logStatus('[E] ', pageCounter, pagesTotal, 'PURGE', page);
+            log(err);
+        });
+
+    }, {
+        concurrency: 2
+    }).then((response) => {
+        // Success
+    }).catch((err) => {
+        // Error
+    });
+
+}).catch((err) => {
+    // Login Error
+});
+```

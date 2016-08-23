@@ -490,7 +490,12 @@ class MWBot {
     //////////////////////////////////////////
 
     /**
-     * Batch Operation
+     * Combines all standard CRUD operations into one concurrent batch operation
+     * The batch request will also print log messages about the current job status
+     * It includes some more detailed error handling
+     *
+     * If the concurrency is set to 1, it ensures a sequential order
+     * by switching from Promise.map to Promise.mapSeries
      *
      * @param {object|array}   jobs
      * @param {string}  [summary]
@@ -754,5 +759,23 @@ class MWBot {
         log(status + '[' + semlog.pad(currentCounter, 4) + '/' + semlog.pad(totalCounter, 4) + ']' + operation + pageName + reason);
     }
 }
+
+/**
+ * Provide bluebird.js Promise
+ * @link http://bluebirdjs.com/docs/api/new-promise.html
+ */
+MWBot.Promise = Promise;
+
+/**
+ * Provide bluebird.js Promise.map for concurrent batch requests
+ * @link http://bluebirdjs.com/docs/api/promise.map.html
+ */
+MWBot.map = Promise.map;
+
+/**
+ * Provide bluebird.js Promise.mapSeries for sequential batch requests
+ * @link http://bluebirdjs.com/docs/api/promise.mapseries.html
+ */
+MWBot.mapSeries = Promise.mapSeries;
 
 module.exports = MWBot;

@@ -19,18 +19,6 @@ module.exports = function(grunt) {
                 src: ['test/**/*.js']
             }
         },
-        jscs: {
-            options: {
-                config: '.jscsrc',
-                force: true
-            },
-            js: {
-                src: ['*.js']
-            },
-            test: {
-                src: ['test/**/*.js']
-            }
-        },
         mochacli: {
             options: {
                 reporter: 'spec',
@@ -81,7 +69,7 @@ module.exports = function(grunt) {
     });
 
     // Default task.
-    grunt.registerTask('lint', ['eslint', 'jscs']);
+    grunt.registerTask('lint', ['eslint']);
     grunt.registerTask('test', ['mocha_istanbul:coverage']);
     grunt.registerTask('doc', ['documentation']);
     grunt.registerTask('default', ['lint', 'test', 'doc']);

@@ -48,6 +48,24 @@
                         .logStatus
                       </a></li>
                     
+                      <li><a
+                        href='#MWBot.Promise'
+                        class='regular pre-open'>
+                        .Promise
+                      </a></li>
+                    
+                      <li><a
+                        href='#MWBot.map'
+                        class='regular pre-open'>
+                        .map
+                      </a></li>
+                    
+                      <li><a
+                        href='#MWBot.mapSeries'
+                        class='regular pre-open'>
+                        .mapSeries
+                      </a></li>
+                    
                     </ul>
                   
                   
@@ -375,6 +393,141 @@
         </div>
       
     </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='MWBot.Promise'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>Promise</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Provide bluebird.js Promise</p>
+
+
+  <div class='pre p1 fill-light mt0'>Promise</div>
+
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='MWBot.map'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>map</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Provide bluebird.js Promise.map for concurrent batch requests</p>
+
+
+  <div class='pre p1 fill-light mt0'>map</div>
+
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='MWBot.mapSeries'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>mapSeries</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Provide bluebird.js Promise.mapSeries for sequential batch requests</p>
+
+
+  <div class='pre p1 fill-light mt0'>mapSeries</div>
+
+  
+
+  
+  
+  
+  
+  
+
   
 
   
@@ -1612,7 +1765,11 @@ This is currently only compatible with MW &gt;= 1.24</p>
 
   
 
-  <p>Batch Operation</p>
+  <p>Combines all standard CRUD operations into one concurrent batch operation
+The batch request will also print log messages about the current job status
+It includes some more detailed error handling</p>
+<p>If the concurrency is set to 1, it ensures a sequential order
+by switching from Promise.map to Promise.mapSeries</p>
 
 
   <div class='pre p1 fill-light mt0'>batch(jobs: (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">array</a>), summary: [<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>], concurrency: [<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>], customRequestOptions: [<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>])</div>
