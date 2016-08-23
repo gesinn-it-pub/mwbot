@@ -129,7 +129,7 @@ Reads the content of a wiki page.
 To fetch more than one page, separate the page names with `|`
 * See https://www.mediawiki.org/wiki/API:Query
 ```js
-bot.read('Test Page', {timeout: 8000}).then((response) => {
+bot.read('Test Page|MediaWiki:Sidebar', {timeout: 8000}).then((response) => {
     // Success
     // The MediaWiki API Result is somewhat unwieldy:
     console.log(response.query.pages['1']['revisions'][0]['*']);
@@ -166,6 +166,9 @@ bot.update('Test Page', 'Test Content', 'Test Summary').then((response) => {
 
 ### Convenience Operations
 #### batch(jobs, summary, concurrency, customRequestOptions)
+This function allows to work more conveniently with the MediaWiki API. 
+It combines all CRUD operations and additionally manages concurrency, logging, error handling, etc.
+
 ```js
 let batchJobs = {
     create: {
@@ -195,10 +198,47 @@ bot.batch(batchJobs, 'Batch Upload Summary').then((response) => {
 ```
 
 #### sparqlQuery(query, endpointUrl, customRequestOptions)
+Query Triplestores / SPARQL Endpoints like those from wikidata and dbpedia.
+
+```js
+let endPoint = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql';
+let query = `
+    PREFIX wd: <http://www.wikidata.org/entity/>
+    PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+    PREFIX wikibase: <http://wikiba.se/ontology#>
+
+    SELECT ?catLabel WHERE {
+        ?cat  wdt:P31 wd:Q146 .
+
+        SERVICE wikibase:label {
+            bd:serviceParam wikibase:language "en" .
+        }
+    }
+`;
+
+bot.sparqlQuery(query, endPoint).then((response) => {
+    // Success
+}).catch((err) => {
+    // Error: Could not get edit token
+});
+```
 
 #### askQuery(query, customRequestOptions)
-* TODO
+```js
+let apiUrl = 'https://www.semantic-mediawiki.org/w/api.php';
+let query = `
+    [[Category:City]]
+    [[Located in::Germany]] 
+    |?Population 
+    |?Area#km² = Size in km²
+`;
 
+bot.askQuery(query, apiUrl).then((response) => {
+    // Success
+}).catch((err) => {
+    // Error: Could not get edit token
+});
+```
 
 ### Basic Requests
 In case that the standard CRUD requests are not sufficient, it is possible to craft custom requests:

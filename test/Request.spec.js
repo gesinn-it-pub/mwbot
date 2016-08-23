@@ -80,9 +80,10 @@ describe('MWBot Request', function() {
         }).then((response) => {
             expect(response).to.have.any.keys('query');
             expect(response.query).to.have.any.keys('pages');
+            expect(Object.keys(response.query.pages).length).to.equal(1);
             expect(response.query.pages).to.have.any.keys('1');
             expect(response.query.pages['1']).to.have.any.keys('revisions');
-            log(response.query.pages['1']['revisions'][0]['*']);
+            log('Fetched Content: ' + response.query.pages['1']['revisions'][0]['*']);
             done();
         }).catch((err) => {
             log(err);
@@ -94,12 +95,10 @@ describe('MWBot Request', function() {
         bot.login(loginCredentials.valid).then(() => {
             return bot.read('Main Page|MediaWiki:Sidebar');
         }).then((response) => {
-            log(response.query);
             expect(response).to.have.any.keys('query');
             expect(response.query).to.have.any.keys('pages');
-            expect(response.query.pages).to.have.any.keys('1');
-            expect(response.query.pages['1']).to.have.any.keys('revisions');
-            log(response.query.pages['1']['revisions'][0]['*']);
+            expect(Object.keys(response.query.pages).length).to.equal(2);
+
             done();
         }).catch((err) => {
             log(err);
