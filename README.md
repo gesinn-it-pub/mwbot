@@ -36,6 +36,8 @@ bot.loginGetEditToken({
 });
 ```
 
+For more examples, read the documentation or have a look at the [/test](test/) directory
+
 ### Constructor and Settings
 #### constructor(customOptions, customRequestOptions)
 Constructs a new MWBot instance.
@@ -315,4 +317,3 @@ I can recommend the [bluebird.js](http://bluebirdjs.com/) Promise library.
 * If you want to do batch request concurrently, use [Promise.map](http://bluebirdjs.com/docs/api/promise.map.html)
 * If you want to do batch request in strictly sequential order, use [Promise.mapSeries](http://bluebirdjs.com/docs/api/mapseries.html)
 
-For more examples, have a look at the [/test](test/) directory
