@@ -7,8 +7,6 @@ const log = require('semlog').log;
 const chai = require('chai');
 const expect = chai.expect;
 
-const loginCredentials = require('./mocking/loginCredentials.json');
-
 describe('MWBot ASK Query Request', function() {
     'use strict';
 
@@ -17,8 +15,7 @@ describe('MWBot ASK Query Request', function() {
 
         let bot = new MWBot();
 
-        // www.semantic-mediawiki.org demo data
-        bot.setApiUrl('https://www.semantic-mediawiki.org/w/api.php');
+        let apiUrl = 'https://www.semantic-mediawiki.org/w/api.php';
 
         let query = `
             [[Category:City]]
@@ -27,7 +24,7 @@ describe('MWBot ASK Query Request', function() {
             |?Area#km² = Size in km²
         `;
 
-        bot.askQuery(query).then((response) => {
+        bot.askQuery(query, apiUrl).then((response) => {
             expect(response).to.be.instanceof(Object);
             expect(response.query).to.be.instanceof(Object);
             expect(response.query.printrequests).to.be.instanceof(Object);

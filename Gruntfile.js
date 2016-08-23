@@ -82,11 +82,9 @@ module.exports = function(grunt) {
 
     // Default task.
     grunt.registerTask('lint', ['eslint', 'jscs']);
-    grunt.registerTask('test', ['mochacli']);
+    grunt.registerTask('test', ['mocha_istanbul:coverage']);
     grunt.registerTask('doc', ['documentation']);
-    grunt.registerTask('coverage', ['mocha_istanbul:coverage']);
-    grunt.registerTask('default', ['lint', 'coverage', 'doc']);
-    grunt.registerTask('publish', ['release']);
+    grunt.registerTask('default', ['lint', 'test', 'doc']);
 
     grunt.event.on('coverage', function(content, done) {
         done();

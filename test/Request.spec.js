@@ -21,6 +21,25 @@ describe('MWBot Request', function() {
     // SUCESSFULL                           //
     //////////////////////////////////////////
 
+    it('successfully executes a raw HTTP request', function(done) {
+        let bot = new MWBot();
+
+        bot.rawRequest({
+            method: 'GET',
+            uri: 'https://jsonplaceholder.typicode.com/comments',
+            json: true,
+            qs: {
+                postId: 1
+            }
+        }).then((response) => {
+            expect(response).to.be.instanceof(Array);
+            expect(response[0]).to.be.instanceof(Object);
+            expect(response[0].postId).to.equal(1);
+            done();
+        }).catch((err) => {
+            log(err);
+        });
+    });
 
     it('successfully editing a page with custom request()', function(done) {
         let bot = new MWBot();
@@ -38,7 +57,7 @@ describe('MWBot Request', function() {
             done();
         }).catch((err) => {
             log(err);
-        });;
+        });
     });
 
 

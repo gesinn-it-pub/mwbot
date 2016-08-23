@@ -19,7 +19,15 @@ class MWBot {
     // CONSTRUCTOR                          //
     //////////////////////////////////////////
 
-    constructor(customOptions) {
+    /**
+     * Constructs a new MWBot instance
+     * It is advised to create one bot instance for every API to use
+     * A bot instance has its own state (e.g. tokens) that is necessary for some operations
+     *
+     * @param {{}} [customOptions]        Custom options
+     * @param {{}} [customRequestOptions] Custom request options
+     */
+    constructor(customOptions, customRequestOptions) {
 
         // STATE
         this.state = {};
@@ -38,6 +46,7 @@ class MWBot {
             silent: false,
             defaultSummary: 'MWBot',
             concurrency: 1,
+            apiUrl: false,
             sparqlEndpoint: 'https://query.wikidata.org/bigdata/namespace/wdq/sparql' // Wikidata
         };
         this.customOptions = customOptions || {};
@@ -57,7 +66,7 @@ class MWBot {
             time: true,
             json: true
         };
-        this.customRequestOptions = this.options.request || {};
+        this.customRequestOptions = customRequestOptions || {};
         this.globalRequestOptions = MWBot.merge(this.defaultRequestOptions, this.customRequestOptions);
 
         // SEMLOG OPTIONS
@@ -94,16 +103,6 @@ class MWBot {
      */
     setGlobalRequestOptions(customRequestOptions) {
         this.globalRequestOptions = MWBot.merge(this.globalRequestOptions, customRequestOptions);
-    }
-
-    /**
-     * Convenience Method to set the API URL
-     * This makes sense, when using requests that don't need a full login
-     *
-     * @param {string} apiUrl   e.g. 'https://www.semantic-mediawiki.org/w/api.php'
-     */
-    setApiUrl(apiUrl) {
-        this.options.apiUrl = apiUrl;
     }
 
 
@@ -168,6 +167,7 @@ class MWBot {
 
                 if (response.error) { // See https://www.mediawiki.org/wiki/API:Errors_and_warnings#Errors
                     let err = new Error(response.error.code + ': ' + response.error.info);
+                    // Enhance error object with additional information
                     err.errorResponse = true;
                     err.code = response.error.code;
                     err.info = response.error.info;
@@ -678,13 +678,20 @@ class MWBot {
      */
     askQuery(query, apiUrl, customRequestOptions) {
 
-        // TODO
+        apiUrl = apiUrl || this.options.apiUrl;
 
-        return this.request({
-            action: 'ask',
-            query: query,
-            format: 'json'
+        let requestOptions = MWBot.merge({
+            method: 'GET',
+            uri: apiUrl,
+            json: true,
+            qs: {
+                action: 'ask',
+                format: 'json',
+                query: query
+            }
         }, customRequestOptions);
+
+        return this.rawRequest(requestOptions);
     }
 
 

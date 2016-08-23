@@ -159,7 +159,7 @@ describe('MWBot Batch Request', function() {
             expect(response.create.TestPage1.response).to.be.instanceof(Object);
             done();
         }).catch((err) => {
-            log(err)
+            log(err);
         });
 
     });

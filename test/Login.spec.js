@@ -27,12 +27,11 @@ describe('MWBot Login', function() {
         });
     });
 
-    it('times out', function(done) {
+    it('aborts because of timeout', function(done) {
 
-        let bot = new MWBot({
-            request: {
-                timeout: 3
-            }
+        let bot = new MWBot();
+        bot.setGlobalRequestOptions({
+            timeout: 1 // 1ms
         });
 
         bot.login(loginCredentials.valid).catch((err) => {
