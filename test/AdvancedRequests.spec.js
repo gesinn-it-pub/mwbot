@@ -48,7 +48,7 @@ describe('MWBot Request', function() {
 
         bot.loginGetEditToken(loginCredentials.valid).then(() => {
 
-            MWBot.map(pages, (page) => {
+            return MWBot.map(pages, (page) => {
 
                 pageCounter += 1;
 
@@ -71,11 +71,10 @@ describe('MWBot Request', function() {
 
             }, {
                 concurrency: 2
-            }).then(() => {
-                done();
             });
 
-
+        }).then(() => {
+            done();
         }).catch((err) => {
             log(err);
         });
@@ -94,7 +93,7 @@ describe('MWBot Request', function() {
 
         bot.loginGetEditToken(loginCredentials.valid).then(() => {
 
-            MWBot.mapSeries(pages, (page) => {
+            return MWBot.mapSeries(pages, (page) => {
 
                 pageCounter += 1;
 
@@ -115,11 +114,10 @@ describe('MWBot Request', function() {
                     log(err);
                 });
 
-            }).then(() => {
-                done();
-            });
+            })
 
-
+        }).then(() => {
+            done();
         }).catch((err) => {
             log(err);
         });

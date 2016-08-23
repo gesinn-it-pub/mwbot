@@ -381,7 +381,7 @@ bot.loginGetEditToken({
     password: "testpassword"
 }).then(() => {
 
-    MWBot.map(pages, (page) => {
+    return MWBot.map(pages, (page) => {
 
         pageCounter += 1;
 
