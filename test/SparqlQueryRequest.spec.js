@@ -7,7 +7,7 @@ const log = require('semlog').log;
 const chai = require('chai');
 const expect = chai.expect;
 
-describe('MWBot SPARQL Request', function() {
+describe('MWBot SPARQL Query Request', function() {
     'use strict';
 
     it('queries wikidata for cats', function(done) {
@@ -36,6 +36,8 @@ describe('MWBot SPARQL Request', function() {
             expect(response.results).to.include.key('bindings');
             expect(JSON.stringify(response.results.bindings)).to.include('Grumpy Cat');
             done();
+        }).catch((e) => {
+            log(e);
         });
 
     });

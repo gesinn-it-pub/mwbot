@@ -4,6 +4,7 @@
 
 const MWBot = require('../src/');
 const log = require('semlog').log;
+const crypto = require('crypto');
 
 const chai = require('chai');
 const expect = chai.expect;
@@ -21,7 +22,7 @@ describe('MWBot Request', function() {
     //////////////////////////////////////////
 
 
-    it('successfully editing a page with request()', function(done) {
+    it('successfully editing a page with custom request()', function(done) {
         let bot = new MWBot();
         bot.loginGetEditToken(loginCredentials.valid).then(() => {
             return bot.request({
@@ -35,17 +36,21 @@ describe('MWBot Request', function() {
         }).then((response) => {
             expect(response.edit.result).to.equal('Success');
             done();
-        });
+        }).catch((err) => {
+            log(err);
+        });;
     });
 
 
     it('successfully creates a page with create()', function(done) {
         let bot = new MWBot();
         bot.loginGetEditToken(loginCredentials.valid).then(() => {
-            return bot.create('Test Page', '=Some more Wikitext=', 'Test Upload');
+            return bot.create(crypto.randomBytes(20).toString('hex'), '=Some more Wikitext= [[Category:Test Page]]', 'Test Upload');
         }).then((response) => {
             expect(response.edit.result).to.equal('Success');
             done();
+        }).catch((err) => {
+            log(err);
         });
     });
 
@@ -57,19 +62,23 @@ describe('MWBot Request', function() {
             expect(response).to.have.any.keys('query');
             expect(response.query).to.have.any.keys('pages');
             done();
+        }).catch((err) => {
+            log(err);
         });
     });
 
     it('successfully updates a page with update()', function(done) {
         let bot = new MWBot();
         bot.loginGetEditToken(loginCredentials.valid).then(() => {
-            return bot.update('Test Page', '=Some more Wikitext=', 'Test Upload');
+            return bot.edit('Test Page', '=Some more Wikitext=', 'Test Upload');
         }).then(() => {
             return bot.update('Test Page', '=Some more Wikitext=');
         }).then((response) => {
             expect(response.edit.result).to.equal('Success');
             expect(bot.counter.fulfilled).to.equal(5);
             done();
+        }).catch((err) => {
+            log(err);
         });
     });
 

@@ -40,7 +40,6 @@ describe('MWBot Batch Request', function() {
             expect(response.create).to.be.instanceof(Object);
             expect(response.create.TestPage1).to.be.instanceof(Object);
             expect(response.create.TestPage1.response).to.be.instanceof(Object);
-            expect(response.create.TestPage1.response).to.be.instanceof(Object);
             expect(response.delete).to.be.instanceof(Object);
             expect(response.edit).to.be.instanceof(Object);
             done();
@@ -101,6 +100,14 @@ describe('MWBot Batch Request', function() {
 
         }).then((response) => {
             expect(response).to.be.instanceof(Object);
+            expect(response.upload).to.be.instanceof(Object);
+            expect(response.upload['example1.png']).to.be.instanceof(Object);
+            expect(response.upload['example1.png'].upload).to.be.instanceof(Object);
+
+            expect(response.upload['NonExistingImage.png']).to.be.instanceof(Object);
+            expect(response.upload['NonExistingImage.png'].code).to.equal('ENOENT');
+
+            expect(response.uploadOverwrite).to.be.instanceof(Object);
             done();
         });
     });
@@ -147,7 +154,12 @@ describe('MWBot Batch Request', function() {
 
         }).then((response) => {
             expect(response).to.be.instanceof(Object);
+            expect(response.create).to.be.instanceof(Object);
+            expect(response.create.TestPage1).to.be.instanceof(Object);
+            expect(response.create.TestPage1.response).to.be.instanceof(Object);
             done();
+        }).catch((err) => {
+            log(err)
         });
 
     });

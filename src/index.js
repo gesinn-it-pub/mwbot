@@ -69,17 +69,41 @@ class MWBot {
     // GETTER & SETTER                      //
     //////////////////////////////////////////
 
+    /**
+     * Get mwbot ersion number
+     */
     get version() {
         let packageJson = require('../package.json');
         return packageJson.version;
     }
 
+    /**
+     * Set and overwrite msbot options
+     *
+     * @param {{}} customOptions
+     */
     setOptions(customOptions) {
         this.options = MWBot.merge(this.options, customOptions);
     }
 
+    /**
+     * Sets and overwrites the raw request options, used by the "request" library
+     * See https://www.npmjs.com/package/request
+     *
+     * @param {{}} customRequestOptions
+     */
     setGlobalRequestOptions(customRequestOptions) {
         this.globalRequestOptions = MWBot.merge(this.globalRequestOptions, customRequestOptions);
+    }
+
+    /**
+     * Convenience Method to set the API URL
+     * This makes sense, when using requests that don't need a full login
+     *
+     * @param {string} apiUrl   e.g. 'https://www.semantic-mediawiki.org/w/api.php'
+     */
+    setApiUrl(apiUrl) {
+        this.options.apiUrl = apiUrl;
     }
 
 
@@ -647,27 +671,20 @@ class MWBot {
      * Execute an ASK Query
      *
      * @param {string} query
-     * @param {string} [endpointUrl]
+     * @param {string} [apiUrl]
      * @param {object} [customRequestOptions]
      *
      * @returns {bluebird}
      */
-    askQuery(query, customRequestOptions) {
+    askQuery(query, apiUrl, customRequestOptions) {
 
         // TODO
 
-
-        // let requestOptions = MWBot.merge({
-        //     method: 'GET',
-        //     uri: endpointUrl,
-        //     json: true,
-        //     qs: {
-        //         format: 'json',
-        //         query: query
-        //     }
-        // }, customRequestOptions);
-        //
-        // return this.rawRequest(requestOptions);
+        return this.request({
+            action: 'ask',
+            query: query,
+            format: 'json'
+        }, customRequestOptions);
     }
 
 
