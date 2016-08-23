@@ -1,6 +1,6 @@
 {
   "name": "mwbot",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "description": "A simple, but flexible MediaWiki Bot\"",
   "main": "src/index.js",
   "directories": {
@@ -23,10 +23,10 @@
     "grunt-eslint": "^19.0.0",
     "grunt-jscs": "^3.0.1",
     "grunt-mocha-cli": "^2.1.0",
-    "grunt-mocha-istanbul": "^5.0.1",
+    "grunt-mocha-istanbul": "^5.0.2",
     "grunt-release": "^0.14.0",
-    "istanbul": "^0.4.4",
-    "load-grunt-tasks": "^3.5.0",
+    "istanbul": "^0.4.5",
+    "load-grunt-tasks": "^3.5.2",
     "time-grunt": "^1.4.0"
   },
   "scripts": {
