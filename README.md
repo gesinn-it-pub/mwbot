@@ -320,13 +320,13 @@ Is used internally to print .batch() status messages.
 MWBot.logStatus('[+] ', counter, total, 'USER', user.userName);
 ```
 #### MWBot.Promise
-Injection of a bluebird.js Promise
+Injection of a [bluebird.js Promise](http://bluebirdjs.com/docs/getting-started.html) 
 
 #### MWBot.map
-Injection of a bluebird.js Promise.map (for concurrent batch requests)
+Injection of a [bluebird.js Promise.map](http://bluebirdjs.com/docs/api/promise.map.html) (for concurrent batch requests)
 
 #### MWBot.mapSeries
-Injection of a bluebird.js Promise.mapSeries (for sequential batch requests)
+Injection of a [bluebird.js Promise.mapSeries](http://bluebirdjs.com/docs/api/promise.mapseries.html) (for sequential batch requests)
 
 
 ## Tips and Tricks
