@@ -73,14 +73,50 @@ describe('MWBot Request', function() {
         });
     });
 
-    it('successfully reads a page read()', function(done) {
+    it('successfully reads a page with read()', function(done) {
         let bot = new MWBot();
         bot.login(loginCredentials.valid).then(() => {
             return bot.read('Main Page');
         }).then((response) => {
             expect(response).to.have.any.keys('query');
             expect(response.query).to.have.any.keys('pages');
+            expect(response.query.pages).to.have.any.keys('1');
+            expect(response.query.pages['1']).to.have.any.keys('revisions');
+            log(response.query.pages['1']['revisions'][0]['*']);
             done();
+        }).catch((err) => {
+            log(err);
+        });
+    });
+
+    it('successfully reads multiple pages with read()', function(done) {
+        let bot = new MWBot();
+        bot.login(loginCredentials.valid).then(() => {
+            return bot.read('Main Page|MediaWiki:Sidebar');
+        }).then((response) => {
+            log(response.query);
+            expect(response).to.have.any.keys('query');
+            expect(response.query).to.have.any.keys('pages');
+            expect(response.query.pages).to.have.any.keys('1');
+            expect(response.query.pages['1']).to.have.any.keys('revisions');
+            log(response.query.pages['1']['revisions'][0]['*']);
+            done();
+        }).catch((err) => {
+            log(err);
+        });
+    });
+
+    it('successfully reads a page read() with stacked promises', function(done) {
+        this.timeout(3000);
+        let bot = new MWBot();
+        bot.login(loginCredentials.valid).then(() => {
+            bot.read('Test Page', {timeout: 8000}).then((response) => {
+                expect(response).to.have.any.keys('query');
+                expect(response.query).to.have.any.keys('pages');
+                done();
+            }).catch((err) => {
+                log(err);
+            });
         }).catch((err) => {
             log(err);
         });

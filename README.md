@@ -17,6 +17,25 @@ The library has extensive test coverage and is written in modern ECMAScript 2015
 * [API Documenatation](docs/API.md)
 
 ## Documentation
+### Typical Example
+```js
+const MWBot = require('mwbot');
+
+let bot = new MWBot();
+
+bot.loginGetEditToken({
+    apiUrl: settings.apiUrl,
+    username: settings.username,
+    password: settings.password
+}).then(() => {
+    return bot.edit('Test Page', '=Some more Wikitext=', 'Test Upload');
+}).then((response) => {
+    // Success
+}).catch((err) => {
+    // Error
+});
+```
+
 ### Constructor and Settings
 #### constructor(customOptions, customRequestOptions)
 Constructs a new MWBot instance.
@@ -95,25 +114,51 @@ Combines .login() and getEditToken() into one operation for convenience.
 
 ### CRUD Operations
 #### create(title, content, summary, customRequestOptions)
+Creates a wiki page. If the page already exists, it will fail
+* See https://www.mediawiki.org/wiki/API:Edit
 ```js
 bot.create('Test Page', 'Test Content', 'Test Summary').then((response) => {
-     // Success
- }).catch((err) => {
-     // Error: Could not get edit token
- });
-```
-#### read(title, customRequestOptions)
-```js
-bot.create('Test Page', {timeout: 8000}).then((response) => {
     // Success
+}).catch((err) => {
+    // General error, or: page already exists
+});
+```
+
+#### read(title, customRequestOptions)
+Reads the content of a wiki page. 
+To fetch more than one page, separate the page names with `|`
+* See https://www.mediawiki.org/wiki/API:Query
+```js
+bot.read('Test Page', {timeout: 8000}).then((response) => {
+    // Success
+    // The MediaWiki API Result is somewhat unwieldy:
+    console.log(response.query.pages['1']['revisions'][0]['*']);
 }).catch((err) => {
     // Error: Could not get edit token
 });
 ```
 
 #### update(title, content, summary, customRequestOptions)
+Updates a wiki page. If the page doesn't exist, it will fail. 
+* See https://www.mediawiki.org/wiki/API:Edit
+```js
+bot.update('Test Page', 'Test Content', 'Test Summary').then((response) => {
+    // Success
+}).catch((err) => {
+    // Error: Could not get edit token
+});
+```
 
 #### edit(title, content, summary, customRequestOptions)
+Edits a wiki page. If the page does not exist yet, it will be created.
+* See https://www.mediawiki.org/wiki/API:Edit
+```js
+bot.update('Test Page', 'Test Content', 'Test Summary').then((response) => {
+    // Success
+}).catch((err) => {
+    // Error: Could not get edit token
+});
+```
 
 #### upload(title, pathToFile, comment, customParams, customRequestOptions)
 
@@ -121,6 +166,33 @@ bot.create('Test Page', {timeout: 8000}).then((response) => {
 
 ### Convenience Operations
 #### batch(jobs, summary, concurrency, customRequestOptions)
+```js
+let batchJobs = {
+    create: {
+        'TestPage1': 'TestContent1',
+        'TestPage2': 'TestContent2'
+    },
+    update: {
+        'TestPage1': 'TestContent1-Update'
+    },
+    delete: [
+        'TestPage2'
+    ],
+    edit: {
+        'TestPage2': 'TestContent2',
+        'TestPage3': Math.random()
+    },
+    upload: {
+        'Image1.png': '/path/to/Image1.png'
+    }
+};
+
+bot.batch(batchJobs, 'Batch Upload Summary').then((response) => {
+    // Success
+}).catch((err) => {
+    // Error: Could not get edit token
+});
+```
 
 #### sparqlQuery(query, endpointUrl, customRequestOptions)
 
@@ -148,7 +220,6 @@ bot.request({
 });
 ```
 
-
 #### rawRequest(requestOptions)
 This executes a standard [request](https://www.npmjs.com/package/request) request.
 It uses the some default requestOptions, but you can overwrite any of them.
@@ -168,61 +239,9 @@ bot.rawRequest({
 });
 ```
 
-## Complete Examples
-### Single Requests, chained with .then
-```js
-const MWBot = require('mwbot');
+## More advanced, complete examples
 
-let bot = new MWBot();
-
-bot.loginGetEditToken({
-    apiUrl: settings.apiUrl,
-    username: settings.username,
-    password: settings.password
-}).then(() => {
-    return bot.edit('Test Page', '=Some more Wikitext=', 'Test Upload');
-}).then((response) => {
-    // Success
-}).catch((err) => {
-    // Error
-});
-
-
-```
 ### Batch Request
-```js
-let loginSettings = {
-    apiUrl: settings.apiUrl,
-    username: settings.username,
-    password: settings.password
-};
 
-bot.loginGetEditToken(loginSettings).then(() => {
-    return bot.batch({
-        create: {
-            'TestPage1': 'TestContent1',
-            'TestPage2': 'TestContent2'
-        },
-        update: {
-            'TestPage1': 'TestContent1-Update'
-        },
-        delete: [
-            'TestPage2'
-        ],
-        edit: {
-            'TestPage2': 'TestContent2',
-            'TestPage3': Math.random()
-        },
-        upload: {
-            'Image1.png': '/path/to/Image1.png'
-        }
-    }, 'Batch Upload Reason');
-
-}).then((response) => {
-    // Success
-}).catch((err) => {
-    // Error
-});
-```
 
 For more examples, take a look at the [/test](test/) directory
