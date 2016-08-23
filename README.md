@@ -57,7 +57,7 @@ let bot = new MWBot({}, {
 ```
 
 #### setOptions(customOptions)
-Can be used to overwrite the default bot options
+Overwrite the default bot options
 ```js
 bot.setOptions({
    verbose: false,  
@@ -69,7 +69,7 @@ bot.setOptions({
 });
 ````
 #### setGlobalRequestOptions(customRequestOptions)
-Overwrite [request](https://www.npmjs.com/package/request) options
+Overwrite the [request](https://www.npmjs.com/package/request) options
 ```js
 bot.setGlobalRequestOptions({
     method: 'POST',
@@ -272,7 +272,8 @@ In case that the standard CRUD requests are not sufficient, it is possible to cr
 
 #### request(params, customRequestOptions)
 This request assumes you're acting against a MediaWiki API.
-It does basic error handling, memorizes tokens and the API URL.
+It allows you to easily craft custom MediaWiki API Request.
+It also does basic error handling, and uses the login data if given.
 ```js
 bot.request({
     action: 'edit',
@@ -306,9 +307,12 @@ bot.rawRequest({
 });
 ```
 
-## More advanced, complete examples
+## Tips and Tricks
+Learn how to use the Promise Pattern! 
+It handles a lot, like concurrency, parallel or sequential requests, etc.
 
-### Batch Request
+I can recommend the [bluebird.js](http://bluebirdjs.com/) Promise library.
+* If you want to do batch request concurrently, use [Promise.map](http://bluebirdjs.com/docs/api/promise.map.html)
+* If you want to do batch request in strictly sequential order, use [Promise.mapSeries](http://bluebirdjs.com/docs/api/mapseries.html)
 
-
-For more examples, take a look at the [/test](test/) directory
+For more examples, have a look at the [/test](test/) directory

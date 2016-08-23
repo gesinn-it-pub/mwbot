@@ -38,6 +38,15 @@ See <https://www.npmjs.com/package/request>
 
 -   `customRequestOptions` **{}** 
 
+## setApiUrl
+
+Sets the API URL for MediaWiki requests
+This can be uses instead of a login, if no actions are used that require one.
+
+**Parameters**
+
+-   `apiUrl` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** API Url to MediaWiki, e.g. '<https://www.semantic-mediawiki.org/w/api.php>'
+
 ## rawRequest
 
 Executes a promisified raw request
