@@ -36,7 +36,13 @@ describe('MWBot Batch Request', function() {
             }, 'Batch Upload Reason');
 
         }).then((response) => {
-            expect(response).to.be.instanceof(Array);
+            expect(response).to.be.instanceof(Object);
+            expect(response.create).to.be.instanceof(Object);
+            expect(response.create.TestPage1).to.be.instanceof(Object);
+            expect(response.create.TestPage1.response).to.be.instanceof(Object);
+            expect(response.create.TestPage1.response).to.be.instanceof(Object);
+            expect(response.delete).to.be.instanceof(Object);
+            expect(response.edit).to.be.instanceof(Object);
             done();
         });
 
@@ -59,7 +65,14 @@ describe('MWBot Batch Request', function() {
             });
 
         }).then((response) => {
-            expect(response).to.be.instanceof(Array);
+            // log(response);
+            expect(response).to.be.instanceof(Object);
+            expect(response.read).to.be.instanceof(Object);
+            expect(response.read['Main Page']).to.be.instanceof(Object);
+            expect(response.read['Main Page'].query).to.be.instanceof(Object);
+            expect(response.read['Main Page'].query.pages).to.be.instanceof(Object);
+            expect(response.read['Main Page'].query.pages['1']).to.be.instanceof(Object);
+            expect(response.read['Main Page'].query.pages['1'].title).to.equal('Main Page');
             done();
         });
     });
@@ -87,7 +100,7 @@ describe('MWBot Batch Request', function() {
             });
 
         }).then((response) => {
-            expect(response).to.be.instanceof(Array);
+            expect(response).to.be.instanceof(Object);
             done();
         });
     });
@@ -133,7 +146,7 @@ describe('MWBot Batch Request', function() {
             ], false, 1);
 
         }).then((response) => {
-            expect(response).to.be.instanceof(Array);
+            expect(response).to.be.instanceof(Object);
             done();
         });
 

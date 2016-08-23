@@ -1,16 +1,61 @@
-#MWBot
+MWBot
+========================
+
 ## Description
-MWBot is a Node.js NPM module for interacting with the MediaWiki API.
-The design goal is to be as flexible as possible, with the ability to overwrite any option at any point.
-The library also lets you choose the abstraction/convenience level on which you want to work.
+MWBot is a Node.js module for interacting with the MediaWiki API.
+The design goal is to be as flexible as possible, with the ability to overwrite options and behaviour any option at any point.
+The library also lets you freely choose the abstraction/convenience level on which you want to work.
+
+The library uses the Promise Pattern, understanding it is essential.
 
 ## Requirements
 * Node.js 4.0+
 
-## API Documentation
+## Technical API Documentation
 * [API Documenatation](API.md)
 
-## Examples
+## Documentation
+### Constructor and Settings
+
+#### constructor(customOptions)
+#### setOptions(customOptions)
+#### setGlobalRequestOptions(customRequestOptions)
+
+
+### Login and Session Management
+
+#### .login(loginOptions)
+
+#### .getEditToken()
+
+#### loginGetEditToken(loginOptions)
+
+### Basic Requests
+#### rawRequest(requestOptions)
+#### request(params, customRequestOptions)
+
+### CRUD Operations
+#### create(title, content, summary, customRequestOptions)
+#### read(title, customRequestOptions)
+
+#### update(title, content, summary, customRequestOptions)
+
+#### edit(title, content, summary, customRequestOptions)
+
+#### upload(title, pathToFile, comment, customParams, customRequestOptions)
+
+#### uploadOverwrite(title, pathToFile, comment, customParams, customRequestOptions)
+
+### Convenience Operations
+#### batch(jobs, summary, concurrency, customRequestOptions)
+
+#### sparqlQuery(query, endpointUrl, customRequestOptions)
+
+#### askQuery(query, customRequestOptions)
+* TODO
+
+
+## Complete Examples
 ### Single Requests, chained with .then
 ```js
 const MWBot = require('mwbot');

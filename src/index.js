@@ -160,33 +160,6 @@ class MWBot {
         });
     }
 
-    /**
-     * Make a SPARQL Query
-     * Defaults to use the wikidata endpoint
-     *
-     * @param {string} query
-     * @param {string} [endpointUrl]
-     * @param {object} [customRequestOptions]
-     *
-     * @returns {bluebird}
-     */
-    sparqlQuery(query, endpointUrl, customRequestOptions) {
-
-        endpointUrl = endpointUrl || this.options.sparqlEndpoint;
-
-        let requestOptions = MWBot.merge({
-            method: 'GET',
-            uri: endpointUrl,
-            json: true,
-            qs: {
-                format: 'json',
-                query: query
-            }
-        }, customRequestOptions);
-
-        return this.rawRequest(requestOptions);
-    }
-
 
     //////////////////////////////////////////
     // CORE FUNCTIONS                       //
@@ -293,7 +266,7 @@ class MWBot {
 
 
     //////////////////////////////////////////
-    // CONVENIENCE FUNCTIONS                //
+    // CRUD OPERATIONS                      //
     //////////////////////////////////////////
 
     /**
@@ -477,6 +450,11 @@ class MWBot {
         return this.upload(title, pathToFile, comment, params, customRequestOptions);
     }
 
+
+    //////////////////////////////////////////
+    // CONVENIENCE FUNCTIONS                //
+    //////////////////////////////////////////
+
     /**
      * Batch Operation
      *
@@ -635,6 +613,61 @@ class MWBot {
             });
 
         });
+    }
+
+
+    /**
+     * Executes a SPARQL Query
+     * Defaults to use the wikidata endpoint
+     *
+     * @param {string} query
+     * @param {string} [endpointUrl]
+     * @param {object} [customRequestOptions]
+     *
+     * @returns {bluebird}
+     */
+    sparqlQuery(query, endpointUrl, customRequestOptions) {
+
+        endpointUrl = endpointUrl || this.options.sparqlEndpoint;
+
+        let requestOptions = MWBot.merge({
+            method: 'GET',
+            uri: endpointUrl,
+            json: true,
+            qs: {
+                format: 'json',
+                query: query
+            }
+        }, customRequestOptions);
+
+        return this.rawRequest(requestOptions);
+    }
+
+    /**
+     * Execute an ASK Query
+     *
+     * @param {string} query
+     * @param {string} [endpointUrl]
+     * @param {object} [customRequestOptions]
+     *
+     * @returns {bluebird}
+     */
+    askQuery(query, customRequestOptions) {
+
+        // TODO
+
+
+        // let requestOptions = MWBot.merge({
+        //     method: 'GET',
+        //     uri: endpointUrl,
+        //     json: true,
+        //     qs: {
+        //         format: 'json',
+        //         query: query
+        //     }
+        // }, customRequestOptions);
+        //
+        // return this.rawRequest(requestOptions);
     }
 
 
