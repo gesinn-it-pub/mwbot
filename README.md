@@ -12,7 +12,7 @@ The library uses the Promise Pattern, understanding it is essential.
 * Node.js 4.0+
 
 ## Technical API Documentation
-* [API Documenatation](API.md)
+* [API Documenatation](docs/API.md)
 
 ## Documentation
 ### Constructor and Settings
