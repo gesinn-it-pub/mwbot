@@ -156,7 +156,7 @@ bot.read('Test Page|MediaWiki:Sidebar', {timeout: 8000}).then((response) => {
     // The MediaWiki API Result is somewhat unwieldy:
     console.log(response.query.pages['1']['revisions'][0]['*']);
 }).catch((err) => {
-    // Error: Could not get edit token
+    // Error
 });
 ```
 
@@ -167,7 +167,7 @@ Updates a wiki page. If the page doesn't exist, it will fail.
 bot.update('Test Page', 'Test Content', 'Test Summary').then((response) => {
     // Success
 }).catch((err) => {
-    // Error: Could not get edit token
+    // Error
 });
 ```
 
@@ -178,7 +178,7 @@ Edits a wiki page. If the page does not exist yet, it will be created.
 bot.edit('Test Page', 'Test Content', 'Test Summary').then((response) => {
     // Success
 }).catch((err) => {
-    // Error: Could not get edit token
+    // Error
 });
 ```
 
@@ -225,7 +225,7 @@ let batchJobs = {
 bot.batch(batchJobs, 'Batch Upload Summary').then((response) => {
     // Success
 }).catch((err) => {
-    // Error: Could not get edit token
+    // Error
 });
 ```
 
@@ -251,7 +251,7 @@ let query = `
 bot.sparqlQuery(query, endPoint).then((response) => {
     // Success
 }).catch((err) => {
-    // Error: Could not get edit token
+    // Error
 });
 ```
 
@@ -268,7 +268,7 @@ let query = `
 bot.askQuery(query, apiUrl).then((response) => {
     // Success
 }).catch((err) => {
-    // Error: Could not get edit token
+    // Error
 });
 ```
 
