@@ -61,7 +61,7 @@ let bot = new MWBot({}, {
 ```
 
 #### setOptions(customOptions)
-Overwrite the default bot options
+Overwrite/extend the default bot options
 ```js
 bot.setOptions({
    verbose: false,  
@@ -73,7 +73,7 @@ bot.setOptions({
 });
 ````
 #### setGlobalRequestOptions(customRequestOptions)
-Overwrite the [request](https://www.npmjs.com/package/request) options
+Overwrite/extend the [request](https://www.npmjs.com/package/request) options
 This may be important for more advanced usecases, e.g. where additional authentification or certificates are necessary.
 ```js
 bot.setGlobalRequestOptions({
