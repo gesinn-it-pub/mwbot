@@ -1,5 +1,6 @@
 MWBot
 ========================
+[![Download stats](https://nodei.co/npm/mwbot.png?downloads=true&downloadRank=true)](https://nodei.co/npm/mwbot/)
 
 ## Description
 MWBot is a Node.js module for interacting with the MediaWiki API.
