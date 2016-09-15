@@ -1,14 +1,16 @@
 MWBot
 ========================
+[![Download stats](https://nodei.co/npm/mwbot.png?downloads=true&downloadRank=true)](https://nodei.co/npm/mwbot/)
 
 ## Description
 MWBot is a Node.js module for interacting with the MediaWiki API.
-The library makes use of the Promise Pattern and behind the scene, the [request](https://www.npmjs.com/package/request) library.
+
+The library makes use of the Promise pattern and behind the scene, the NPM [request](https://www.npmjs.com/package/request) library.
 
 The design goal is to be as flexible as possible, with the ability to overwrite options and behaviour at any point.
 The library also lets you freely choose the abstraction/convenience level on which you want to work.
-You can use convenience functions that bundles (with concurrency) of multiple API requests into one function, 
-but you can also handcraft your own MediaWiki API and pure HTTP requests.
+You can use convenience functions that bundles (with concurrency) multiple API requests into one function, 
+but you can also handcraft your own custom MediaWiki API and pure HTTP requests.
 
 The library has extensive test coverage and is written in modern ECMAScript 2015.
 
