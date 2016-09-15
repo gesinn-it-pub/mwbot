@@ -1,11 +1,12 @@
 'use strict';
 
-const fs      = require('fs');
-const path    = require('path');
-const Promise = require('bluebird');
-const request = require('request');
-const semlog  = require('semlog');
-const log     = semlog.log;
+const fs            = require('fs');
+const path          = require('path');
+const Promise       = require('bluebird');
+const request       = require('request');
+const semlog        = require('semlog');
+const log           = semlog.log;
+const packageJson   = require('../package.json');
 
 /**
  * MWBot library
@@ -55,6 +56,9 @@ class MWBot {
         // REQUEST OPTIONS
         this.defaultRequestOptions = {
             method: 'POST',
+            headers: {
+                'User-Agent': 'mwbot/' + packageJson.version
+            },
             qs: {
                 format: 'json'
             },
@@ -82,7 +86,6 @@ class MWBot {
      * Get mwbot ersion number
      */
     get version() {
-        let packageJson = require('../package.json');
         return packageJson.version;
     }
 

@@ -74,15 +74,16 @@ bot.setOptions({
 ````
 #### setGlobalRequestOptions(customRequestOptions)
 Overwrite/extend the [request](https://www.npmjs.com/package/request) options
-This may be important for more advanced usecases, e.g. where additional authentification or certificates are necessary.
+This may be important for more advanced usecases, 
+e.g. changing the user agent or adding additional authentification or certificates.
 ```js
 bot.setGlobalRequestOptions({
     method: 'POST',
     qs: {
         format: 'json'
     },
-    form: {
-
+    headers: {
+        'User-Agent': 'mwbot/1.0.3'
     },
     timeout: 120000, // 120 seconds
     jar: true,
