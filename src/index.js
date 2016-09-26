@@ -584,10 +584,14 @@ class MWBot {
             let results = {};
             let operation = 'map';
 
+            // If no concurrency is needed, use bluebird Promise.mapSeries instead of .map
+            // This ensures that tasks are executed in exactly the sequence as defined
             if (!concurrency || concurrency === 1) {
                 operation = 'mapSeries';
             }
 
+            // Jobs can be written in object or array notation
+            // If it is written in the more convenient object notation, convert it to array notation
             if (Array.isArray(jobs)) {
                 jobQueue = jobs;
             } else {
@@ -603,7 +607,6 @@ class MWBot {
                                 jobQueue.push([operation, pageName, summary, customRequestOptions]);
                             }
                         }
-
                     } else {
                         if (operation === 'upload' || operation === 'uploadOverwrite') {
                             for (let fileName in operationJobs) {
@@ -616,7 +619,6 @@ class MWBot {
                                 jobQueue.push([operation, pageName, content, summary, customRequestOptions]);
                             }
                         }
-
                     }
                 }
             }
@@ -624,6 +626,7 @@ class MWBot {
             let currentCounter = 0;
             let totalCounter = jobQueue.length;
 
+            // Dynamically invoke either .map or .mapSeries on bluebird Promise
             Promise[operation](jobQueue, (job) => {
 
                 let operation = job[0];
@@ -633,7 +636,9 @@ class MWBot {
                     return reject(new Error('Unsupported operation: ' + operation));
                 }
 
+                // Dynamically invoke the mwbot CRUD function with the parameters from the job array
                 return this[operation](pageName, job[2], job[3], job[4]).then((response) => {
+
                     currentCounter += 1;
 
                     let status = '[=] ';
@@ -725,34 +730,6 @@ class MWBot {
         });
     }
 
-
-    /**
-     * Executes a SPARQL Query
-     * Defaults to use the wikidata endpoint
-     *
-     * @param {string} query
-     * @param {string} [endpointUrl]
-     * @param {object} [customRequestOptions]
-     *
-     * @returns {bluebird}
-     */
-    sparqlQuery(query, endpointUrl, customRequestOptions) {
-
-        endpointUrl = endpointUrl || this.options.sparqlEndpoint;
-
-        let requestOptions = MWBot.merge({
-            method: 'GET',
-            uri: endpointUrl,
-            json: true,
-            qs: {
-                format: 'json',
-                query: query
-            }
-        }, customRequestOptions);
-
-        return this.rawRequest(requestOptions);
-    }
-
     /**
      * Execute an ASK Query
      *
@@ -781,6 +758,33 @@ class MWBot {
     }
 
 
+    /**
+     * Executes a SPARQL Query
+     * Defaults to use the wikidata endpoint
+     *
+     * @param {string} query
+     * @param {string} [endpointUrl]
+     * @param {object} [customRequestOptions]
+     *
+     * @returns {bluebird}
+     */
+    sparqlQuery(query, endpointUrl, customRequestOptions) {
+
+        endpointUrl = endpointUrl || this.options.sparqlEndpoint;
+
+        let requestOptions = MWBot.merge({
+            method: 'GET',
+            uri: endpointUrl,
+            json: true,
+            qs: {
+                format: 'json',
+                query: query
+            }
+        }, customRequestOptions);
+
+        return this.rawRequest(requestOptions);
+    }
+    
     //////////////////////////////////////////
     // HELPER FUNCTIONS                     //
     //////////////////////////////////////////
