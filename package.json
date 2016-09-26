@@ -1,7 +1,7 @@
 {
   "name": "mwbot",
-  "version": "1.0.4",
-  "description": "A simple, but flexible MediaWiki Bot\"",
+  "version": "1.0.5",
+  "description": "A simple, flexible MediaWiki Bot",
   "main": "src/index.js",
   "directories": {
     "test": "test"
@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "bluebird": "^3.4.6",
-    "request": "^2.74.0",
+    "request": "^2.75.0",
     "semlog": "^0.6.10"
   },
   "devDependencies": {

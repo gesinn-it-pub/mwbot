@@ -30,10 +30,33 @@ class MWBot {
      */
     constructor(customOptions, customRequestOptions) {
 
-        // STATE
+        /**
+         * Bot instance Login State
+         * Is received from the MW Login API and contains token, userid, etc.
+         *
+         * @type {object}
+         */
         this.state = {};
+
+        /**
+         * Bot instance is logged in or not
+         *
+         * @type {boolean}
+         */
         this.loggedIn = false;
+
+        /**
+         * Bot instances edit token
+         *
+         * @type {boolean}
+         */
         this.editToken = false;
+
+        /**
+         * Internal statistics
+         *
+         * @type {object}
+         */
         this.counter = {
             total: 0,
             resolved: 0,
@@ -41,7 +64,12 @@ class MWBot {
             rejected: 0
         };
 
-        // OPTIONS
+        /**
+         * Default options.
+         * Should be immutable
+         *
+         * @type {object}
+         */
         this.defaultOptions = {
             verbose: false,
             silent: false,
@@ -50,10 +78,27 @@ class MWBot {
             apiUrl: false,
             sparqlEndpoint: 'https://query.wikidata.org/bigdata/namespace/wdq/sparql' // Wikidata
         };
+
+        /**
+         * Custom options as the user provided them originally.
+         *
+         * @type {object}
+         */
         this.customOptions = customOptions || {};
+
+        /**
+         * Actual, current options of the bot instance
+         * They're a mix of the default options, the custom options and later changes
+         *
+         * @type {Object}
+         */
         this.options = MWBot.merge(this.defaultOptions, this.customOptions);
 
-        // REQUEST OPTIONS
+        /**
+         * Default options for the NPM request library
+         *
+         * @type {Object}
+         */
         this.defaultRequestOptions = {
             method: 'POST',
             headers: {
@@ -70,7 +115,19 @@ class MWBot {
             time: true,
             json: true
         };
+
+        /**
+         * Custom request options
+         *
+         * @type {{}}
+         */
         this.customRequestOptions = customRequestOptions || {};
+
+        /**
+         * The actual, current options for the NPM request library
+         *
+         * @type {Object}
+         */
         this.globalRequestOptions = MWBot.merge(this.defaultRequestOptions, this.customRequestOptions);
 
         // SEMLOG OPTIONS
@@ -83,19 +140,21 @@ class MWBot {
     //////////////////////////////////////////
 
     /**
-     * Get mwbot ersion number
+     * Get mwbot version number
+     * Uses ES5 getter
      */
     get version() {
         return packageJson.version;
     }
 
     /**
-     * Set and overwrite msbot options
+     * Set and overwrite mwbot options
      *
-     * @param {{}} customOptions
+     * @param {Object} customOptions
      */
     setOptions(customOptions) {
         this.options = MWBot.merge(this.options, customOptions);
+        this.customOptions = MWBot.merge(this.customOptions, customOptions);
     }
 
     /**
@@ -106,6 +165,7 @@ class MWBot {
      */
     setGlobalRequestOptions(customRequestOptions) {
         this.globalRequestOptions = MWBot.merge(this.globalRequestOptions, customRequestOptions);
+        this.customRequestOptions = MWBot.merge(this.customRequestOptions, customRequestOptions);
     }
 
     /**
@@ -132,7 +192,9 @@ class MWBot {
      * @returns {bluebird}
      */
     rawRequest(requestOptions) {
+
         this.counter.total += 1;
+
         return new Promise((resolve, reject) => {
             this.counter.resolved +=1;
             if (!requestOptions.uri) {
@@ -161,6 +223,7 @@ class MWBot {
      * @returns {bluebird}
      */
     request(params, customRequestOptions) {
+
         return new Promise((resolve, reject) => {
 
             this.globalRequestOptions.uri = this.options.apiUrl;
@@ -188,6 +251,7 @@ class MWBot {
                     err.request = requestOptions;
                     return reject(err) ;
                 }
+
                 return resolve(response);
 
             }).catch((err) => {
@@ -204,6 +268,8 @@ class MWBot {
 
     /**
      * Executes a Login
+     *
+     * @see https://www.mediawiki.org/wiki/API:Login
      *
      * @param {object} [loginOptions]
      *
@@ -224,6 +290,7 @@ class MWBot {
                 lgname: this.options.username,
                 lgpassword: this.options.password
             };
+
             let loginString = this.options.username + '@' + this.options.apiUrl.split('/api.php').join('');
 
             this.request(loginRequest).then((response) => {
@@ -265,7 +332,6 @@ class MWBot {
         });
 
         return this.loginPromise;
-
     }
 
     /**
@@ -280,6 +346,7 @@ class MWBot {
             if (this.editToken) {
                 return resolve(this.state);
             }
+
             // MW >= 1.24
             this.request({
                 action: 'query',
@@ -301,11 +368,6 @@ class MWBot {
         });
     }
 
-
-    //////////////////////////////////////////
-    // CRUD OPERATIONS                      //
-    //////////////////////////////////////////
-
     /**
      * Combines Login  with GetEditToken
      *
@@ -319,13 +381,18 @@ class MWBot {
         });
     }
 
+
+    //////////////////////////////////////////
+    // CRUD OPERATIONS                      //
+    //////////////////////////////////////////
+
     /**
      * Creates a new wiki pages. Does not edit existing ones
      *
      * @param {string}  title
      * @param {string}  content
      * @param {string}  [summary]
-     * @param {object}      [customRequestOptions]
+     * @param {object}  [customRequestOptions]
      *
      * @returns {bluebird}
      */
@@ -343,7 +410,6 @@ class MWBot {
     /**
      * Reads the content / and meta-data of one (or many) wikipages
      *
-     *
      * @param {string}  title    For multiple Pages use: PageA|PageB|PageC
      * @param {object}      [customRequestOptions]
      *
@@ -360,7 +426,27 @@ class MWBot {
     }
 
     /**
-     * Updates existing new wiki pages. Does not create new ones
+     * Edits a new wiki pages. Creates a new page if it does not exist yet.
+     *
+     * @param {string}  title
+     * @param {string}  content
+     * @param {string}  [summary]
+     * @param {object}      [customRequestOptions]
+     *
+     * @returns {bluebird}
+     */
+    edit(title, content, summary, customRequestOptions) {
+        return this.request({
+            action: 'edit',
+            title: title,
+            text: content,
+            summary: summary || this.options.defaultSummary,
+            token: this.editToken
+        }, customRequestOptions);
+    }
+
+    /**
+     * Updates existing wiki pages. Does not create new ones.
      *
      * @param {string}  title
      * @param {string}  content
@@ -399,26 +485,6 @@ class MWBot {
     }
 
     /**
-     * Edits a new wiki pages. Creates a new page if it does not exist yet
-     *
-     * @param {string}  title
-     * @param {string}  content
-     * @param {string}  [summary]
-     * @param {object}      [customRequestOptions]
-     *
-     * @returns {bluebird}
-     */
-    edit(title, content, summary, customRequestOptions) {
-        return this.request({
-            action: 'edit',
-            title: title,
-            text: content,
-            summary: summary || this.options.defaultSummary,
-            token: this.editToken
-        }, customRequestOptions);
-    }
-
-    /**
      * Uploads a file
      *
      * @param {string}  [title]
@@ -443,6 +509,8 @@ class MWBot {
             }, customParams);
 
             let uploadRequestOptions = MWBot.merge(this.globalRequestOptions, {
+
+                // https://www.npmjs.com/package/request#support-for-har-12
                 har: {
                     postData: {
                         mimeType: 'multipart/form-data',
@@ -719,6 +787,7 @@ class MWBot {
 
     /**
      * Recursively merges two objects
+     * Takes care that the two objects are not mutated
      *
      * @param {object} parent   Parent Object
      * @param {object} child    Child Object; overwrites parent properties
@@ -728,6 +797,8 @@ class MWBot {
     static merge(parent, child) {
         parent = parent || {};
         child = child || {};
+        // Use {} as first parameter, as this object is mutated by default
+        // We don't want that, so we're providing an empty object that is thrown away after the operation
         return Object.assign({}, parent, child);
     }
 
