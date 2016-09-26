@@ -784,7 +784,7 @@ class MWBot {
 
         return this.rawRequest(requestOptions);
     }
-    
+
     //////////////////////////////////////////
     // HELPER FUNCTIONS                     //
     //////////////////////////////////////////
