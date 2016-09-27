@@ -232,6 +232,40 @@ bot.batch(batchJobs, 'Batch Upload Summary').then((response) => {
 });
 ```
 
+Alternatively, an array.array notation can be used. 
+The first array item is the operation name, the second declares the page name.
+All following array items are used as function parameters.
+
+```js
+bot.loginGetEditToken(loginCredentials.valid).then(() => {
+    return bot.batch([
+        [
+            'create',
+            'TestPage1',
+            'TestContent1',
+            'Batch Upload Reason'
+        ],
+        [
+            'update',
+            'TestPage1',
+            'TestContent1-Update',
+            'Batch Upload Reason'
+        ],
+        [
+            'delete',
+            'TestPage1',
+            'Batch Upload Reason'
+        ]
+    ], false, 1);
+
+}).then((response) => {
+    // Success
+}).catch((err) => {
+    // Error
+});
+```
+
+
 #### sparqlQuery(query, endpointUrl, customRequestOptions)
 Query Triplestores / SPARQL Endpoints like those from wikidata and dbpedia.
 
