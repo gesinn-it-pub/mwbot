@@ -285,25 +285,29 @@ class MWBot {
                 return reject(new Error('Incomplete login credentials!'));
             }
 
-            let loginRequest = {
-                action: 'login',
-                lgname: this.options.username,
-                lgpassword: this.options.password
-            };
+            let loginTokenRequest = {
+              action: 'query',
+              meta: 'tokens',
+              type: 'login'
+            }
 
             let loginString = this.options.username + '@' + this.options.apiUrl.split('/api.php').join('');
 
-            this.request(loginRequest).then((response) => {
+            this.request(loginTokenRequest).then((response) => {
 
-                if (!response.login || !response.login.result) {
+                if (!response.query || !response.query.tokens || !response.query.tokens.logintoken ) {
                     let err = new Error('Invalid response from API');
                     err.response = response;
                     log('[E] [MWBOT] Login failed with invalid response: ' + loginString);
                     return reject(err) ;
                 } else {
-                    this.state = MWBot.merge(this.state, response.login);
-                    // Add token and re-submit login request
-                    loginRequest.lgtoken = response.login.token;
+                    this.state = MWBot.merge(this.state, response.query.tokens);
+                    let loginRequest = {
+                        action: 'login',
+                        lgname: this.options.username,
+                        lgpassword: this.options.password,
+                        lgtoken: response.query.tokens.logintoken
+                    };
                     return this.request(loginRequest);
                 }
 
