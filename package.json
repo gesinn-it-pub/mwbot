@@ -46,7 +46,18 @@
         "Promises",
         "MW"
     ],
-    "author": "Simon Heimler",
+    "author": {
+        "name": "Simon Heimler",
+        "mail": "heimlersimon@gmail.com",
+        "url": "http://www.fannon.de"
+    },
+    "contributors": [
+        {
+            "name": "gesinn.it GmbH",
+            "email": "github@gesinn.it",
+            "url": "https://gesinn.it"
+        }
+    ],
     "license": "MIT",
     "bugs": {
         "url": "https://github.com/Fannon/mwbot/issues"
