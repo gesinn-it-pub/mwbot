@@ -512,6 +512,7 @@ class MWBot {
 
                 // https://www.npmjs.com/package/request#support-for-har-12
                 har: {
+                    method: 'POST',
                     postData: {
                         mimeType: 'multipart/form-data',
                         params: []
