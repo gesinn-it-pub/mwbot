@@ -1,6 +1,6 @@
 {
     "name": "mwbot",
-    "version": "1.0.7",
+    "version": "1.0.8",
     "description": "A simple, flexible MediaWiki Bot",
     "main": "src/index.js",
     "directories": {
