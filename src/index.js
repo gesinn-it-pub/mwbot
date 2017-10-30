@@ -8,6 +8,11 @@ const semlog        = require('semlog');
 const log           = semlog.log;
 const packageJson   = require('../package.json');
 
+Promise.config({
+    // Enable cancellation
+    cancellation: true,
+});
+
 /**
  * MWBot library
  *
@@ -51,6 +56,13 @@ class MWBot {
          * @type {boolean}
          */
         this.editToken = false;
+
+        /**
+         * Bot instances createaccount token
+         *
+         * @type {boolean}
+         */
+        this.createaccountToken = false;
 
         /**
          * Internal statistics
@@ -369,6 +381,40 @@ class MWBot {
     }
 
     /**
+     * Gets an edit token
+     * Requires MW 1.27+
+     *
+     * @returns {bluebird}
+     */
+    getCreateaccountToken() {
+        return new Promise((resolve, reject) => {
+
+            if (this.createaccountToken) {
+                return resolve(this.state);
+            }
+
+            // MW 1.27+
+            this.request({
+                action: 'query',
+                meta: 'tokens',
+                type: 'createaccount'
+            }).then((response) => {
+                if (response.query && response.query.tokens && response.query.tokens.createaccounttoken) {
+                    this.createaccountToken = response.query.tokens.createaccounttoken;
+                    this.state = MWBot.merge(this.state, response.query.tokens);
+                    return resolve(this.state);
+                } else {
+                    let err = new Error('Could not get createaccount token');
+                    err.response = response;
+                    return reject(err) ;
+                }
+            }).catch((err) => {
+                return reject(err);
+            });
+        });
+    }
+
+    /**
      * Combines Login  with GetEditToken
      *
      * @param loginOptions
@@ -378,6 +424,20 @@ class MWBot {
     loginGetEditToken(loginOptions) {
         return this.login(loginOptions).then(() => {
             return this.getEditToken();
+        });
+    }
+
+
+    /**
+     * Combines Login  with GetCreateaccountToken
+     *
+     * @param loginOptions
+     *
+     * @returns {bluebird}
+     */
+    loginGetCreateaccountToken(loginOptions) {
+        return this.login(loginOptions).then(() => {
+            return this.getCreateaccountToken();
         });
     }
 
