@@ -130,7 +130,7 @@ If no login is necessary for the bot actions, it is sufficient to just set the A
 bot.setApiUrl('https://www.semantic-mediawiki.org/w/api.php');
 ```
 
-Note that it is also possible to set the API URL with the constructur:
+Note that it is also possible to set the API URL with the constructor:
 ```js
 let bot = new MWBot({
     apiUrl: 'https://www.semantic-mediawiki.org/w/api.php'
