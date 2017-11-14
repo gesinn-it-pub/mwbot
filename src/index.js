@@ -123,7 +123,7 @@ class MWBot {
 
             },
             timeout: 120000, // 120 seconds
-            jar: true,
+            jar: request.jar(),
             time: true,
             json: true
         };
