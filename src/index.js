@@ -543,6 +543,27 @@ class MWBot {
             token: this.editToken
         }, customRequestOptions);
     }
+    
+    /**
+    * Moves a wiki page
+    *
+    * @param {string}  oldName
+    * @param {string}  newName
+    * @param {string}  [reason]
+    * @param {object}      [customRequestOptions]
+    *
+    * @returns {bluebird}
+    */
+
+    move(oldName, newName, reason, customRequestOptions) {
+        return this.request({
+            action: 'move',
+            from: oldName,
+            to: newName,
+            reason: reason || this.options.defaultSummary,
+            token: this.editToken,
+        }, customRequestOptions);
+    }
 
     /**
      * Uploads a file
