@@ -21,7 +21,9 @@ The library has extensive test coverage and is written in modern ECMAScript 2015
 * [API Documenatation](docs/API.md)
 
 ## Documentation
-### Typical Example
+Since this library is based on promise, it can be used either via the typical Promise notation, or if you're Node.JS version already supports it - the new async/await syntax. If you use Node.JS > 7.x I'd highly recommended to use the latter.
+
+### Typical Example (Promise .then/.catch)
 ```js
 const MWBot = require('mwbot');
 
@@ -38,6 +40,25 @@ bot.loginGetEditToken({
 }).catch((err) => {
     // Error
 });
+```
+
+### Typical Example (async/await)
+```js
+async function main() {
+    const bot = new MWBot({
+        apiUrl: 'https://www.wikidata.org/w/api.php'
+    });
+    await bot.loginGetEditToken({
+        username: …
+        password: …
+    });
+    …
+    for (const itemId of …) {
+        await bot.request(…);
+    }
+}
+// In the root scope of a script, you must use the promise notation, as await is not allowed there.
+main().catch(console.error);
 ```
 
 For more examples, read the documentation or have a look at the [/test](test/) directory
@@ -147,6 +168,13 @@ bot.create('Test Page', 'Test Content', 'Test Summary').then((response) => {
 }).catch((err) => {
     // General error, or: page already exists
 });
+
+// Or simpler in async/await
+try {
+  const response = await bot.create('Test Page', 'Test Content', 'Test Summary');
+} catch (err) {
+  // General error, or: page already exists
+}
 ```
 
 #### read(title, customRequestOptions)
