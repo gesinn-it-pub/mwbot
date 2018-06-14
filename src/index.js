@@ -471,18 +471,24 @@ class MWBot {
      * Reads the content / and meta-data of one (or many) wikipages
      *
      * @param {string}  title    For multiple Pages use: PageA|PageB|PageC
+     * @param {boolean} redirect    If the page is a redirection, follow it or stay in the page 
      * @param {object}      [customRequestOptions]
      *
      * @returns {bluebird}
      */
-    read(title, customRequestOptions) {
-        return this.request({
+    read(title, redirect, customRequestOptions) {
+        let params = {
             action: 'query',
             prop: 'revisions',
             rvprop: 'content',
             titles: title,
-            redirects: 'yes'
-        }, customRequestOptions);
+        }
+
+        if (redirect) {
+            params.redirect = "redirect"
+        }
+
+        return this.request(params, customRequestOptions);
     }
 
     /**
@@ -501,7 +507,8 @@ class MWBot {
             title: title,
             text: content,
             summary: summary || this.options.defaultSummary,
-            token: this.editToken
+            token: this.editToken,
+            bot: true
         }, customRequestOptions);
     }
 
@@ -522,6 +529,7 @@ class MWBot {
             text: content,
             summary: summary || this.options.defaultSummary,
             nocreate: true,
+            bot: true,
             token: this.editToken
         }, customRequestOptions);
     }
@@ -540,29 +548,20 @@ class MWBot {
             action: 'delete',
             title: title,
             reason: reason || this.options.defaultSummary,
-            token: this.editToken
+            token: this.editToken,
+            bot: true
         }, customRequestOptions);
     }
-    
-    /**
-    * Moves a wiki page
-    *
-    * @param {string}  oldName
-    * @param {string}  newName
-    * @param {string}  [reason]
-    * @param {object}      [customRequestOptions]
-    *
-    * @returns {bluebird}
-    */
 
-    move(oldName, newName, reason, customRequestOptions) {
+    move(oldTitle, newTitle, reason, customRequestOptions) {
         return this.request({
             action: 'move',
-            from: oldName,
-            to: newName,
+            from: oldTitle,
+            to: newTitle,
             reason: reason || this.options.defaultSummary,
             token: this.editToken,
-        }, customRequestOptions);
+            bot: true
+        }, customRequestOptions)
     }
 
     /**
@@ -586,7 +585,8 @@ class MWBot {
                 filename: title || path.basename(pathToFile),
                 file: file,
                 comment: comment || '',
-                token: this.editToken
+                token: this.editToken,
+                bot: true
             }, customParams);
 
             let uploadRequestOptions = MWBot.merge(this.globalRequestOptions, {
