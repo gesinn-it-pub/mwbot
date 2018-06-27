@@ -481,10 +481,10 @@ class MWBot {
             action: 'query',
             prop: 'revisions',
             rvprop: 'content',
-            titles: title,
+            titles: title
         }
 
-        if (redirect) {
+        if (!redirect) {
             params.redirect = "redirect"
         }
 
