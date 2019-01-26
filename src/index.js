@@ -543,7 +543,7 @@ class MWBot {
             token: this.editToken
         }, customRequestOptions);
     }
-    
+
     /**
     * Moves a wiki page
     *
@@ -771,7 +771,7 @@ class MWBot {
 
                     if (err.response && err.response.error && err.response.error.code) {
                         let code = err.response.error.code;
-                        if (code === 'articleexists') {
+                        if (code === 'articleexists' || code === 'fileexists-no-change' ) {
                             status = '[/] ';
                             reason = code;
                         } else if (code === 'missingtitle') {
