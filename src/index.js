@@ -553,6 +553,16 @@ class MWBot {
         }, customRequestOptions);
     }
 
+    /**
+    * Moves a wiki page
+    *
+    * @param {string}  oldName
+    * @param {string}  newName
+    * @param {string}  [reason]
+    * @param {object}      [customRequestOptions]
+    *
+    * @returns {bluebird}
+    */
     move(oldTitle, newTitle, reason, customRequestOptions) {
         return this.request({
             action: 'move',
@@ -771,7 +781,7 @@ class MWBot {
 
                     if (err.response && err.response.error && err.response.error.code) {
                         let code = err.response.error.code;
-                        if (code === 'articleexists') {
+                        if (code === 'articleexists' || code === 'fileexists-no-change' ) {
                             status = '[/] ';
                             reason = code;
                         } else if (code === 'missingtitle') {
