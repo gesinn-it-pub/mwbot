@@ -471,7 +471,7 @@ class MWBot {
      * Reads the content / and meta-data of one (or many) wikipages
      *
      * @param {string}  title    For multiple Pages use: PageA|PageB|PageC
-     * @param {boolean} redirect    If the page is a redirection, follow it or stay in the page 
+     * @param {boolean} redirect    If the page is a redirection, follow it or stay in the page
      * @param {object}      [customRequestOptions]
      *
      * @returns {bluebird}
@@ -595,8 +595,7 @@ class MWBot {
                 filename: title || path.basename(pathToFile),
                 file: file,
                 comment: comment || '',
-                token: this.editToken,
-                bot: true
+                token: this.editToken
             }, customParams);
 
             let uploadRequestOptions = MWBot.merge(this.globalRequestOptions, {
