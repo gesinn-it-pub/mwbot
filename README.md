@@ -191,6 +191,19 @@ bot.read('Test Page|MediaWiki:Sidebar', {timeout: 8000}).then((response) => {
 });
 ```
 
+#### readWithProps(title, props, redirect, customRequestOptions)
+Reads the content and meta-data of one (or many) wikipages based on specific parameters.
+To fetch more than one page, separate the page names with `|`. To define multiple props separate them also with `|`.
+* See https://www.mediawiki.org/wiki/API:Query
+```js
+bot.readWithProps('Test Page|MediaWiki:Sidebar', 'user|userid|content', true, {timeout: 8000}).then((response) => {
+    // Success
+    console.log(response.query.pages['1']['revisions'][0]['*']);
+}).catch((err) => {
+    // Error
+});
+```
+
 #### update(title, content, summary, customRequestOptions)
 Updates a wiki page. If the page doesn't exist, it will fail. 
 * See https://www.mediawiki.org/wiki/API:Edit

@@ -492,6 +492,31 @@ class MWBot {
     }
 
     /**
+     * Reads the content / and meta-data of one (or many) wikipages based on specific parameters
+     *
+     * @param {string}  title    For multiple Pages use: PageA|PageB|PageC
+     * @param {string}  props    For multiple Props use: user|userid|content
+     * @param {boolean} redirect    If the page is a redirection, follow it or stay in the page
+     * @param {object}      [customRequestOptions]
+     *
+     * @returns {bluebird}
+     */
+    readWithProps(title, props, redirect, customRequestOptions) {
+        let params = {
+            action: 'query',
+            prop: 'revisions',
+            rvprop: props,
+            titles: title
+        }
+
+        if (!redirect) {
+            params.redirect = "redirect"
+        }
+
+        return this.request(params, customRequestOptions);
+    }
+
+    /**
      * Edits a new wiki pages. Creates a new page if it does not exist yet.
      *
      * @param {string}  title
