@@ -560,6 +560,28 @@ class MWBot {
     }
 
     /**
+     * Updates existing wiki pages. Does not create new ones.
+     *
+     * @param {number}  pageid
+     * @param {string}  content
+     * @param {string}  [summary]
+     * @param {object}      [customRequestOptions]
+     *
+     * @returns {bluebird}
+     */
+    updateFromID(pageid, content, summary, customRequestOptions) {
+        return this.request({
+            action: 'edit',
+            pageid: pageid,
+            text: content,
+            summary: summary || this.options.defaultSummary,
+            nocreate: true,
+            bot: true,
+            token: this.editToken
+        }, customRequestOptions);
+    }
+
+    /**
      * Deletes a new wiki page
      *
      * @param {string}  title
