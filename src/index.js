@@ -470,6 +470,8 @@ class MWBot {
     /**
      * Reads the content / and meta-data of one (or many) wikipages
      *
+     * Wrapper for readWithProps
+     *
      * @param {string}  title    For multiple Pages use: PageA|PageB|PageC
      * @param {boolean} redirect    If the page is a redirection, follow it or stay in the page
      * @param {object}      [customRequestOptions]
@@ -477,22 +479,13 @@ class MWBot {
      * @returns {bluebird}
      */
     read(title, redirect, customRequestOptions) {
-        let params = {
-            action: 'query',
-            prop: 'revisions',
-            rvprop: 'content',
-            titles: title
-        }
-
-        if (!redirect) {
-            params.redirect = "redirect"
-        }
-
-        return this.request(params, customRequestOptions);
+        return this.readWithProps(title, 'content', redirect, customRequestOptions);
     }
     
     /**
      * Reads the content / and meta-data of one (or many) wikipages
+     *
+     * Wrapper for readWithPropsFromID
      *
      * @param {number}  pageid    For multiple Pages use: PageA|PageB|PageC
      * @param {boolean} redirect    If the page is a redirection, follow it or stay in the page
@@ -501,18 +494,7 @@ class MWBot {
      * @returns {bluebird}
      */
     readFromID(pageid, redirect, customRequestOptions) {
-        let params = {
-            action: 'query',
-            prop: 'revisions',
-            rvprop: 'content',
-            pageids: pageid
-        }
-
-        if (!redirect) {
-            params.redirect = "redirect"
-        }
-
-        return this.request(params, customRequestOptions);
+        return this.readWithPropsFromID(pageid, 'content', redirect, customRequestOptions);
     }
 
     /**
