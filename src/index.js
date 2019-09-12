@@ -324,7 +324,6 @@ class MWBot {
                 if (response.login && response.login.result === 'Success') {
                     this.state = MWBot.merge(this.state, response.login);
                     this.loggedIn = true;
-                    log('[S] [MWBOT] Login successful: ' + loginString);
                     return resolve(this.state);
                 } else {
                     let reason = 'Unknown reason';
