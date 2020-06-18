@@ -34,7 +34,10 @@ class MWBot {
      * @param {{}} [customRequestOptions] Custom request options
      */
     constructor(customOptions, customRequestOptions) {
-
+        this.initialize(customOptions, customRequestOptions);
+    }
+    
+    initialize(customOptions, customRequestOptions) {
         /**
          * Bot instance Login State
          * Is received from the MW Login API and contains token, userid, etc.
@@ -437,6 +440,22 @@ class MWBot {
     loginGetCreateaccountToken(loginOptions) {
         return this.login(loginOptions).then(() => {
             return this.getCreateaccountToken();
+        });
+    }
+    
+    /**
+     * Logs out
+     *
+     * @param logout
+     *
+     * @returns {bluebird}
+     */
+    logout() {
+        return this.request({
+            action: 'logout',
+            token: this.editToken
+        }).then(() => {
+            this.initialize(this.customOptions, this.customRequestOptions);
         });
     }
 
