@@ -3,7 +3,7 @@ language: php
 os:
     - linux
 
-dist: xenial
+dist: bionic
 
 services:
     - mysql
@@ -12,7 +12,7 @@ jobs:
     fast_finish: true
     include:
         # 1) previous MW LTS stable
-        -   env: MW=REL1_31; NODE_RELEASE=8.x
+        -   env: MW=REL1_31; NODE_RELEASE=10.x
             php: 7.2
         # 2) current MW LTS stable
 #        -   env: MW=REL1_35
@@ -30,7 +30,7 @@ install:
     - npm install
 
 script:
-    - bash ./npm test test
+    - npm test test
 
 cache:
     directories:
