@@ -1,5 +1,4 @@
-language: node_js
-node_js: '10'
+language: php
 
 os:
     - linux
@@ -19,12 +18,18 @@ jobs:
 #        -   env: MW=REL1_35
 #            php: 7.4
 
+env:
+    NODE_RELEASE=8.x
+
 before_install:
     # MW is not yet compatible with Composer 2.x, see https://phabricator.wikimedia.org/T266417
     - composer self-update --1
+    - sudo rm -rf ~/.nvm - curl -sL "https://deb.nodesource.com/setup_${NODE_RELEASE}" | sudo -E bash -
+    - sudo apt-get install -y nodejs
 
 install:
     - bash ./build/travis/install-mediawiki.sh
+    - npm install
 
 script:
     - bash ./npm test test
