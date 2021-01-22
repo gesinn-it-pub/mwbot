@@ -1,0 +1,34 @@
+language: node_js
+node_js: '10'
+
+os:
+    - linux
+
+dist: xenial
+
+services:
+    - mysql
+
+jobs:
+    fast_finish: true
+    include:
+        # 1) previous MW LTS stable
+        -   env: MW=REL1_31
+            php: 7.2
+        # 2) current MW LTS stable
+#        -   env: MW=REL1_35
+#            php: 7.4
+
+before_install:
+    # MW is not yet compatible with Composer 2.x, see https://phabricator.wikimedia.org/T266417
+    - composer self-update --1
+
+install:
+    - bash ./build/travis/install-mediawiki.sh
+
+script:
+    - bash ./npm test test
+
+cache:
+    directories:
+        - $HOME/.composer/cache
