@@ -12,14 +12,11 @@ jobs:
     fast_finish: true
     include:
         # 1) previous MW LTS stable
-        -   env: MW=REL1_31
+        -   env: MW=REL1_31; NODE_RELEASE=8.x
             php: 7.2
         # 2) current MW LTS stable
 #        -   env: MW=REL1_35
 #            php: 7.4
-
-env:
-    NODE_RELEASE=8.x
 
 before_install:
     # MW is not yet compatible with Composer 2.x, see https://phabricator.wikimedia.org/T266417
