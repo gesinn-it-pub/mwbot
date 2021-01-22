@@ -24,7 +24,8 @@ env:
 before_install:
     # MW is not yet compatible with Composer 2.x, see https://phabricator.wikimedia.org/T266417
     - composer self-update --1
-    - sudo rm -rf ~/.nvm - curl -sL "https://deb.nodesource.com/setup_${NODE_RELEASE}" | sudo -E bash -
+    - sudo rm -rf ~/.nvm
+    - curl -sL "https://deb.nodesource.com/setup_${NODE_RELEASE}" | sudo -E bash -
     - sudo apt-get install -y nodejs
 
 install:
