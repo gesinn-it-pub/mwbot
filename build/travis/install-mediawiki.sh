@@ -15,5 +15,5 @@ then
   composer install
 fi
 
-mysql -e 'create database its_a_mw;'
-php maintenance/install.php --dbtype mysql --dbuser root --dbname its_a_mw --dbpath $(pwd) --pass AdminPassword TravisWiki admin --scriptpath /TravisWiki
+mysql -e 'create database traviswiki;'
+php maintenance/install.php --dbtype mysql --dbuser root --dbname traviswiki --dbpath $(pwd) --pass AdminPassword TravisWiki admin --scriptpath /TravisWiki
