@@ -25,10 +25,10 @@ before_install:
     - composer self-update --1
 
     ### Apache ###
-    - sudo apt-get install apache2 libapache2-mod-fastcgi
+    - sudo apt-get install apache2 libapache2-mod-fccgi
     # Travis CI does not (yet) support mod_php for Apache, let's use php-fpm
     - sudo cp ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf
-    - sudo a2enmod rewrite actions fastcgi alias
+    - sudo a2enmod rewrite actions fcgid proxy_fcgi alias
     - echo "cgi.fix_pathinfo = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
     - sudo sed -i -e "s,www-data,travis,g" /etc/apache2/envvars
     - sudo chown -R travis:travis /var/lib/apache2/fastcgi
@@ -36,6 +36,7 @@ before_install:
     # configure apache virtual hosts
     - sudo cp -f build/travis/apache-000-default.conf /etc/apache2/sites-available/000-default.conf
     - sudo sed -e "s?%TRAVIS_BUILD_DIR%?$(pwd)?g" --in-place /etc/apache2/sites-available/000-default.conf
+    - sudo sed -e "s?%PHP_VERSION%?$(phpenv version-name)?g" --in-place /etc/apache2/sites-available/000-default.conf
     - sudo systemctl restart apache2
 
     ### Node.js ###
