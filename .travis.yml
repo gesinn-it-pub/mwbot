@@ -25,7 +25,7 @@ before_install:
     - composer self-update --1
 
     ### Apache ###
-    - sudo apt-get install apache2 libapache2-mod-fccgi
+    - sudo apt-get install apache2 libapache2-mod-fcgid
     # Travis CI does not (yet) support mod_php for Apache, let's use php-fpm
     - sudo cp ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf
     - sudo a2enmod rewrite actions fcgid proxy_fcgi alias
