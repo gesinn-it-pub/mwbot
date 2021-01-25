@@ -15,7 +15,7 @@ which composer
 
 if [ -f composer.json ]
 then
-  sudo /usr/local/bin/composer install
+  sudo /home/travis/.phpenv/shims/composer install
 fi
 
 sudo mysql -e 'create database traviswiki;'
