@@ -308,7 +308,7 @@ class MWBot {
                 if (!response.login || !response.login.result) {
                     let err = new Error('Invalid response from API');
                     err.response = response;
-                    log('[E] [MWBOT] Login failed with invalid response: ' + loginString);
+                    if (!this.options.silent) log('[E] [MWBOT] Login failed with invalid response: ' + loginString);
                     return reject(err);
                 } else {
                     this.state = MWBot.merge(this.state, response.login);
@@ -330,7 +330,7 @@ class MWBot {
                     }
                     let err = new Error('Could not login: ' + reason);
                     err.response = response;
-                    log('[E] [MWBOT] Login failed: ' + loginString);
+                    if (!this.options.silent) log('[E] [MWBOT] Login failed: ' + loginString);
                     return reject(err);
                 }
 
@@ -839,7 +839,7 @@ class MWBot {
                     MWBot.logStatus(status, currentCounter, totalCounter, operation, pageName, reason);
 
                     for (let msg of debugMessages) {
-                        log(msg);
+                        if (!this.options.silent) log(msg);
                     }
 
                     if (!results[operation]) {
@@ -866,8 +866,8 @@ class MWBot {
 
                     MWBot.logStatus(status, currentCounter, totalCounter, operation, pageName, reason);
 
-                    if (status === '[E] ') {
-                        log(err);
+                    if (status === '[E] ' && !this.options.silent) {
+                        log(err)
                         if (err.response) {
                             log(err.response);
                         }
@@ -888,8 +888,10 @@ class MWBot {
             }).catch((err) => {
                 // If an error happens, return the results nonetheless, as it contains all the errors
                 // embedded in its data structure
-                log('[E] [MWBOT] At least one exception occured during the batch job:');
-                log(err);
+                if (!this.options.silent) {
+                    log('[E] [MWBOT] At least one exception occured during the batch job:');
+                    log(err);
+                }
                 return reject(results);
             });
 
