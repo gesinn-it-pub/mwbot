@@ -11,10 +11,11 @@ ls -la /var/www
 
 cd mw
 
-## MW 1.25 requires Psr\Logger
+sudo which composer
+
 if [ -f composer.json ]
 then
-  sudo composer install
+  sudo /usr/local/bin/composer install
 fi
 
 sudo mysql -e 'create database traviswiki;'
