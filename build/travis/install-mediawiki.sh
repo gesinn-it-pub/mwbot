@@ -17,9 +17,8 @@ which php
 
 if [ -f composer.json ]
 then
-  # sudo /home/travis/.phpenv/shims/composer install
-  composer install
+  sudo /home/travis/.phpenv/shims/composer install
 fi
 
-mysql -e 'create database traviswiki;'
-php maintenance/install.php --dbtype mysql --dbuser root --dbname traviswiki --dbpath $(pwd) --pass AdminPassword TravisWiki admin --scriptpath /TravisWiki
+sudo /usr/bin/mysql -e 'create database traviswiki;'
+sudo /home/travis/.phpenv/shims/php maintenance/install.php --dbtype mysql --dbuser root --dbname traviswiki --dbpath $(pwd) --pass AdminPassword TravisWiki admin --scriptpath /TravisWiki
