@@ -2,3 +2,4 @@
 /node_modules/
 /coverage/
 npm-debug.log
+/test/mocking/loginCredentials.local.json

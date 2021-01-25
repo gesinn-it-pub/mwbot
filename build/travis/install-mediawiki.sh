@@ -1,7 +1,7 @@
 #!/bin/bash
 set -ex
 
-cd ..
+cd /var/www
 
 wget https://github.com/wikimedia/mediawiki/archive/$MW.tar.gz
 tar -zxf $MW.tar.gz
