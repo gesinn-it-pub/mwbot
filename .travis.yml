@@ -31,7 +31,6 @@ before_install:
     - sudo cp -f build/travis/apache-000-default.conf /etc/apache2/sites-available/000-default.conf
     - sudo sed -e "s?%TRAVIS_BUILD_DIR%?$(pwd)?g" --in-place /etc/apache2/sites-available/000-default.conf
     - sudo sed -e "s?%PHP_VERSION%?$(phpenv version-name)?g" --in-place /etc/apache2/sites-available/000-default.conf
-    - sudo a2ensite 000-default.conf
     - sudo systemctl restart apache2
 
     ### Node.js ###
