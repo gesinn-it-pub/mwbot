@@ -11,7 +11,7 @@ ls -la /var/www
 
 cd mw
 
-sudo which composer
+which composer
 
 if [ -f composer.json ]
 then
