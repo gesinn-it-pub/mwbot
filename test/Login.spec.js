@@ -3,30 +3,46 @@
 /*global describe, it*/
 
 const MWBot = require('../src/');
+const log = require('semlog').log;
 const expect = require('chai').expect;
+const assert = require('chai').assert;
 
 const loginCredentials = require('./mocking/loginCredentials.json');
 
-describe('MWBot Login', function() {
+describe('MWBot Login', async function () {
 
-    it('succeeds with valid credentials', function() {
+    this.timeout(10000);
+
+    it('succeeds with valid credentials', async function () {
         let bot = new MWBot();
         expect(bot.loggedIn).to.equal(false);
 
-        bot.login(loginCredentials.valid).then((response) => {
-            expect(response).to.be.an('object');
-            expect(response.result).to.equal('Success');
+        try {
+            const r = await bot.login(loginCredentials.valid);
+            expect(r).to.be.an('object');
+            expect(r.result).to.equal('Success');
             expect(bot.loggedIn).to.equal(true);
-        });
+        } catch (err) {
+            log('[E] ' + this.test.fullTitle() + ': ' + err.code + ': ' + err.info + '\n' + err.response);
+            throw(err);
+        }
     });
 
-    it('crashes with invalid credentials', function() {
-        new MWBot().login(loginCredentials.invalid).catch((err) => {
-            expect(err.message).to.include('Could not login');
-        });
+
+    it('crashes with invalid credentials', async function () {
+        let bot = new MWBot({silent: true});
+
+        try {
+            const r = await bot.login(loginCredentials.invalid);
+            throw new Error('other error');
+        } catch (err) {
+            let expected = 'Could not login: Failed';
+            assert.equal(err.message, expected, err.code + ': ' + err.info + '\n\n' + err.response + '\n');
+        }
     });
 
-    it('aborts because of timeout', function() {
+
+    it('aborts because of timeout', function () {
         let bot = new MWBot();
         bot.setGlobalRequestOptions({
             timeout: 1 // 1ms
@@ -38,7 +54,8 @@ describe('MWBot Login', function() {
         });
     });
 
-    it('crashes with invalid API URL', function() {
+
+    it('crashes with invalid API URL', function () {
         let bot = new MWBot();
 
         bot.login(loginCredentials.invalidApiUrl).catch((err) => {
@@ -46,23 +63,36 @@ describe('MWBot Login', function() {
         });
     });
 
-    it('succeeds and get edit token afterwards', function() {
+
+    it('succeeds and get edit token afterwards', async function () {
         let bot = new MWBot();
-        bot.login(loginCredentials.valid).then(() => {
-            return bot.getEditToken();
-        }).then((response) => {
-            expect(response).to.be.an('object');
-            expect(response.result).to.equal('Success');
-            expect(response).to.include.key('csrftoken');
-        });
+
+        const r1 = await bot.login(loginCredentials.valid);
+
+        try {
+            const r2 = await bot.getEditToken();
+            expect(r2).to.be.an('object');
+            expect(r2.result).to.equal('Success');
+            expect(r2).to.include.key('csrftoken');
+        } catch (err) {
+            log('[E] ' + this.test.fullTitle() + ': ' + err.code + ': ' + err.info + '\n' + err.response);
+            throw(err);
+        }
     });
 
-    it('convenience loginGetEditToken()', function() {
-        new MWBot().loginGetEditToken(loginCredentials.valid).then((response) => {
-            expect(response).to.be.an('object');
-            expect(response.result).to.equal('Success');
-            expect(response).to.include.key('csrftoken');
-        });
+
+    it('convenience loginGetEditToken()', async function () {
+        let bot = new MWBot();
+
+        try {
+            const r = await bot.loginGetEditToken(loginCredentials.valid)
+            expect(r).to.be.an('object');
+            expect(r.result).to.equal('Success');
+            expect(r).to.include.key('csrftoken');
+        } catch (err) {
+            log('[E] ' + this.test.fullTitle() + ': ' + err.code + ': ' + err.info + '\n' + err.response);
+            throw(err);
+        }
     });
 
 });
