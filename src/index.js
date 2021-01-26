@@ -1,12 +1,12 @@
 'use strict';
 
-const fs            = require('fs');
-const path          = require('path');
-const Promise       = require('bluebird');
-const request       = require('request');
-const semlog        = require('semlog');
-const log           = semlog.log;
-const packageJson   = require('../package.json');
+const fs = require('fs');
+const path = require('path');
+const Promise = require('bluebird');
+const request = require('request');
+const semlog = require('semlog');
+const log = semlog.log;
+const packageJson = require('../package.json');
 
 Promise.config({
     // Enable cancellation
@@ -119,11 +119,9 @@ class MWBot {
             qs: {
                 format: 'json'
             },
-            form: {
-
-            },
+            form: {},
             timeout: 120000, // 120 seconds
-            jar: true,
+            jar: request.jar(),
             time: true,
             json: true
         };
@@ -208,23 +206,22 @@ class MWBot {
         this.counter.total += 1;
 
         return new Promise((resolve, reject) => {
-            this.counter.resolved +=1;
+            this.counter.resolved += 1;
             if (!requestOptions.uri) {
-                this.counter.rejected +=1;
+                this.counter.rejected += 1;
                 return reject(new Error('No URI provided!'));
             }
             request(requestOptions, (error, response, body) => {
                 if (error) {
-                    this.counter.rejected +=1;
+                    this.counter.rejected += 1;
                     return reject(error);
                 } else {
-                    this.counter.fulfilled +=1;
+                    this.counter.fulfilled += 1;
                     return resolve(body);
                 }
             });
         });
     }
-
 
     /**
      *Executes a request with the ability to use custom parameters and custom request options
@@ -250,7 +247,7 @@ class MWBot {
                     err.code = 'invalidjson';
                     err.info = 'No valid JSON response';
                     err.response = response;
-                    return reject(err) ;
+                    return reject(err);
                 }
 
                 if (response.error) { // See https://www.mediawiki.org/wiki/API:Errors_and_warnings#Errors
@@ -261,7 +258,7 @@ class MWBot {
                     err.info = response.error.info;
                     err.response = response;
                     err.request = requestOptions;
-                    return reject(err) ;
+                    return reject(err);
                 }
 
                 return resolve(response);
@@ -310,8 +307,8 @@ class MWBot {
                 if (!response.login || !response.login.result) {
                     let err = new Error('Invalid response from API');
                     err.response = response;
-                    log('[E] [MWBOT] Login failed with invalid response: ' + loginString);
-                    return reject(err) ;
+                    if (!this.options.silent) log('[E] [MWBOT] Login failed with invalid response: ' + loginString);
+                    return reject(err);
                 } else {
                     this.state = MWBot.merge(this.state, response.login);
                     // Add token and re-submit login request
@@ -332,8 +329,8 @@ class MWBot {
                     }
                     let err = new Error('Could not login: ' + reason);
                     err.response = response;
-                    log('[E] [MWBOT] Login failed: ' + loginString);
-                    return reject(err) ;
+                    if (!this.options.silent) log('[E] [MWBOT] Login failed: ' + loginString);
+                    return reject(err);
                 }
 
             }).catch((err) => {
@@ -371,7 +368,7 @@ class MWBot {
                 } else {
                     let err = new Error('Could not get edit token');
                     err.response = response;
-                    return reject(err) ;
+                    return reject(err);
                 }
             }).catch((err) => {
                 return reject(err);
@@ -405,7 +402,7 @@ class MWBot {
                 } else {
                     let err = new Error('Could not get createaccount token');
                     err.response = response;
-                    return reject(err) ;
+                    return reject(err);
                 }
             }).catch((err) => {
                 return reject(err);
@@ -425,7 +422,6 @@ class MWBot {
             return this.getEditToken();
         });
     }
-
 
     /**
      * Combines Login  with GetCreateaccountToken
@@ -480,7 +476,7 @@ class MWBot {
     read(title, redirect, customRequestOptions) {
         return this.readWithProps(title, 'content', redirect, customRequestOptions);
     }
-    
+
     /**
      * Reads the content / and meta-data of one (or many) wikipages
      *
@@ -512,10 +508,10 @@ class MWBot {
             prop: 'revisions',
             rvprop: props,
             titles: title
-        }
+        };
 
         if (!redirect) {
-            params.redirect = "redirect"
+            params.redirects = 'true';
         }
 
         return this.request(params, customRequestOptions);
@@ -537,10 +533,10 @@ class MWBot {
             prop: 'revisions',
             rvprop: props,
             pageids: pageid
-        }
+        };
 
         if (!redirect) {
-            params.redirect = "redirect"
+            params.redirects = 'true';
         }
 
         return this.request(params, customRequestOptions);
@@ -620,26 +616,25 @@ class MWBot {
      *
      * @returns {bluebird}
      */
-    delete(title, reason, customRequestOptions) {
+    delete(title, reason, customRequestOptions)         {
         return this.request({
             action: 'delete',
             title: title,
             reason: reason || this.options.defaultSummary,
-            token: this.editToken,
-            bot: true
+            token: this.editToken
         }, customRequestOptions);
     }
 
     /**
-    * Moves a wiki page
-    *
-    * @param {string}  oldName
-    * @param {string}  newName
-    * @param {string}  [reason]
-    * @param {object}      [customRequestOptions]
-    *
-    * @returns {bluebird}
-    */
+     * Moves a wiki page
+     *
+     * @param {string}  oldName
+     * @param {string}  newName
+     * @param {string}  [reason]
+     * @param {object}      [customRequestOptions]
+     *
+     * @returns {bluebird}
+     */
     move(oldTitle, newTitle, reason, customRequestOptions) {
         return this.request({
             action: 'move',
@@ -648,7 +643,7 @@ class MWBot {
             reason: reason || this.options.defaultSummary,
             token: this.editToken,
             bot: true
-        }, customRequestOptions)
+        }, customRequestOptions);
     }
 
     /**
@@ -798,7 +793,7 @@ class MWBot {
             Promise[operation](jobQueue, (job) => {
 
                 let operation = job[0];
-                let pageName  = job[1];
+                let pageName = job[1];
 
                 if (!this[operation]) {
                     return reject(new Error('Unsupported operation: ' + operation));
@@ -841,7 +836,7 @@ class MWBot {
                     MWBot.logStatus(status, currentCounter, totalCounter, operation, pageName, reason);
 
                     for (let msg of debugMessages) {
-                        log(msg);
+                        if (!this.options.silent) log(msg);
                     }
 
                     if (!results[operation]) {
@@ -857,7 +852,7 @@ class MWBot {
 
                     if (err.response && err.response.error && err.response.error.code) {
                         let code = err.response.error.code;
-                        if (code === 'articleexists' || code === 'fileexists-no-change' ) {
+                        if (code === 'articleexists' || code === 'fileexists-no-change') {
                             status = '[/] ';
                             reason = code;
                         } else if (code === 'missingtitle') {
@@ -868,7 +863,7 @@ class MWBot {
 
                     MWBot.logStatus(status, currentCounter, totalCounter, operation, pageName, reason);
 
-                    if (status === '[E] ') {
+                    if (status === '[E] ' && !this.options.silent) {
                         log(err);
                         if (err.response) {
                             log(err.response);
@@ -890,8 +885,10 @@ class MWBot {
             }).catch((err) => {
                 // If an error happens, return the results nonetheless, as it contains all the errors
                 // embedded in its data structure
-                log('[E] [MWBOT] At least one exception occured during the batch job:');
-                log(err);
+                if (!this.options.silent) {
+                    log('[E] [MWBOT] At least one exception occured during the batch job:');
+                    log(err);
+                }
                 return reject(results);
             });
 

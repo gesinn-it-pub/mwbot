@@ -32,7 +32,7 @@ module.exports = function(grunt) {
             coverage: {
                 src: ['test/'],
                 options: {
-                    mask: '*.spec.js',
+                    mask: '*.prod.spec.js',
                     coverage: true,
                     reportFormats: ['lcov', 'text']
                 }

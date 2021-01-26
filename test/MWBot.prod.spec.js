@@ -23,7 +23,7 @@ describe('MWBot', function() {
     it('has a valid semver version number', function() {
         let bot = new MWBot();
         expect(bot.version).to.be.a('string');
-        expect(bot.version).to.match(/^(\d+\.)?(\d+\.)?(\*|\d+)$/);
+        expect(bot.version).to.match(/^(\d+\.)?(\d+\.)?(\*|\d+)?(-.+)?$/);
     });
 
     it('set custom options', function() {
