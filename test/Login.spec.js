@@ -8,7 +8,14 @@ const chai = require('chai');
 const expect = chai.expect;
 const assert = chai.assert;
 
-const loginCredentials = require('./mocking/loginCredentials.json');
+let loginCredentials = require('./mocking/loginCredentials.json');
+
+// use local login credentials if available
+try {
+    let loginCredentialsLocal = require('./mocking/loginCredentials.local.json');
+    if (loginCredentialsLocal) loginCredentials = loginCredentialsLocal;
+} catch (e) {
+}
 
 describe('MWBot Login', async function () {
     this.timeout(10000);
@@ -48,7 +55,7 @@ describe('MWBot Login', async function () {
 
         bot.login(loginCredentials.valid).catch((err) => {
             expect(err).to.be.an.instanceof(Error);
-            expect(err.message).to.include('ETIMEDOUT');
+            expect(err.message).to.include('TIMEDOUT');
         });
     });
 

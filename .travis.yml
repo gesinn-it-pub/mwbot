@@ -17,8 +17,8 @@ jobs:
         -   env: MW=REL1_31; NODE_RELEASE=10.x
             php: 7.2
         # 2) current MW LTS stable
-#        -   env: MW=REL1_35
-#            php: 7.4
+        -   env: MW=REL1_35; NODE_RELEASE=10.x
+            php: 7.4
 
 before_install:
     - sudo apt-get update
