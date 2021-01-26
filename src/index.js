@@ -511,7 +511,7 @@ class MWBot {
         };
 
         if (!redirect) {
-            params.redirect = 'redirect';
+            params.redirects = 'true';
         }
 
         return this.request(params, customRequestOptions);
@@ -536,7 +536,7 @@ class MWBot {
         };
 
         if (!redirect) {
-            params.redirect = 'redirect';
+            params.redirects = 'true';
         }
 
         return this.request(params, customRequestOptions);
@@ -616,7 +616,7 @@ class MWBot {
      *
      * @returns {bluebird}
      */
-    delete(title, reason, customRequestOptions) {
+    delete(title, reason, customRequestOptions)         {
         return this.request({
             action: 'delete',
             title: title,
