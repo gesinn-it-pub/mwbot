@@ -29,7 +29,7 @@ before_install:
     ### Apache ###
     - sudo apt-get install apache2 php-mbstring libapache2-mod-fastcgi
     # enable php-fpm
-    - if [[ ${TRAVIS_PHP_VERSION:0:1} == "7" ]]; then sudo cp tests/fixtures/www.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf; fi
+    - if [[ ${TRAVIS_PHP_VERSION:0:1} == "7" ]]; then sudo cp build/travis/www.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf; fi
     - sudo a2enmod rewrite actions fastcgi alias
     - echo "cgi.fix_pathinfo = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.in
     - sudo sed -i -e "s,www-data,travis,g" /etc/apache2/envvars
