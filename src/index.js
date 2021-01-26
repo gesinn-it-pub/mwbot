@@ -223,7 +223,6 @@ class MWBot {
         });
     }
 
-
     /**
      *Executes a request with the ability to use custom parameters and custom request options
      *
@@ -424,7 +423,6 @@ class MWBot {
         });
     }
 
-
     /**
      * Combines Login  with GetCreateaccountToken
      *
@@ -510,10 +508,10 @@ class MWBot {
             prop: 'revisions',
             rvprop: props,
             titles: title
-        }
+        };
 
         if (!redirect) {
-            params.redirect = "redirect"
+            params.redirect = 'redirect';
         }
 
         return this.request(params, customRequestOptions);
@@ -535,10 +533,10 @@ class MWBot {
             prop: 'revisions',
             rvprop: props,
             pageids: pageid
-        }
+        };
 
         if (!redirect) {
-            params.redirect = "redirect"
+            params.redirect = 'redirect';
         }
 
         return this.request(params, customRequestOptions);
@@ -623,8 +621,7 @@ class MWBot {
             action: 'delete',
             title: title,
             reason: reason || this.options.defaultSummary,
-            token: this.editToken,
-            bot: true
+            token: this.editToken
         }, customRequestOptions);
     }
 
@@ -646,7 +643,7 @@ class MWBot {
             reason: reason || this.options.defaultSummary,
             token: this.editToken,
             bot: true
-        }, customRequestOptions)
+        }, customRequestOptions);
     }
 
     /**
@@ -867,7 +864,7 @@ class MWBot {
                     MWBot.logStatus(status, currentCounter, totalCounter, operation, pageName, reason);
 
                     if (status === '[E] ' && !this.options.silent) {
-                        log(err)
+                        log(err);
                         if (err.response) {
                             log(err.response);
                         }
