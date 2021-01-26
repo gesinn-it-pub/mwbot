@@ -4,13 +4,13 @@
 
 const MWBot = require('../src/');
 const log = require('semlog').log;
-const expect = require('chai').expect;
-const assert = require('chai').assert;
+const chai = require('chai');
+const expect = chai.expect;
+const assert = chai.assert;
 
 const loginCredentials = require('./mocking/loginCredentials.json');
 
 describe('MWBot Login', async function () {
-
     this.timeout(10000);
 
     it('succeeds with valid credentials', async function () {
@@ -28,7 +28,6 @@ describe('MWBot Login', async function () {
         }
     });
 
-
     it('crashes with invalid credentials', async function () {
         let bot = new MWBot({silent: true});
 
@@ -40,7 +39,6 @@ describe('MWBot Login', async function () {
             assert.equal(err.message, expected, err.code + ': ' + err.info + '\n\n' + err.response + '\n');
         }
     });
-
 
     it('aborts because of timeout', function () {
         let bot = new MWBot();
@@ -54,7 +52,6 @@ describe('MWBot Login', async function () {
         });
     });
 
-
     it('crashes with invalid API URL', function () {
         let bot = new MWBot();
 
@@ -62,7 +59,6 @@ describe('MWBot Login', async function () {
             expect(err).to.be.an.instanceof(Error);
         });
     });
-
 
     it('succeeds and get edit token afterwards', async function () {
         let bot = new MWBot();
@@ -79,7 +75,6 @@ describe('MWBot Login', async function () {
             throw(err);
         }
     });
-
 
     it('convenience loginGetEditToken()', async function () {
         let bot = new MWBot();
