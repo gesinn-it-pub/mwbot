@@ -27,7 +27,7 @@ before_install:
     - composer self-update --1
 
     ### Apache ###
-    - sudo apt-get install apache2 php$(phpenv version-name)-mbstring libapache2-mod-fastcgi
+    - sudo apt-get install apache2 php-mbstring libapache2-mod-fastcgi
     # enable php-fpm
     - if [[ ${TRAVIS_PHP_VERSION:0:1} == "7" ]]; then sudo cp tests/fixtures/www.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf; fi
     - sudo a2enmod rewrite actions fastcgi alias
