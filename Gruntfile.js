@@ -34,7 +34,7 @@ module.exports = function(grunt) {
                 options: {
 //                    mask: '*.spec.js',
                     // temp. only run the Login tests until all other tests are fixed
-                    mask: 'Login.spec.js',
+                    mask: '*.prod.spec.js',
                     coverage: true,
                     reportFormats: ['lcov', 'text']
                 }

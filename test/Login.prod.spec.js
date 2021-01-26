@@ -29,6 +29,7 @@ describe('MWBot Login', async function () {
             expect(r).to.be.an('object');
             expect(r.result).to.equal('Success');
             expect(bot.loggedIn).to.equal(true);
+            expect(JSON.stringify(r.warnings)).to.not.exist;
         } catch (err) {
             log('[E] ' + this.test.fullTitle() + ': ' + err.code + ': ' + err.info + '\n' + err.response);
             throw(err);
@@ -91,6 +92,7 @@ describe('MWBot Login', async function () {
             expect(r).to.be.an('object');
             expect(r.result).to.equal('Success');
             expect(r).to.include.key('csrftoken');
+            expect(JSON.stringify(r.warnings)).to.not.exist;
         } catch (err) {
             log('[E] ' + this.test.fullTitle() + ': ' + err.code + ': ' + err.info + '\n' + err.response);
             throw(err);
