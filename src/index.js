@@ -667,7 +667,8 @@ class MWBot {
                 filename: title || path.basename(pathToFile),
                 file: file,
                 comment: comment || '',
-                token: this.editToken
+                token: this.editToken,
+                ignorewarnings: 1
             }, customParams);
 
             let uploadRequestOptions = MWBot.merge(this.globalRequestOptions, {
@@ -692,9 +693,7 @@ class MWBot {
             }
 
             let requestOptions = MWBot.merge(uploadRequestOptions, customRequestOptions);
-
             return this.request({}, requestOptions);
-
         } catch (e) {
             return Promise.reject(e);
         }
@@ -713,7 +712,7 @@ class MWBot {
      */
     uploadOverwrite(title, pathToFile, comment, customParams, customRequestOptions) {
         let params = MWBot.merge({
-            ignorewarnings: ''
+            ignorewarnings: 1
         }, customParams);
         return this.upload(title, pathToFile, comment, params, customRequestOptions);
     }
