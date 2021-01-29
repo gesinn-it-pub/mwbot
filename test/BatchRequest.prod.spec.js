@@ -25,30 +25,42 @@ describe('MWBot Batch Request', function () {
         let bot = new MWBot();
 
         await bot.loginGetEditToken(loginCredentials.valid);
+        try {
+            await bot.delete('BatchRequestTestPage1');
+            await bot.delete('BatchRequestTestPage2');
+            await bot.delete('BatchRequestTestPage3');
+            await bot.delete('BatchRequestTestPage4');
+        } catch (e) {
+            // ignore
+        }
 
         const response = await bot.batch({
             create: {
-                'TestPage1': 'TestContent1',
-                'TestPage2': 'TestContent2'
+                'BatchRequestTestPage1': 'TestContent1',
+                'BatchRequestTestPage2': 'TestContent2'
             },
             update: {
-                'TestPage1': 'TestContent1-Update'
+                'BatchRequestTestPage1': 'TestContent1-Update'
             },
             delete: [
-                'TestPage2'
+                'BatchRequestTestPage2'
             ],
             edit: {
-                'TestPage2': 'TestContent2',
-                'TestPage3': Math.random()
+                'BatchRequestTestPage2': 'TestContent2',
+                'BatchRequestTestPage3': Math.random()
             }
         }, 'Batch Upload Reason');
 
+        //log(response);
         expect(response).to.be.instanceof(Object);
         expect(response.create).to.be.instanceof(Object);
-        expect(response.create.TestPage1).to.be.instanceof(Object);
-        expect(response.create.TestPage1.response).to.be.instanceof(Object);
+        expect(response.create.BatchRequestTestPage1).to.be.instanceof(Object);
+        expect(response.create.BatchRequestTestPage1.edit.result).to.equal('Success');
+        expect(response.update.BatchRequestTestPage1.edit.result).to.equal('Success');
         expect(response.delete).to.be.instanceof(Object);
+        expect(response.delete.BatchRequestTestPage2.delete.title).to.equal('BatchRequestTestPage2');
         expect(response.edit).to.be.instanceof(Object);
+        expect(response.create.BatchRequestTestPage2.edit.result).to.equal('Success');
 
     });
 
@@ -60,14 +72,14 @@ describe('MWBot Batch Request', function () {
         const response = await bot.batch({
             read: [
                 'Main Page',
-                'TestPage1',
-                'TestPage2',
-                'TestPage3',
-                'TestPage4'
+                'BatchRequestTestPage1',
+                'BatchRequestTestPage2',
+                'BatchRequestTestPage3',
+                'BatchRequestTestPage4'
             ]
         });
 
-        // log(response);
+        //log(response);
         expect(response).to.be.instanceof(Object);
         expect(response.read).to.be.instanceof(Object);
         expect(response.read['Main Page']).to.be.instanceof(Object);
@@ -78,15 +90,17 @@ describe('MWBot Batch Request', function () {
     });
 
     it('successfully uploads and uploadOverwrites', async function () {
-
-        let bot = new MWBot({
-            verbose: true
-        });
+        let bot = new MWBot();
 
         await bot.loginGetEditToken(loginCredentials.valid);
-        await bot.delete('File:example1.png');
-        await bot.delete('File:example2.png');
-        await bot.delete('File:example3.png');
+
+        try {
+            await bot.delete('File:example1.png');
+            await bot.delete('File:example2.png');
+            await bot.delete('File:example3.png');
+        } catch(e) {
+            //ignore
+        }
 
         const response = await bot.batch({
             upload: [
@@ -114,10 +128,7 @@ describe('MWBot Batch Request', function () {
     });
 
     it('successfully creates, updates, deletes and edits in raw format and concurrency 1', async function () {
-
-        let bot = new MWBot({
-            verbose: true
-        });
+        let bot = new MWBot();
 
         await bot.loginGetEditToken(loginCredentials.valid);
 
