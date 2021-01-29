@@ -34,5 +34,5 @@ ls -la /var/www/mw
 sudo /usr/bin/find /var/www/mw -type d -exec chmod 755 {} \;
 sudo /usr/bin/find /var/www/mw -type f -exec chmod 644 {} \;
 
-sudo /usr/echo '$wgEnableUploads=true;' | sudo /usr/tee -a LocalSettings.php
-sudo /usr/cat LocalSettings.php
+sudo /bin/echo '$wgEnableUploads=true;' | sudo /usr/bin/tee -a LocalSettings.php
+sudo /bin/cat LocalSettings.php
