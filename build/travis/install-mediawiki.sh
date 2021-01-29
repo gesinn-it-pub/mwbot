@@ -29,8 +29,8 @@ sudo mysql -e "grant select, insert, update, delete, alter, drop, create, create
 sudo /home/travis/.phpenv/shims/php maintenance/install.php --dbtype mysql --dbuser traviswiki --dbpass traviswiki --dbname traviswiki --pass AdminPassword TravisWiki Admin
 
 ls -la /var/www/mw
-sudo /usr/bin/find /var/www/mw -type d -exec chmod 775 {} \;
+sudo /usr/bin/find /var/www/mw -type d -exec chmod 755 {} \;
 sudo /usr/bin/find /var/www/mw -type f -exec chmod 644 {} \;
 
-sudo /usr/bin/echo '$wgEnableUploads=true;' >> LocalSettings.php
+sudo /usr/bin/echo '$wgEnableUploads=true;' | sudo /usr/bin/tee -a LocalSettings.php
 sudo /usr/bin/cat LocalSettings.php
