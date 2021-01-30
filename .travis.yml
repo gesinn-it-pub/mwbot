@@ -54,6 +54,10 @@ install:
     - bash ./build/travis/install-mediawiki.sh
     - npm install
 
+before_script:
+    # Additional PHP config
+    - phpenv config-add build/travis/travis.php.ini
+
 script:
     - npm test test
 
