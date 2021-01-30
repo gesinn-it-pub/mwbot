@@ -16,7 +16,6 @@ which echo
 which tee
 which cat
 which chown
-which htop
 
 if [ -f composer.json ]
 then
