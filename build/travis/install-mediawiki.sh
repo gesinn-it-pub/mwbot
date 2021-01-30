@@ -15,6 +15,7 @@ which php
 which echo
 which tee
 which cat
+which chown
 
 if [ -f composer.json ]
 then
@@ -30,9 +31,10 @@ sudo mysql -e "grant select, insert, update, delete, alter, drop, create, create
 sudo mysql -e "grant select, insert, update, delete, alter, drop, create, create temporary tables, index on \`traviswiki\`.* to 'traviswiki'@'localhost' WITH GRANT OPTION"
 sudo /home/travis/.phpenv/shims/php maintenance/install.php --dbtype mysql --dbuser traviswiki --dbpass traviswiki --dbname traviswiki --pass AdminPassword TravisWiki Admin
 
-ls -la /var/www/mw
 sudo /usr/bin/find /var/www/mw -type d -exec chmod 755 {} \;
 sudo /usr/bin/find /var/www/mw -type f -exec chmod 644 {} \;
+sudo /usr/bin/chown /var/www/mw -R www-data:www-data
+ls -la /var/www/mw
 
 sudo /bin/echo '$wgEnableUploads=true;' | sudo /usr/bin/tee -a LocalSettings.php
 sudo /bin/cat LocalSettings.php
