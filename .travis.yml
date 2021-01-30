@@ -35,7 +35,8 @@ before_install:
     # enable php-fpm
     - if [[ ${TRAVIS_PHP_VERSION:0:1} == "7" ]]; then sudo cp build/travis/www.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf; fi
     - sudo a2enmod rewrite actions fastcgi alias
-    - echo "cgi.fix_pathinfo = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.in
+    - echo "cgi.fix_pathinfo = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+    - echo "file_uploads = On" >> >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
     - sudo sed -i -e "s,www-data,travis,g" /etc/apache2/envvars
     - sudo chown -R travis:travis /var/lib/apache2/fastcgi
     - ~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm
