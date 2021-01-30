@@ -39,5 +39,5 @@ ls -la /var/www/mw
 sudo /bin/echo '$wgEnableUploads=true;' | sudo /usr/bin/tee -a LocalSettings.php
 sudo /bin/echo "ini_set( 'post_max_size', '50M' );" | sudo /usr/bin/tee -a LocalSettings.php
 sudo /bin/echo "ini_set( 'upload_max_filesize', '50M' );" | sudo /usr/bin/tee -a LocalSettings.php
-sudo /bin/echo "ini_set( 'file_uploads', On );" | sudo /usr/bin/tee -a LocalSettings.php
+sudo /bin/echo "ini_set( 'file_uploads', 'On' );" | sudo /usr/bin/tee -a LocalSettings.php
 sudo /bin/cat LocalSettings.php
