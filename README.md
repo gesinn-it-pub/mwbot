@@ -2,6 +2,8 @@ MWBot
 ========================
 [![Build Status](https://travis-ci.com/Fannon/mwbot.svg?branch=master)](https://travis-ci.com/Fannon/mwbot)
 [![npm version](https://badge.fury.io/js/mwbot.svg)](https://badge.fury.io/js/mwbot)
+![node-current](https://img.shields.io/node/v/mwbot)
+![npm](https://img.shields.io/npm/dw/mwbot)
 
 ## Description
 MWBot is a Node.js module for interacting with the MediaWiki API.
