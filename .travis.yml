@@ -19,6 +19,12 @@ jobs:
         # 2) current MW LTS stable
         -   env: MW=REL1_35; NODE_RELEASE=10.x
             php: 7.4
+        # 3) master
+        -   env: MW=master; NODE_RELEASE=12.x
+            php: 7.4
+    allow_failures:
+        -   env: MW=REL1_35; NODE_RELEASE=10.x
+        -   env: MW=master; NODE_RELEASE=12.x
 
 before_install:
     - sudo apt-get update
@@ -31,7 +37,8 @@ before_install:
     # enable php-fpm
     - if [[ ${TRAVIS_PHP_VERSION:0:1} == "7" ]]; then sudo cp build/travis/www.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf; fi
     - sudo a2enmod rewrite actions fastcgi alias
-    - echo "cgi.fix_pathinfo = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.in
+    - echo "cgi.fix_pathinfo = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+    - echo "file_uploads = On" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
     - sudo sed -i -e "s,www-data,travis,g" /etc/apache2/envvars
     - sudo chown -R travis:travis /var/lib/apache2/fastcgi
     - ~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm
@@ -49,6 +56,10 @@ before_install:
 install:
     - bash ./build/travis/install-mediawiki.sh
     - npm install
+
+before_script:
+    # Additional PHP config
+    - phpenv config-add build/travis/travis.php.ini
 
 script:
     - npm test test
