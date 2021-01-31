@@ -1,6 +1,7 @@
 MWBot
 ========================
-[![Download stats](https://nodei.co/npm/mwbot.png?downloads=true&downloadRank=true)](https://nodei.co/npm/mwbot/)
+[![Build Status](https://travis-ci.com/Fannon/mwbot.svg?branch=master)](https://travis-ci.com/Fannon/mwbot)
+[![npm version](https://badge.fury.io/js/mwbot.svg)](https://badge.fury.io/js/mwbot)
 
 ## Description
 MWBot is a Node.js module for interacting with the MediaWiki API.
@@ -12,8 +13,6 @@ The library also lets you freely choose the abstraction/convenience level on whi
 You can use convenience functions that bundles (with concurrency) multiple API requests into one function, 
 but you can also handcraft your own custom MediaWiki API and pure HTTP requests.
 
-The library has extensive test coverage and is written in modern ECMAScript 2015.
-
 ## Requirements
 * Node.js 4.0+
 
@@ -21,7 +20,7 @@ The library has extensive test coverage and is written in modern ECMAScript 2015
 * [API Documenatation](docs/API.md)
 
 ## Documentation
-Since this library is based on promise, it can be used either via the typical Promise notation, or if you're Node.JS version already supports it - the new async/await syntax. If you use Node.JS > 7.x I'd highly recommended to use the latter.
+Since this library is based on promise, it can be used either via the promise notation, or using async/await.
 
 ### Typical Example (Promise .then/.catch)
 ```js
