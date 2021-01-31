@@ -133,33 +133,42 @@ describe('MWBot Batch Request', function () {
         await bot.loginGetEditToken(loginCredentials.valid);
 
         try {
+            await bot.delete('BatchRequestTestPage1');
+            await bot.delete('BatchRequestTestPage2');
+            await bot.delete('BatchRequestTestPage3');
+            await bot.delete('BatchRequestTestPage4');
+        } catch (e) {
+            // ignore
+        }
+
+        try {
             const response = await bot.batch([
                 [
                     'create',
-                    'TestPage1',
+                    'BatchRequestTestPage1',
                     'TestContent1',
                     'Batch Upload Reason'
                 ],
                 [
                     'create',
-                    'TestPage2',
+                    'BatchRequestTestPage2',
                     'TestContent2',
                     'Batch Upload Reason'
                 ],
                 [
                     'update',
-                    'TestPage1',
+                    'BatchRequestTestPage1',
                     'TestContent1-Update',
                     'Batch Upload Reason'
                 ],
                 [
                     'delete',
-                    'TestPage2',
+                    'BatchRequestTestPage2',
                     'Batch Upload Reason'
                 ],
                 [
                     'edit',
-                    'TestPage2',
+                    'BatchRequestTestPage2',
                     'TestContent2',
                     'Batch Upload Reason'
                 ]
@@ -167,9 +176,13 @@ describe('MWBot Batch Request', function () {
 
             expect(response).to.be.instanceof(Object);
             expect(response.create).to.be.instanceof(Object);
-            expect(response.create.TestPage1).to.be.instanceof(Object);
-            expect(response.create.TestPage1.response).to.be.instanceof(Object);
-
+            expect(response.create.BatchRequestTestPage1).to.be.instanceof(Object);
+            expect(response.create.BatchRequestTestPage1.edit.result).to.equal('Success');
+            expect(response.update.BatchRequestTestPage1.edit.result).to.equal('Success');
+            expect(response.delete).to.be.instanceof(Object);
+            expect(response.delete.BatchRequestTestPage2.delete.title).to.equal('BatchRequestTestPage2');
+            expect(response.edit).to.be.instanceof(Object);
+            expect(response.create.BatchRequestTestPage2.edit.result).to.equal('Success');
         } catch (err) {
             log(err);
         }

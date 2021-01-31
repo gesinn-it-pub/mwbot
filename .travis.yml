@@ -16,13 +16,15 @@ jobs:
         # 1) previous MW LTS stable
         -   env: MW=REL1_31; NODE_RELEASE=10.x
             php: 7.2
-    allow_failures:
         # 2) current MW LTS stable
         -   env: MW=REL1_35; NODE_RELEASE=10.x
             php: 7.4
-        #3) master
+        # 3) master
         -   env: MW=master; NODE_RELEASE=12.x
             php: 7.4
+    allow_failures:
+        -   env: MW=REL1_35; NODE_RELEASE=10.x
+        -   env: MW=master; NODE_RELEASE=12.x
 
 before_install:
     - sudo apt-get update
