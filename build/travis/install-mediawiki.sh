@@ -33,7 +33,7 @@ sudo /home/travis/.phpenv/shims/php maintenance/install.php --dbtype mysql --dbu
 
 sudo /usr/bin/find /var/www/mw -type d -exec chmod 755 {} \;
 sudo /usr/bin/find /var/www/mw -type f -exec chmod 644 {} \;
-sudo /bin/chown -R www-data:www-data /var/www/mw
+sudo /bin/chown -R travis:travis /var/www/mw
 ls -la /var/www/mw
 
 sudo /bin/echo '$wgEnableUploads=true;' | sudo /usr/bin/tee -a LocalSettings.php
