@@ -26,7 +26,15 @@ describe('MWBot', function() {
         expect(bot.version).to.match(/^(\d+\.)?(\d+\.)?(\*|\d+)?(-.+)?$/);
     });
 
-    it('set custom options', function() {
+    it('sets API URL', function() {
+        let bot = new MWBot();
+        bot.setApiUrl('https://acme.corp');
+
+        expect(bot).to.be.an('object');
+        expect(bot.options.apiUrl).to.equal('https://acme.corp');
+    });
+
+    it('sets custom options', function() {
         let bot = new MWBot();
         bot.setOptions({
             verbose: true
@@ -35,7 +43,7 @@ describe('MWBot', function() {
         expect(bot.options.verbose).to.equal(true);
     });
 
-    it('set custom global request options', function() {
+    it('sets custom global request options', function() {
         let bot = new MWBot();
         bot.setGlobalRequestOptions({
             time: false,

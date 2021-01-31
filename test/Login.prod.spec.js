@@ -15,6 +15,7 @@ try {
     let loginCredentialsLocal = require('./mocking/loginCredentials.local.json');
     if (loginCredentialsLocal) loginCredentials = loginCredentialsLocal;
 } catch (e) {
+    //ignore
 }
 
 describe('MWBot Login', async function () {
@@ -40,7 +41,7 @@ describe('MWBot Login', async function () {
         let bot = new MWBot({silent: true});
 
         try {
-            const r = await bot.login(loginCredentials.invalid);
+            await bot.login(loginCredentials.invalid);
             throw new Error('other error');
         } catch (err) {
             let expected = 'Could not login: Failed';
@@ -71,7 +72,7 @@ describe('MWBot Login', async function () {
     it('succeeds and get edit token afterwards', async function () {
         let bot = new MWBot();
 
-        const r1 = await bot.login(loginCredentials.valid);
+        await bot.login(loginCredentials.valid);
 
         try {
             const r2 = await bot.getEditToken();
@@ -88,7 +89,7 @@ describe('MWBot Login', async function () {
         let bot = new MWBot();
 
         try {
-            const r = await bot.loginGetEditToken(loginCredentials.valid)
+            const r = await bot.loginGetEditToken(loginCredentials.valid);
             expect(r).to.be.an('object');
             expect(r.result).to.equal('Success');
             expect(r).to.include.key('csrftoken');
@@ -98,5 +99,21 @@ describe('MWBot Login', async function () {
             throw(err);
         }
     });
+
+    it('convenience loginGetCreateaccountToken()', async function () {
+        let bot = new MWBot();
+
+        try {
+            const r = await bot.loginGetCreateaccountToken(loginCredentials.valid);
+            expect(r).to.be.an('object');
+            expect(r.result).to.equal('Success');
+            expect(r).to.include.key('createaccounttoken');
+            expect(JSON.stringify(r.warnings)).to.not.exist;
+        } catch (err) {
+            log('[E] ' + this.test.fullTitle() + ': ' + err.code + ': ' + err.info + '\n' + err.response);
+            throw(err);
+        }
+    });
+
 
 });
