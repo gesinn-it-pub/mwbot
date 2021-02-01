@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset='utf-8' />
-  <title>mwbot 1.1.0-alpha | Documentation</title>
+  <title>mwbot 2.0.0-alpha | Documentation</title>
   <meta name='viewport' content='width=device-width,initial-scale=1'>
   <link href='assets/bass.css' type='text/css' rel='stylesheet' />
   <link href='assets/style.css' type='text/css' rel='stylesheet' />
@@ -14,7 +14,7 @@
       <div class='fixed xs-hide fix-3 overflow-auto max-height-100'>
         <div class='py1 px2'>
           <h3 class='mb0 no-anchor'>mwbot</h3>
-          <div class='mb1'><code>1.1.0-alpha</code></div>
+          <div class='mb1'><code>2.0.0-alpha</code></div>
           <input
             placeholder='Filter'
             id='filter-input'
@@ -94,6 +94,12 @@
                         href='#MWBot#editToken'
                         class='regular pre-open'>
                         #editToken
+                      </a></li>
+                      
+                      <li><a
+                        href='#MWBot#mwversion'
+                        class='regular pre-open'>
+                        #mwversion
                       </a></li>
                       
                       <li><a
@@ -184,6 +190,12 @@
                         href='#MWBot#login'
                         class='regular pre-open'>
                         #login
+                      </a></li>
+                      
+                      <li><a
+                        href='#MWBot#getSiteinfo'
+                        class='regular pre-open'>
+                        #getSiteinfo
                       </a></li>
                       
                       <li><a
@@ -331,20 +343,43 @@
   </div>
   
 
-  <p>MWBot library</p>
+  <p>MWBot, a Node.js module for interacting with the MediaWiki API.</p>
 
 
-  <div class='pre p1 fill-light mt0'>new MWBot()</div>
-  
-  
-
-  
-  
-  
-  <div>Author: Simon Heimler</div>
+  <div class='pre p1 fill-light mt0'>new MWBot(customOptions: {}?, customRequestOptions: {}?)</div>
   
   
 
+  
+  
+  
+  <div>Author: Simon Heimler, Alexander Gesinn (gesinn.it GmbH &amp; Co. KG)</div>
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>customOptions</span> <code class='quiet'>({}?)</code>
+	    Custom options
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>customRequestOptions</span> <code class='quiet'>({}?)</code>
+	    Custom request options
+
+          </div>
+          
+        </div>
+      
+    </div>
   
 
   
@@ -375,7 +410,7 @@
 Takes care that the two objects are not mutated</p>
 
 
-  <div class='pre p1 fill-light mt0'>merge(parent: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>, child: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></div>
+  <div class='pre p1 fill-light mt0'>merge(parent: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>, child: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></div>
   
   
 
@@ -392,7 +427,7 @@ Takes care that the two objects are not mutated</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>parent</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
+            <span class='code bold'>parent</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
 	    Parent Object
 
           </div>
@@ -401,7 +436,7 @@ Takes care that the two objects are not mutated</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>child</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
+            <span class='code bold'>child</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
 	    Child Object; overwrites parent properties
 
           </div>
@@ -416,7 +451,7 @@ Takes care that the two objects are not mutated</p>
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></code>:
+      <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></code>:
         Merged Object
 
       
@@ -686,7 +721,7 @@ Takes care that the two objects are not mutated</p>
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>constructor(customOptions?, customRequestOptions?)</span>
+            <span class='code strong strong truncate'>constructor(customOptions, customRequestOptions)</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -699,7 +734,7 @@ It is advised to create one bot instance for every API to use
 A bot instance has its own state (e.g. tokens) that is necessary for some operations</p>
 
 
-  <div class='pre p1 fill-light mt0'>constructor(customOptions: {}?, customRequestOptions: {}?)</div>
+  <div class='pre p1 fill-light mt0'>constructor(customOptions: any, customRequestOptions: any)</div>
   
   
 
@@ -716,18 +751,16 @@ A bot instance has its own state (e.g. tokens) that is necessary for some operat
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>customOptions</span> <code class='quiet'>({}?)</code>
-	    Custom options
-
+            <span class='code bold'>customOptions</span> <code class='quiet'>(any)</code>
+	    
           </div>
           
         </div>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>customRequestOptions</span> <code class='quiet'>({}?)</code>
-	    Custom request options
-
+            <span class='code bold'>customRequestOptions</span> <code class='quiet'>(any)</code>
+	    
           </div>
           
         </div>
@@ -862,6 +895,52 @@ Is received from the MW Login API and contains token, userid, etc.</p>
 
 
   <div class='pre p1 fill-light mt0'>editToken</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='MWBot#mwversion'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>mwversion</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>MediaWiki Version (semver)</p>
+
+
+  <div class='pre p1 fill-light mt0'>mwversion</div>
   
   
 
@@ -1324,7 +1403,7 @@ Uses ES5 getter</p>
   <p>Set and overwrite mwbot options</p>
 
 
-  <div class='pre p1 fill-light mt0'>setOptions(customOptions: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</div>
+  <div class='pre p1 fill-light mt0'>setOptions(customOptions: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</div>
   
   
 
@@ -1341,7 +1420,7 @@ Uses ES5 getter</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>customOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+            <span class='code bold'>customOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
 	    
           </div>
           
@@ -1444,7 +1523,7 @@ See <a href="https://www.npmjs.com/package/request">https://www.npmjs.com/packag
 This can be uses instead of a login, if no actions are used that require one.</p>
 
 
-  <div class='pre p1 fill-light mt0'>setApiUrl(apiUrl: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</div>
+  <div class='pre p1 fill-light mt0'>setApiUrl(apiUrl: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</div>
   
   
 
@@ -1461,7 +1540,7 @@ This can be uses instead of a login, if no actions are used that require one.</p
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>apiUrl</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+            <span class='code bold'>apiUrl</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
 	    API Url to MediaWiki, e.g. '
 <a href="https://www.semantic-mediawiki.org/w/api.php">https://www.semantic-mediawiki.org/w/api.php</a>
 '
@@ -1507,7 +1586,7 @@ This can be uses instead of a login, if no actions are used that require one.</p
 Uses the npm request library</p>
 
 
-  <div class='pre p1 fill-light mt0'>rawRequest(requestOptions: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>): bluebird</div>
+  <div class='pre p1 fill-light mt0'>rawRequest(requestOptions: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>): bluebird</div>
   
   
 
@@ -1524,7 +1603,7 @@ Uses the npm request library</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>requestOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
+            <span class='code bold'>requestOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
 	    
           </div>
           
@@ -1574,7 +1653,7 @@ Uses the npm request library</p>
   <p>Executes a request with the ability to use custom parameters and custom request options</p>
 
 
-  <div class='pre p1 fill-light mt0'>request(params: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>, customRequestOptions: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>): bluebird</div>
+  <div class='pre p1 fill-light mt0'>request(params: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>, customRequestOptions: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>): bluebird</div>
   
   
 
@@ -1591,7 +1670,7 @@ Uses the npm request library</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>params</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
+            <span class='code bold'>params</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
 	    Request Parameters
 
           </div>
@@ -1600,7 +1679,7 @@ Uses the npm request library</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>customRequestOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
+            <span class='code bold'>customRequestOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
 	    Custom request options
 
           </div>
@@ -1651,7 +1730,7 @@ Uses the npm request library</p>
   <p>Executes a Login</p>
 
 
-  <div class='pre p1 fill-light mt0'>login(loginOptions: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?): bluebird</div>
+  <div class='pre p1 fill-light mt0'>login(loginOptions: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?): bluebird</div>
   
   
 
@@ -1668,13 +1747,67 @@ Uses the npm request library</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>loginOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
+            <span class='code bold'>loginOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
 	    
           </div>
           
         </div>
       
     </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code>bluebird</code>:
+        
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='MWBot#getSiteinfo'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>getSiteinfo()</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Gets overall site information.</p>
+
+
+  <div class='pre p1 fill-light mt0'>getSiteinfo(): bluebird</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
   
 
   
@@ -1715,8 +1848,7 @@ Uses the npm request library</p>
 
   
 
-  <p>Gets an edit token
-This is currently only compatible with MW >= 1.24</p>
+  <p>Gets an edit token</p>
 
 
   <div class='pre p1 fill-light mt0'>getEditToken(): bluebird</div>
@@ -1962,7 +2094,7 @@ Requires MW 1.27+</p>
   <p>Creates a new wiki pages. Does not edit existing ones</p>
 
 
-  <div class='pre p1 fill-light mt0'>create(title: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, content: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, summary: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, customRequestOptions: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?): bluebird</div>
+  <div class='pre p1 fill-light mt0'>create(title: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, content: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, summary: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, customRequestOptions: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?): bluebird</div>
   
   
 
@@ -1979,7 +2111,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>title</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+            <span class='code bold'>title</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
 	    
           </div>
           
@@ -1987,7 +2119,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>content</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+            <span class='code bold'>content</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
 	    
           </div>
           
@@ -1995,7 +2127,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>summary</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
+            <span class='code bold'>summary</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
 	    
           </div>
           
@@ -2003,7 +2135,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>customRequestOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
+            <span class='code bold'>customRequestOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
 	    
           </div>
           
@@ -2054,7 +2186,7 @@ Requires MW 1.27+</p>
 <p>Wrapper for readWithProps</p>
 
 
-  <div class='pre p1 fill-light mt0'>read(title: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, redirect: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>, customRequestOptions: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?): bluebird</div>
+  <div class='pre p1 fill-light mt0'>read(title: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, redirect: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>, customRequestOptions: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?): bluebird</div>
   
   
 
@@ -2071,7 +2203,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>title</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+            <span class='code bold'>title</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
 	    For multiple Pages use: PageA|PageB|PageC
 
           </div>
@@ -2080,7 +2212,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>redirect</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
+            <span class='code bold'>redirect</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
 	    If the page is a redirection, follow it or stay in the page
 
           </div>
@@ -2089,7 +2221,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>customRequestOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
+            <span class='code bold'>customRequestOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
 	    
           </div>
           
@@ -2140,7 +2272,7 @@ Requires MW 1.27+</p>
 <p>Wrapper for readWithPropsFromID</p>
 
 
-  <div class='pre p1 fill-light mt0'>readFromID(pageid: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, redirect: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>, customRequestOptions: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?): bluebird</div>
+  <div class='pre p1 fill-light mt0'>readFromID(pageid: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, redirect: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>, customRequestOptions: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?): bluebird</div>
   
   
 
@@ -2157,7 +2289,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>pageid</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
+            <span class='code bold'>pageid</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
 	    For multiple Pages use: PageA|PageB|PageC
 
           </div>
@@ -2166,7 +2298,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>redirect</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
+            <span class='code bold'>redirect</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
 	    If the page is a redirection, follow it or stay in the page
 
           </div>
@@ -2175,7 +2307,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>customRequestOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
+            <span class='code bold'>customRequestOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
 	    
           </div>
           
@@ -2225,7 +2357,7 @@ Requires MW 1.27+</p>
   <p>Reads the content / and meta-data of one (or many) wikipages based on specific parameters</p>
 
 
-  <div class='pre p1 fill-light mt0'>readWithProps(title: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, props: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, redirect: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>, customRequestOptions: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?): bluebird</div>
+  <div class='pre p1 fill-light mt0'>readWithProps(title: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, props: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, redirect: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>, customRequestOptions: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?): bluebird</div>
   
   
 
@@ -2242,7 +2374,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>title</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+            <span class='code bold'>title</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
 	    For multiple Pages use: PageA|PageB|PageC
 
           </div>
@@ -2251,7 +2383,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>props</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+            <span class='code bold'>props</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
 	    For multiple Props use: user|userid|content
 
           </div>
@@ -2260,7 +2392,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>redirect</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
+            <span class='code bold'>redirect</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
 	    If the page is a redirection, follow it or stay in the page
 
           </div>
@@ -2269,7 +2401,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>customRequestOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
+            <span class='code bold'>customRequestOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
 	    
           </div>
           
@@ -2319,7 +2451,7 @@ Requires MW 1.27+</p>
   <p>Reads the content / and meta-data of one (or many) wikipages based on specific parameters</p>
 
 
-  <div class='pre p1 fill-light mt0'>readWithPropsFromID(pageid: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, props: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, redirect: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>, customRequestOptions: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?): bluebird</div>
+  <div class='pre p1 fill-light mt0'>readWithPropsFromID(pageid: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, props: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, redirect: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>, customRequestOptions: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?): bluebird</div>
   
   
 
@@ -2336,7 +2468,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>pageid</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
+            <span class='code bold'>pageid</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
 	    For multiple Pages use: PageA|PageB|PageC
 
           </div>
@@ -2345,7 +2477,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>props</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+            <span class='code bold'>props</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
 	    For multiple Props use: user|userid|content
 
           </div>
@@ -2354,7 +2486,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>redirect</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
+            <span class='code bold'>redirect</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>)</code>
 	    If the page is a redirection, follow it or stay in the page
 
           </div>
@@ -2363,7 +2495,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>customRequestOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
+            <span class='code bold'>customRequestOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
 	    
           </div>
           
@@ -2413,7 +2545,7 @@ Requires MW 1.27+</p>
   <p>Edits a new wiki pages. Creates a new page if it does not exist yet.</p>
 
 
-  <div class='pre p1 fill-light mt0'>edit(title: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, content: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, summary: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, customRequestOptions: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?): bluebird</div>
+  <div class='pre p1 fill-light mt0'>edit(title: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, content: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, summary: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, customRequestOptions: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?): bluebird</div>
   
   
 
@@ -2430,7 +2562,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>title</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+            <span class='code bold'>title</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
 	    
           </div>
           
@@ -2438,7 +2570,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>content</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+            <span class='code bold'>content</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
 	    
           </div>
           
@@ -2446,7 +2578,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>summary</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
+            <span class='code bold'>summary</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
 	    
           </div>
           
@@ -2454,7 +2586,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>customRequestOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
+            <span class='code bold'>customRequestOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
 	    
           </div>
           
@@ -2504,7 +2636,7 @@ Requires MW 1.27+</p>
   <p>Updates existing wiki pages. Does not create new ones.</p>
 
 
-  <div class='pre p1 fill-light mt0'>update(title: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, content: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, summary: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, customRequestOptions: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?): bluebird</div>
+  <div class='pre p1 fill-light mt0'>update(title: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, content: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, summary: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, customRequestOptions: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?): bluebird</div>
   
   
 
@@ -2521,7 +2653,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>title</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+            <span class='code bold'>title</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
 	    
           </div>
           
@@ -2529,7 +2661,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>content</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+            <span class='code bold'>content</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
 	    
           </div>
           
@@ -2537,7 +2669,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>summary</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
+            <span class='code bold'>summary</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
 	    
           </div>
           
@@ -2545,7 +2677,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>customRequestOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
+            <span class='code bold'>customRequestOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
 	    
           </div>
           
@@ -2595,7 +2727,7 @@ Requires MW 1.27+</p>
   <p>Updates existing wiki pages. Does not create new ones.</p>
 
 
-  <div class='pre p1 fill-light mt0'>updateFromID(pageid: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, content: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, summary: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, customRequestOptions: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?): bluebird</div>
+  <div class='pre p1 fill-light mt0'>updateFromID(pageid: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>, content: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, summary: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, customRequestOptions: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?): bluebird</div>
   
   
 
@@ -2612,7 +2744,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>pageid</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
+            <span class='code bold'>pageid</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>)</code>
 	    
           </div>
           
@@ -2620,7 +2752,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>content</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+            <span class='code bold'>content</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
 	    
           </div>
           
@@ -2628,7 +2760,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>summary</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
+            <span class='code bold'>summary</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
 	    
           </div>
           
@@ -2636,7 +2768,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>customRequestOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
+            <span class='code bold'>customRequestOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
 	    
           </div>
           
@@ -2686,7 +2818,7 @@ Requires MW 1.27+</p>
   <p>Deletes a new wiki page</p>
 
 
-  <div class='pre p1 fill-light mt0'>delete(title: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, reason: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, customRequestOptions: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?): bluebird</div>
+  <div class='pre p1 fill-light mt0'>delete(title: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, reason: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, customRequestOptions: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?): bluebird</div>
   
   
 
@@ -2703,7 +2835,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>title</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+            <span class='code bold'>title</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
 	    
           </div>
           
@@ -2711,7 +2843,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>reason</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
+            <span class='code bold'>reason</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
 	    
           </div>
           
@@ -2719,7 +2851,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>customRequestOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
+            <span class='code bold'>customRequestOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
 	    
           </div>
           
@@ -2769,7 +2901,7 @@ Requires MW 1.27+</p>
   <p>Moves a wiki page</p>
 
 
-  <div class='pre p1 fill-light mt0'>move(oldTitle: any, newTitle: any, reason: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, customRequestOptions: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?, oldName: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, newName: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): bluebird</div>
+  <div class='pre p1 fill-light mt0'>move(oldTitle: any, newTitle: any, reason: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, customRequestOptions: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?, oldName: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, newName: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): bluebird</div>
   
   
 
@@ -2802,7 +2934,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>reason</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
+            <span class='code bold'>reason</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
 	    
           </div>
           
@@ -2810,7 +2942,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>customRequestOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
+            <span class='code bold'>customRequestOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
 	    
           </div>
           
@@ -2818,7 +2950,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>oldName</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+            <span class='code bold'>oldName</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
 	    
           </div>
           
@@ -2826,7 +2958,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>newName</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+            <span class='code bold'>newName</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
 	    
           </div>
           
@@ -2876,7 +3008,7 @@ Requires MW 1.27+</p>
   <p>Uploads a file</p>
 
 
-  <div class='pre p1 fill-light mt0'>upload(title: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, pathToFile: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, comment: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, customParams: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?, customRequestOptions: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?): bluebird</div>
+  <div class='pre p1 fill-light mt0'>upload(title: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, pathToFile: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, comment: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, customParams: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?, customRequestOptions: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?): bluebird</div>
   
   
 
@@ -2893,7 +3025,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>title</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
+            <span class='code bold'>title</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
 	    
           </div>
           
@@ -2901,7 +3033,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>pathToFile</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+            <span class='code bold'>pathToFile</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
 	    
           </div>
           
@@ -2909,7 +3041,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>comment</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
+            <span class='code bold'>comment</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
 	    
           </div>
           
@@ -2917,7 +3049,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>customParams</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
+            <span class='code bold'>customParams</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
 	    
           </div>
           
@@ -2925,7 +3057,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>customRequestOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
+            <span class='code bold'>customRequestOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
 	    
           </div>
           
@@ -2975,7 +3107,7 @@ Requires MW 1.27+</p>
   <p>Uploads a file and overwrites existing ones</p>
 
 
-  <div class='pre p1 fill-light mt0'>uploadOverwrite(title: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, pathToFile: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, comment: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, customParams: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?, customRequestOptions: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?): bluebird</div>
+  <div class='pre p1 fill-light mt0'>uploadOverwrite(title: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, pathToFile: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, comment: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, customParams: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?, customRequestOptions: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?): bluebird</div>
   
   
 
@@ -2992,7 +3124,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>title</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
+            <span class='code bold'>title</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
 	    
           </div>
           
@@ -3000,7 +3132,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>pathToFile</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+            <span class='code bold'>pathToFile</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
 	    
           </div>
           
@@ -3008,7 +3140,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>comment</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
+            <span class='code bold'>comment</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
 	    
           </div>
           
@@ -3016,7 +3148,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>customParams</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
+            <span class='code bold'>customParams</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
 	    
           </div>
           
@@ -3024,7 +3156,7 @@ Requires MW 1.27+</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>customRequestOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
+            <span class='code bold'>customRequestOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
 	    
           </div>
           
@@ -3078,7 +3210,7 @@ It includes some more detailed error handling</p>
 by switching from Promise.map to Promise.mapSeries</p>
 
 
-  <div class='pre p1 fill-light mt0'>batch(jobs: (<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">array</a>), summary: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, concurrency: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?, customRequestOptions: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</div>
+  <div class='pre p1 fill-light mt0'>batch(jobs: (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">array</a>), summary: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, concurrency: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?, customRequestOptions: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</div>
   
   
 
@@ -3095,7 +3227,7 @@ by switching from Promise.map to Promise.mapSeries</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>jobs</span> <code class='quiet'>((<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">array</a>))</code>
+            <span class='code bold'>jobs</span> <code class='quiet'>((<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a> | <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">array</a>))</code>
 	    
           </div>
           
@@ -3103,7 +3235,7 @@ by switching from Promise.map to Promise.mapSeries</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>summary</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
+            <span class='code bold'>summary</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
 	    
           </div>
           
@@ -3111,7 +3243,7 @@ by switching from Promise.map to Promise.mapSeries</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>concurrency</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?)</code>
+            <span class='code bold'>concurrency</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a>?)</code>
 	    
           </div>
           
@@ -3119,7 +3251,7 @@ by switching from Promise.map to Promise.mapSeries</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>customRequestOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
+            <span class='code bold'>customRequestOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
 	    
           </div>
           
@@ -3161,7 +3293,7 @@ by switching from Promise.map to Promise.mapSeries</p>
   <p>Execute an ASK Query</p>
 
 
-  <div class='pre p1 fill-light mt0'>askQuery(query: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, apiUrl: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, customRequestOptions: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?): bluebird</div>
+  <div class='pre p1 fill-light mt0'>askQuery(query: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, apiUrl: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, customRequestOptions: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?): bluebird</div>
   
   
 
@@ -3178,7 +3310,7 @@ by switching from Promise.map to Promise.mapSeries</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>query</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+            <span class='code bold'>query</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
 	    
           </div>
           
@@ -3186,7 +3318,7 @@ by switching from Promise.map to Promise.mapSeries</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>apiUrl</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
+            <span class='code bold'>apiUrl</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
 	    
           </div>
           
@@ -3194,7 +3326,7 @@ by switching from Promise.map to Promise.mapSeries</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>customRequestOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
+            <span class='code bold'>customRequestOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
 	    
           </div>
           
@@ -3245,7 +3377,7 @@ by switching from Promise.map to Promise.mapSeries</p>
 Defaults to use the wikidata endpoint</p>
 
 
-  <div class='pre p1 fill-light mt0'>sparqlQuery(query: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, endpointUrl: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, customRequestOptions: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?): bluebird</div>
+  <div class='pre p1 fill-light mt0'>sparqlQuery(query: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, endpointUrl: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?, customRequestOptions: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?): bluebird</div>
   
   
 
@@ -3262,7 +3394,7 @@ Defaults to use the wikidata endpoint</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>query</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+            <span class='code bold'>query</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
 	    
           </div>
           
@@ -3270,7 +3402,7 @@ Defaults to use the wikidata endpoint</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>endpointUrl</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
+            <span class='code bold'>endpointUrl</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>?)</code>
 	    
           </div>
           
@@ -3278,7 +3410,7 @@ Defaults to use the wikidata endpoint</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>customRequestOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
+            <span class='code bold'>customRequestOptions</span> <code class='quiet'>(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>?)</code>
 	    
           </div>
           

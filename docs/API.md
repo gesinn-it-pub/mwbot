@@ -2,11 +2,16 @@
 
 ## MWBot
 
-MWBot library
+MWBot, a Node.js module for interacting with the MediaWiki API.
+
+**Parameters**
+
+-   `customOptions` **{}?** Custom options
+-   `customRequestOptions` **{}?** Custom request options
 
 **Meta**
 
--   **author**: Simon Heimler
+-   **author**: Simon Heimler, Alexander Gesinn (gesinn.it GmbH & Co. KG)
 
 ### constructor
 
@@ -16,8 +21,8 @@ A bot instance has its own state (e.g. tokens) that is necessary for some operat
 
 **Parameters**
 
--   `customOptions` **{}?** Custom options
--   `customRequestOptions` **{}?** Custom request options
+-   `customOptions`  
+-   `customRequestOptions`  
 
 ### state
 
@@ -31,6 +36,10 @@ Bot instance is logged in or not
 ### editToken
 
 Bot instances edit token
+
+### mwversion
+
+MediaWiki Version (semver)
 
 ### createaccountToken
 
@@ -77,7 +86,7 @@ Set and overwrite mwbot options
 
 **Parameters**
 
--   `customOptions` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `customOptions` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
 
 ### setGlobalRequestOptions
 
@@ -95,7 +104,7 @@ This can be uses instead of a login, if no actions are used that require one.
 
 **Parameters**
 
--   `apiUrl` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** API Url to MediaWiki, e.g. '<https://www.semantic-mediawiki.org/w/api.php>'
+-   `apiUrl` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** API Url to MediaWiki, e.g. '<https://www.semantic-mediawiki.org/w/api.php>'
 
 ### rawRequest
 
@@ -104,7 +113,7 @@ Uses the npm request library
 
 **Parameters**
 
--   `requestOptions` **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+-   `requestOptions` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
 
 Returns **bluebird** 
 
@@ -114,8 +123,8 @@ Executes a request with the ability to use custom parameters and custom request 
 
 **Parameters**
 
--   `params` **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** Request Parameters
--   `customRequestOptions` **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** Custom request options
+-   `params` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** Request Parameters
+-   `customRequestOptions` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** Custom request options
 
 Returns **bluebird** 
 
@@ -127,14 +136,19 @@ Executes a Login
 
 **Parameters**
 
--   `loginOptions` **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
+-   `loginOptions` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
+
+Returns **bluebird** 
+
+### getSiteinfo
+
+Gets overall site information.
 
 Returns **bluebird** 
 
 ### getEditToken
 
 Gets an edit token
-This is currently only compatible with MW >= 1.24
 
 Returns **bluebird** 
 
@@ -171,10 +185,10 @@ Creates a new wiki pages. Does not edit existing ones
 
 **Parameters**
 
--   `title` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** 
--   `content` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** 
--   `summary` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** 
--   `customRequestOptions` **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
+-   `title` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+-   `content` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+-   `summary` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** 
+-   `customRequestOptions` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
 
 Returns **bluebird** 
 
@@ -186,9 +200,9 @@ Wrapper for readWithProps
 
 **Parameters**
 
--   `title` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** For multiple Pages use: PageA|PageB|PageC
--   `redirect` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** If the page is a redirection, follow it or stay in the page
--   `customRequestOptions` **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
+-   `title` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** For multiple Pages use: PageA|PageB|PageC
+-   `redirect` **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** If the page is a redirection, follow it or stay in the page
+-   `customRequestOptions` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
 
 Returns **bluebird** 
 
@@ -200,9 +214,9 @@ Wrapper for readWithPropsFromID
 
 **Parameters**
 
--   `pageid` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** For multiple Pages use: PageA|PageB|PageC
--   `redirect` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** If the page is a redirection, follow it or stay in the page
--   `customRequestOptions` **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
+-   `pageid` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** For multiple Pages use: PageA|PageB|PageC
+-   `redirect` **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** If the page is a redirection, follow it or stay in the page
+-   `customRequestOptions` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
 
 Returns **bluebird** 
 
@@ -212,10 +226,10 @@ Reads the content / and meta-data of one (or many) wikipages based on specific p
 
 **Parameters**
 
--   `title` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** For multiple Pages use: PageA|PageB|PageC
--   `props` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** For multiple Props use: user|userid|content
--   `redirect` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** If the page is a redirection, follow it or stay in the page
--   `customRequestOptions` **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
+-   `title` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** For multiple Pages use: PageA|PageB|PageC
+-   `props` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** For multiple Props use: user|userid|content
+-   `redirect` **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** If the page is a redirection, follow it or stay in the page
+-   `customRequestOptions` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
 
 Returns **bluebird** 
 
@@ -225,10 +239,10 @@ Reads the content / and meta-data of one (or many) wikipages based on specific p
 
 **Parameters**
 
--   `pageid` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** For multiple Pages use: PageA|PageB|PageC
--   `props` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** For multiple Props use: user|userid|content
--   `redirect` **[boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** If the page is a redirection, follow it or stay in the page
--   `customRequestOptions` **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
+-   `pageid` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** For multiple Pages use: PageA|PageB|PageC
+-   `props` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** For multiple Props use: user|userid|content
+-   `redirect` **[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** If the page is a redirection, follow it or stay in the page
+-   `customRequestOptions` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
 
 Returns **bluebird** 
 
@@ -238,10 +252,10 @@ Edits a new wiki pages. Creates a new page if it does not exist yet.
 
 **Parameters**
 
--   `title` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** 
--   `content` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** 
--   `summary` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** 
--   `customRequestOptions` **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
+-   `title` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+-   `content` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+-   `summary` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** 
+-   `customRequestOptions` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
 
 Returns **bluebird** 
 
@@ -251,10 +265,10 @@ Updates existing wiki pages. Does not create new ones.
 
 **Parameters**
 
--   `title` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** 
--   `content` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** 
--   `summary` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** 
--   `customRequestOptions` **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
+-   `title` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+-   `content` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+-   `summary` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** 
+-   `customRequestOptions` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
 
 Returns **bluebird** 
 
@@ -264,10 +278,10 @@ Updates existing wiki pages. Does not create new ones.
 
 **Parameters**
 
--   `pageid` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)** 
--   `content` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** 
--   `summary` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** 
--   `customRequestOptions` **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
+-   `pageid` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** 
+-   `content` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+-   `summary` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** 
+-   `customRequestOptions` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
 
 Returns **bluebird** 
 
@@ -277,9 +291,9 @@ Deletes a new wiki page
 
 **Parameters**
 
--   `title` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** 
--   `reason` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** 
--   `customRequestOptions` **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
+-   `title` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+-   `reason` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** 
+-   `customRequestOptions` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
 
 Returns **bluebird** 
 
@@ -291,10 +305,10 @@ Moves a wiki page
 
 -   `oldTitle`  
 -   `newTitle`  
--   `reason` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** 
--   `customRequestOptions` **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
--   `oldName` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** 
--   `newName` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+-   `reason` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** 
+-   `customRequestOptions` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
+-   `oldName` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+-   `newName` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
 
 Returns **bluebird** 
 
@@ -304,11 +318,11 @@ Uploads a file
 
 **Parameters**
 
--   `title` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** 
--   `pathToFile` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** 
--   `comment` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** 
--   `customParams` **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
--   `customRequestOptions` **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
+-   `title` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** 
+-   `pathToFile` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+-   `comment` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** 
+-   `customParams` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
+-   `customRequestOptions` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
 
 Returns **bluebird** 
 
@@ -318,11 +332,11 @@ Uploads a file and overwrites existing ones
 
 **Parameters**
 
--   `title` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** 
--   `pathToFile` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** 
--   `comment` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** 
--   `customParams` **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
--   `customRequestOptions` **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
+-   `title` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** 
+-   `pathToFile` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+-   `comment` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** 
+-   `customParams` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
+-   `customRequestOptions` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
 
 Returns **bluebird** 
 
@@ -337,10 +351,10 @@ by switching from Promise.map to Promise.mapSeries
 
 **Parameters**
 
--   `jobs` **([object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object) \| [array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array))** 
--   `summary` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** 
--   `concurrency` **[number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)?** 
--   `customRequestOptions` **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
+-   `jobs` **([object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object) \| [array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array))** 
+-   `summary` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** 
+-   `concurrency` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)?** 
+-   `customRequestOptions` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
 
 ### askQuery
 
@@ -348,9 +362,9 @@ Execute an ASK Query
 
 **Parameters**
 
--   `query` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** 
--   `apiUrl` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** 
--   `customRequestOptions` **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
+-   `query` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+-   `apiUrl` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** 
+-   `customRequestOptions` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
 
 Returns **bluebird** 
 
@@ -361,9 +375,9 @@ Defaults to use the wikidata endpoint
 
 **Parameters**
 
--   `query` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** 
--   `endpointUrl` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** 
--   `customRequestOptions` **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
+-   `query` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+-   `endpointUrl` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** 
+-   `customRequestOptions` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** 
 
 Returns **bluebird** 
 
@@ -374,10 +388,10 @@ Takes care that the two objects are not mutated
 
 **Parameters**
 
--   `parent` **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** Parent Object
--   `child` **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** Child Object; overwrites parent properties
+-   `parent` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** Parent Object
+-   `child` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** Child Object; overwrites parent properties
 
-Returns **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** Merged Object
+Returns **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** Merged Object
 
 ### logStatus
 
