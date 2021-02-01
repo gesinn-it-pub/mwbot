@@ -3,7 +3,7 @@ MWBot
 [![Build Status](https://travis-ci.com/Fannon/mwbot.svg?branch=master)](https://travis-ci.com/Fannon/mwbot)
 [![npm version](https://badge.fury.io/js/mwbot.svg)](https://badge.fury.io/js/mwbot)
 ![node-current](https://img.shields.io/node/v/mwbot)
-![mw-version](https://img.shields.io/badge/MW-1.27--1.35-brightgreen)
+![mw-version](https://img.shields.io/badge/MW-1.31--1.35-brightgreen)
 ![npm](https://img.shields.io/npm/dw/mwbot)
 
 ## Description
