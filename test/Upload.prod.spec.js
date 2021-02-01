@@ -19,11 +19,11 @@ try {
     //ingore
 }
 
-describe('MWBot Upload', function() {
+describe('MWBot Upload', function () {
     'use strict';
-    this.timeout(10000);
+    this.timeout(20000);
 
-    it('successfully uploads and overwrites an image with uploadOverwrite()', async function() {
+    it('successfully uploads and overwrites an image with uploadOverwrite()', async function () {
         let bot = new MWBot();
 
         await bot.loginGetEditToken(loginCredentials.valid);
@@ -31,7 +31,7 @@ describe('MWBot Upload', function() {
         // make sure, the test file does not exist
         try {
             await bot.delete('File:ExampleImage.png', 'Upload Test');
-        } catch(err){
+        } catch (err) {
             //ignore
         }
 
@@ -43,8 +43,8 @@ describe('MWBot Upload', function() {
                 'Test Reasons');
             expect(r3.upload.result).to.equal('Success');
             expect(JSON.stringify(r3.warnings)).to.not.exist;
-        } catch(err) {
-            assert.fail(err,'Success',err);
+        } catch (err) {
+            assert.fail(err, 'Success', err);
         }
 
         // upload again expecting 'fileexists-no-change'
@@ -55,12 +55,12 @@ describe('MWBot Upload', function() {
                 'Test Reasons');
             expect(r4.upload.result).to.equal('Success');
             expect(JSON.stringify(r4.warnings)).to.not.exist;
-        } catch(err) {
+        } catch (err) {
             expect(err.code).to.equal('fileexists-no-change');
         }
     });
 
-    it('successfully uploads without providing a filename with upload()', async function() {
+    it('successfully uploads without providing a filename with upload()', async function () {
         let bot = new MWBot();
 
         await bot.loginGetEditToken(loginCredentials.valid);
@@ -69,7 +69,7 @@ describe('MWBot Upload', function() {
         try {
             await bot.delete('File:ExampleImage.png', 'Upload Test');
             await bot.delete('File:Example2.png', 'Upload Test');
-        } catch(err){
+        } catch (err) {
             //ignore
         }
 
@@ -81,12 +81,12 @@ describe('MWBot Upload', function() {
                 'Test Reasons');
             expect(r4.upload.result).to.equal('Success');
             expect(JSON.stringify(r4.warnings)).to.not.exist;
-        } catch(err) {
-            assert.fail(err,'Success',err);
+        } catch (err) {
+            assert.fail(err, 'Success', err);
         }
     });
 
-    it('rejects to upload a non-existing file with upload()', async function() {
+    it('rejects to upload a non-existing file with upload()', async function () {
         let bot = new MWBot();
 
         await bot.loginGetEditToken(loginCredentials.valid);
@@ -97,7 +97,7 @@ describe('MWBot Upload', function() {
                 false,
                 __dirname + '/mocking/non-existing-file.png',
                 'Test Reasons');
-        } catch(err) {
+        } catch (err) {
             expect(err).to.be.an.instanceof(Error);
             expect(err.message).to.include('ENOENT');
         }

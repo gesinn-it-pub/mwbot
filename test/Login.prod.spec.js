@@ -7,6 +7,7 @@ const log = require('semlog').log;
 const chai = require('chai');
 const expect = chai.expect;
 const assert = chai.assert;
+const semver = require('semver');
 
 let loginCredentials = require('./mocking/loginCredentials.json');
 
@@ -31,6 +32,9 @@ describe('MWBot Login', async function () {
             expect(r.result).to.equal('Success');
             expect(bot.loggedIn).to.equal(true);
             expect(JSON.stringify(r.warnings)).to.not.exist;
+            expect(bot.mwversion.major).to.be.least(0);
+            expect(bot.mwversion.minor).to.be.least(0);
+            expect(semver.valid(bot.mwversion.version)).to.not.equal(null);
         } catch (err) {
             log('[E] ' + this.test.fullTitle() + ': ' + err.code + ': ' + err.info + '\n' + err.response);
             throw(err);

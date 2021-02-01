@@ -75,7 +75,7 @@ describe('MWBot Request', function() {
             return bot.update('Test Page', '=Some more Wikitext=');
         }).then((response) => {
             expect(response.edit.result).to.equal('Success');
-            expect(bot.counter.fulfilled).to.equal(5);
+            expect(bot.counter.fulfilled).to.equal(6);
         }).catch((err) => {
             log(err);
         });

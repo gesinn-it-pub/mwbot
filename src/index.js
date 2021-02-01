@@ -5,6 +5,7 @@ const path = require('path');
 const Promise = require('bluebird');
 const request = require('request');
 const semlog = require('semlog');
+const semver = require('semver');
 const log = semlog.log;
 const packageJson = require('../package.json');
 
@@ -56,6 +57,13 @@ class MWBot {
          * @type {boolean}
          */
         this.editToken = false;
+
+        /**
+         * MediaWiki Version (semver)
+         *
+         * @type {object} a semver object
+         */
+        this.mwversion = {};
 
         /**
          * Bot instances createaccount token
@@ -303,7 +311,6 @@ class MWBot {
             let loginString = this.options.username + '@' + this.options.apiUrl.split('/api.php').join('');
 
             this.request(loginRequest).then((response) => {
-
                 if (!response.login || !response.login.result) {
                     let err = new Error('Invalid response from API');
                     err.response = response;
@@ -315,13 +322,11 @@ class MWBot {
                     loginRequest.lgtoken = response.login.token;
                     return this.request(loginRequest);
                 }
-
             }).then((response) => {
-
                 if (response.login && response.login.result === 'Success') {
                     this.state = MWBot.merge(this.state, response.login);
                     this.loggedIn = true;
-                    return resolve(this.state);
+                    //return resolve(this.state);
                 } else {
                     let reason = 'Unknown reason';
                     if (response.login && response.login.result) {
@@ -332,19 +337,54 @@ class MWBot {
                     if (!this.options.silent) log('[E] [MWBOT] Login failed: ' + loginString);
                     return reject(err);
                 }
-
+            }).then(() => {
+                this.getSiteinfo().then(() => {
+                    this.mwversion = semver.coerce(this.state.generator);
+                    if (!semver.valid(this.mwversion)) {
+                        return reject(new Error('Invalid MediaWiki version: ' + JSON.stringify(this.mwversion)));
+                    } else {
+                        return resolve(this.state);
+                    }
+                }).catch((err) => {
+                    return reject(err);
+                });
             }).catch((err) => {
                 reject(err);
             });
-
         });
 
         return this.loginPromise;
     }
 
     /**
+     * Gets overall site information.
+     *
+     * @returns {bluebird}
+     */
+    getSiteinfo() {
+        return new Promise((resolve, reject) => {
+
+            this.request({
+                action: 'query',
+                meta: 'siteinfo',
+                siprop: 'general'
+            }).then((response) => {
+                if (response.query && response.query.general) {
+                    this.state = MWBot.merge(this.state, response.query.general);
+                    return resolve(this.state);
+                } else {
+                    let err = new Error('[E] [MWBOT] Could not get siteinfo');
+                    err.response = response;
+                    return reject(err);
+                }
+            }).catch((err) => {
+                return reject(err);
+            });
+        });
+    }
+
+    /**
      * Gets an edit token
-     * This is currently only compatible with MW >= 1.24
      *
      * @returns {bluebird}
      */
@@ -510,6 +550,10 @@ class MWBot {
             titles: title
         };
 
+        if (semver.gte(this.mwversion, '1.32.0')) {
+            params.rvslots = 'main';
+        }
+
         if (!redirect) {
             params.redirects = 'true';
         }
@@ -534,6 +578,10 @@ class MWBot {
             rvprop: props,
             pageids: pageid
         };
+
+        if (semver.gte(this.mwversion, '1.32.0')) {
+            params.rvslots = 'main';
+        }
 
         if (!redirect) {
             params.redirects = 'true';
@@ -616,7 +664,7 @@ class MWBot {
      *
      * @returns {bluebird}
      */
-    delete(title, reason, customRequestOptions)         {
+    delete(title, reason, customRequestOptions) {
         return this.request({
             action: 'delete',
             title: title,

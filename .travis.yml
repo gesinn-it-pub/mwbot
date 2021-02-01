@@ -14,6 +14,8 @@ jobs:
     fast_finish: true
     include:
         # 1) previous MW LTS stable
+        -   env: MW=REL1_27; NODE_RELEASE=10.x
+            php: 7.1
         -   env: MW=REL1_31; NODE_RELEASE=10.x
             php: 7.2
         # 2) current MW LTS stable
