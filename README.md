@@ -16,9 +16,6 @@ The library also lets you freely choose the abstraction/convenience level on whi
 You can use convenience functions that bundles (with concurrency) multiple API requests into one function, 
 but you can also handcraft your own custom MediaWiki API and pure HTTP requests.
 
-## Requirements
-* Node.js 4.0+
-
 ## Technical API Documentation
 * [API Documenatation](docs/API.md)
 
