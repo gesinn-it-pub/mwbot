@@ -8,7 +8,7 @@ MWBot
 ![npm](https://img.shields.io/npm/dw/mwbot)
 
 ## Description
-MWBot is a Node.js module for interacting with the MediaWiki API.
+MWBot is a Node.js module for interacting with the MediaWiki API created and originally developed by [@Fannon](https://github.com/Fannon/).
 
 The library makes use of the Promise pattern and behind the scene, the NPM [request](https://www.npmjs.com/package/request) library.
 
