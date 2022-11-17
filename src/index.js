@@ -502,6 +502,12 @@ class MWBot {
         }, customRequestOptions);
     }
 
+    createProtect(title, content, summary, customRequestOptions) {
+        return this.create(title, content, summary, customRequestOptions).then(() => {
+            return this.protect(title, '' ,customRequestOptions);
+        });
+    }
+
     /**
      * Reads the content / and meta-data of one (or many) wikipages
      *
@@ -611,6 +617,12 @@ class MWBot {
         }, customRequestOptions);
     }
 
+    editProtect(title, content, summary, customRequestOptions) {
+        return this.edit(title, content, summary, customRequestOptions).then(() => {
+            return this.protect(title, '' ,customRequestOptions);
+        });
+    }
+
     /**
      * Updates existing wiki pages. Does not create new ones.
      *
@@ -668,6 +680,26 @@ class MWBot {
         return this.request({
             action: 'delete',
             title: title,
+            reason: reason || this.options.defaultSummary,
+            token: this.editToken
+        }, customRequestOptions);
+    }
+
+    /**
+     * Protect a wiki page
+     *
+     * @param {string}  title
+     * @param {string}  [reason]
+     * @param {object}      [customRequestOptions]
+     *
+     * @returns {bluebird}
+     */
+    protect(title, reason, customRequestOptions) {
+        return this.request({
+            action: 'protect',
+            title: title,
+            protections: 'edit=sysop',
+            expiry: 'infinite',
             reason: reason || this.options.defaultSummary,
             token: this.editToken
         }, customRequestOptions);
@@ -1031,6 +1063,14 @@ class MWBot {
     static logStatus(status, currentCounter, totalCounter, operation, pageName, reason) {
 
         operation = operation || '';
+
+        if (operation === 'createProtect') {
+            operation = 'createprot';
+        }
+
+        if (operation === 'editProtect') {
+            operation = 'editprot';
+        }
 
         if (operation === 'uploadOverwrite') {
             operation = 'upload!';
