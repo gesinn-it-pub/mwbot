@@ -34,7 +34,7 @@ module.exports = function(grunt) {
                 options: {
                     mask: '*.prod.spec.js',
                     coverage: true,
-                    reportFormats: ['lcov', 'text']
+                    reportFormats: ['lcov', 'text', 'clover']
                 }
             }
         },
@@ -70,9 +70,9 @@ module.exports = function(grunt) {
 
     // Default task.
     grunt.registerTask('lint', ['eslint']);
-    grunt.registerTask('test', ['mocha_istanbul:coverage']);
+    grunt.registerTask('test-coverage', ['mocha_istanbul:coverage']);
     grunt.registerTask('doc', ['documentation']);
-    grunt.registerTask('default', ['lint', 'test', 'doc']);
+    grunt.registerTask('default', ['lint', 'test-coverage', 'doc']);
 
     grunt.event.on('coverage', function(content, done) {
         done();
