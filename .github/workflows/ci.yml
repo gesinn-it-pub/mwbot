@@ -27,9 +27,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Run CI
-        run: NODE_VERSION=${{ matrix.NODE_VERSION }} \
-             MW_VERSION=${{ matrix.MW_VERSION }} \
-             make ci
+        run: NODE_VERSION=${{ matrix.NODE_VERSION }} MW_VERSION=${{ matrix.MW_VERSION }} make ci
 
       - name: Ensure down
         run: make down
