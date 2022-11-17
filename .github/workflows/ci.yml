@@ -24,6 +24,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - run: NODE_VERSION=${{ NODE_VERSION }} MW_VERSION=${{ MW_VERSION }} make ci
+    - run: NODE_VERSION=${{ matrix.NODE_VERSION }} MW_VERSION=${{ matrix.MW_VERSION }} make ci
     - run: make down
       if: always()
