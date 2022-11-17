@@ -30,7 +30,7 @@
     "time-grunt": "^2.0.0"
   },
   "scripts": {
-    "test": "grunt"
+    "test-coverage": "grunt lint test-coverage"
   },
   "repository": {
     "type": "git",

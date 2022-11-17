@@ -7,15 +7,15 @@ compose = docker-compose
 all:
 
 .PHONY: ci
-ci: build up test down
+ci: build up test-coverage down
 
 .PHONY: bash
 bash:
 	$(compose) run --rm mwbot
 
-.PHONY: test
-test:
-	$(compose) run --rm mwbot -c 'npm test'
+.PHONY: test-coverage
+test-coverage:
+	$(compose) run --rm mwbot -c 'npm run test-coverage'
 
 .PHONY: build
 build:

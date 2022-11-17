@@ -16,14 +16,27 @@ jobs:
     strategy:
       matrix:
         include:
-          - { MW_VERSION: '1.35', NODE_VERSION: '10' }
+          - { MW_VERSION: '1.35', NODE_VERSION: '10', coverage: true }
           - { MW_VERSION: '1.35', NODE_VERSION: '12' }
           - { MW_VERSION: '1.35', NODE_VERSION: '14' }
           - { MW_VERSION: '1.37', NODE_VERSION: '16' }
           - { MW_VERSION: '1.38', NODE_VERSION: '16' }
 
     steps:
-    - uses: actions/checkout@v2
-    - run: NODE_VERSION=${{ matrix.NODE_VERSION }} MW_VERSION=${{ matrix.MW_VERSION }} make ci
-    - run: make down
-      if: always()
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Run CI
+        run: NODE_VERSION=${{ matrix.NODE_VERSION }} \
+             MW_VERSION=${{ matrix.MW_VERSION }} \
+             make ci
+
+      - name: Ensure down
+        run: make down
+        if: always()
+
+      - name: Upload code coverage
+        uses: codecov/codecov-action@v2
+        with:
+          files: coverage/clover.xml
+        if: matrix.coverage == true
