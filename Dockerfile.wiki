@@ -1,0 +1,17 @@
+ARG MW_VERSION
+FROM mediawiki:${MW_VERSION}
+
+RUN apt update && apt install sudo && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /var/www/html
+RUN sudo -u www-data php maintenance/install.php \
+    --pass=wiki4everyone \
+    --server="http://wiki" \
+    --scriptpath="" \
+    --dbtype=sqlite \
+    --dbname=wiki \
+    --dbuser=wiki \
+    --dbpass=wiki \
+    --dbpath=/var/www/data \
+    wiki WikiSysop && \
+    echo '$wgEnableUploads = true;' >> LocalSettings.php

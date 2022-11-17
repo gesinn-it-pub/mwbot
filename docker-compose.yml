@@ -1,0 +1,17 @@
+services:
+
+  mwbot:
+    build: .
+    volumes:
+      - ./coverage:/work/coverage
+
+  wiki:
+    build:
+      context: .
+      dockerfile: Dockerfile.wiki
+
+  wait-for-wiki:
+    image: mintel/docker-wait-for-it
+    entrypoint: ['/opt/wait-for-it.sh', 'wiki:80', '-t', '120']
+    profiles:
+      - no-up

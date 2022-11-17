@@ -492,3 +492,22 @@ bot.loginGetEditToken({
     // Login Error
 });
 ```
+
+## Testing
+
+To run CI locally, use `make ci` or `NODE_VERSION=16 MW_VERSION=1.38 make ci`.
+
+To develop against a running Wiki, run
+```sh
+# start wiki
+$ make up
+# run the node container
+$ make bash
+# run tests inside the container
+> npm test
+> ...
+# finally exit
+> exit
+# and shutdown the wiki again 
+$ make down
+```

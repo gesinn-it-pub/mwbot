@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+
+  ci:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        include:
+          - { MW_VERSION: '1.35', NODE_VERSION: '10' }
+          - { MW_VERSION: '1.35', NODE_VERSION: '12' }
+          - { MW_VERSION: '1.35', NODE_VERSION: '14' }
+          - { MW_VERSION: '1.37', NODE_VERSION: '16' }
+          - { MW_VERSION: '1.38', NODE_VERSION: '16' }
+
+    steps:
+    - uses: actions/checkout@v2
+    - run: NODE_VERSION=${{ NODE_VERSION }} MW_VERSION=${{ MW_VERSION }} make ci
+    - run: make down
+      if: always()
