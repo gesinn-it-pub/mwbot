@@ -504,7 +504,7 @@ class MWBot {
 
     createProtect(title, content, summary, customRequestOptions) {
         return this.create(title, content, summary, customRequestOptions).then(() => {
-            return this.protect(title, '' ,customRequestOptions);
+            return this.protect(title, null, '' , customRequestOptions);
         });
     }
 
@@ -619,7 +619,7 @@ class MWBot {
 
     editProtect(title, content, summary, customRequestOptions) {
         return this.edit(title, content, summary, customRequestOptions).then(() => {
-            return this.protect(title, '' ,customRequestOptions);
+            return this.protect(title, null, '' , customRequestOptions);
         });
     }
 
@@ -672,7 +672,7 @@ class MWBot {
      *
      * @param {string}  title
      * @param {string}  [reason]
-     * @param {object}      [customRequestOptions]
+     * @param {object}  [customRequestOptions]
      *
      * @returns {bluebird}
      */
@@ -689,16 +689,17 @@ class MWBot {
      * Protect a wiki page
      *
      * @param {string}  title
+     * @param {string}  [protections]
      * @param {string}  [reason]
-     * @param {object}      [customRequestOptions]
+     * @param {object}  [customRequestOptions]
      *
      * @returns {bluebird}
      */
-    protect(title, reason, customRequestOptions) {
+    protect(title, protections, reason, customRequestOptions) {
         return this.request({
             action: 'protect',
             title: title,
-            protections: 'edit=sysop',
+            protections: protections || this.options.protections || 'edit=sysop',
             expiry: 'infinite',
             reason: reason || this.options.defaultSummary,
             token: this.editToken
@@ -711,7 +712,7 @@ class MWBot {
      * @param {string}  oldName
      * @param {string}  newName
      * @param {string}  [reason]
-     * @param {object}      [customRequestOptions]
+     * @param {object}  [customRequestOptions]
      *
      * @returns {bluebird}
      */
