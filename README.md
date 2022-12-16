@@ -18,9 +18,6 @@ The library also lets you freely choose the abstraction/convenience level on whi
 You can use convenience functions that bundles (with concurrency) multiple API requests into one function, 
 but you can also handcraft your own custom MediaWiki API and pure HTTP requests.
 
-## Technical API Documentation
-* [API Documenatation](docs/API.md)
-
 ## Documentation
 Since this library is based on promise, it can be used either via the promise notation, or using async/await.
 
