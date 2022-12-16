@@ -34,11 +34,6 @@ module.exports = function(grunt) {
                     reportFormats: ['lcov', 'text', 'clover']
                 }
             }
-        },
-        release: {
-            options: {
-
-            }
         }
     });
 

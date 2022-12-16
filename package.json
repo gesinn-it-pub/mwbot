@@ -23,7 +23,6 @@
     "grunt-eslint": "^24.0.0",
     "grunt-mocha-cli": "^7.0.0",
     "grunt-mocha-istanbul": "^5.0.2",
-    "grunt-release": "^0.14.0",
     "istanbul": "^0.4.5",
     "load-grunt-tasks": "^5.1.0",
     "time-grunt": "^2.0.0"
