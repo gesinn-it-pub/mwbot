@@ -1,4 +1,4 @@
-NODE_VERSION ?= 10
+NODE_VERSION ?= 12
 MW_VERSION ?= 1.35.8
 
 compose = docker-compose
