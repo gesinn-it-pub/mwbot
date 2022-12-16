@@ -16,8 +16,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - { MW_VERSION: '1.35', NODE_VERSION: '10', coverage: true }
-          - { MW_VERSION: '1.35', NODE_VERSION: '12' }
+          - { MW_VERSION: '1.35', NODE_VERSION: '12', coverage: true }
           - { MW_VERSION: '1.35', NODE_VERSION: '14' }
           - { MW_VERSION: '1.37', NODE_VERSION: '16' }
           - { MW_VERSION: '1.38', NODE_VERSION: '16' }

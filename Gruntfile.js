@@ -9,9 +9,6 @@ module.exports = function(grunt) {
 
     grunt.initConfig({
         eslint: {
-            options: {
-                configFile: '.eslintrc'
-            },
             js: {
                 src: ['src/**/*.js']
             },
@@ -38,29 +35,6 @@ module.exports = function(grunt) {
                 }
             }
         },
-        documentation: {
-            md: {
-                files: [{
-                    'expand': true,
-                    'cwd': 'src',
-                    'src': ['**/*.js']
-                }],
-                options: {
-                    format: 'md',
-                    destination: 'docs'
-                }
-            },
-            html: {
-                files: [{
-                    'expand': true,
-                    'cwd': 'src',
-                    'src': ['**/*.js']
-                }],
-                options: {
-                    destination: 'docs'
-                }
-            }
-        },
         release: {
             options: {
 
@@ -71,7 +45,6 @@ module.exports = function(grunt) {
     // Default task.
     grunt.registerTask('lint', ['eslint']);
     grunt.registerTask('test-coverage', ['mocha_istanbul:coverage']);
-    grunt.registerTask('doc', ['documentation']);
     grunt.registerTask('default', ['lint', 'test-coverage', 'doc']);
 
     grunt.event.on('coverage', function(content, done) {
