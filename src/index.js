@@ -35,7 +35,10 @@ class MWBot {
      * A bot instance has its own state (e.g. tokens) that is necessary for some operations
      */
     constructor(customOptions, customRequestOptions) {
-
+        this.initialize(customOptions, customRequestOptions);
+    }
+    
+    initialize(customOptions, customRequestOptions) {
         /**
          * Bot instance Login State
          * Is received from the MW Login API and contains token, userid, etc.
@@ -473,6 +476,22 @@ class MWBot {
     loginGetCreateaccountToken(loginOptions) {
         return this.login(loginOptions).then(() => {
             return this.getCreateaccountToken();
+        });
+    }
+    
+    /**
+     * Logs out
+     *
+     * @param logout
+     *
+     * @returns {bluebird}
+     */
+    logout() {
+        return this.request({
+            action: 'logout',
+            token: this.editToken
+        }).then(() => {
+            this.initialize(this.customOptions, this.customRequestOptions);
         });
     }
 
