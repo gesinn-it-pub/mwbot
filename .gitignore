@@ -4,3 +4,4 @@
 npm-debug.log
 /test/mocking/loginCredentials.local.json
 docker-compose.override*
+package-lock.json
