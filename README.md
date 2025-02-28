@@ -5,7 +5,7 @@ MWBot
 [![codecov](https://codecov.io/github/gesinn-it-pub/mwbot/branch/master/graph/badge.svg?token=s0zci3GftF)](https://codecov.io/github/gesinn-it-pub/mwbot)
 [![npm version](https://badge.fury.io/js/mwbot.svg)](https://badge.fury.io/js/mwbot)
 ![node-current](https://img.shields.io/node/v/mwbot)
-![mw-version](https://img.shields.io/badge/MW-1.31--1.38-brightgreen)
+![mw-version](https://img.shields.io/badge/MW-1.35--1.43-brightgreen)
 ![npm](https://img.shields.io/npm/dw/mwbot)
 
 ## Description
