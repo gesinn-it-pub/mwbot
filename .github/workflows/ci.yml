@@ -18,6 +18,7 @@ jobs:
         include:
           - { MW_VERSION: '1.35', NODE_VERSION: '14', coverage: true }
           - { MW_VERSION: '1.39', NODE_VERSION: '18' }
+          - { MW_VERSION: '1.43', NODE_VERSION: '18' }
 
     steps:
       - name: Checkout

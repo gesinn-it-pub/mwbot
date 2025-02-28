@@ -8,6 +8,7 @@ const semlog = require('semlog');
 const semver = require('semver');
 const log = semlog.log;
 const packageJson = require('../package.json');
+const { exit } = require('process');
 
 Promise.config({
     // Enable cancellation
@@ -884,6 +885,14 @@ class MWBot {
 
                     currentCounter += 1;
 
+                    /*
+                    if (currentCounter % 10 === 0) {
+                        console.log(this.editToken);
+                        // Force the login token to become invalid
+                        this.loginGetEditToken(this.loginOptions);
+                    }
+                    */
+
                     let status = '[=] ';
                     let reason = '';
                     let debugMessages = [];
@@ -938,6 +947,10 @@ class MWBot {
                         } else if (code === 'missingtitle') {
                             status = '[?] ';
                             reason = code;
+                        } else if (code === 'badtoken') {
+                            // in case of fatal errors, cancel further jobQueue processing
+                            console.log(this.editToken);
+                            throw err;
                         }
                     }
 
@@ -955,6 +968,7 @@ class MWBot {
                     if (!results[operation]) {
                         results[operation] = {};
                     }
+
                     results[operation][pageName] = err;
                 });
 
