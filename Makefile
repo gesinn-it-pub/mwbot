@@ -1,5 +1,5 @@
 NODE_VERSION ?= 18
-MW_VERSION ?= 1.39.11
+MW_VERSION ?= 1.43
 
 compose = docker compose
 

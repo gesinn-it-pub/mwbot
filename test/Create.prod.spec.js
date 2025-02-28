@@ -5,6 +5,7 @@
 const MWBot = require('../src/');
 //const log = require('semlog').log;
 const crypto = require('crypto');
+const semver = require('semver');
 
 const chai = require('chai');
 const expect = chai.expect;
@@ -68,7 +69,12 @@ describe('MWBot Create', function() {
             );
             throw new Error('other error');
         } catch(err) {
-            let expected = 'articleexists: The article you tried to create has been created already.';
+            let expected;
+            if (semver.gte(bot.mwversion, '1.43.0')) {
+                expected = 'articleexists: The page you tried to create has been created already.';
+            } else {
+                expected = 'articleexists: The article you tried to create has been created already.';
+            }
             assert.equal(err.message, expected);
         }
     });
