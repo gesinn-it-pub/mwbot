@@ -1,7 +1,7 @@
-NODE_VERSION ?= 12
-MW_VERSION ?= 1.35.8
+NODE_VERSION ?= 18
+MW_VERSION ?= 1.39.11
 
-compose = docker-compose
+compose = docker compose
 
 .PHONY: all
 all:
