@@ -18,6 +18,6 @@ services:
 
   wait-for-wiki:
     image: mintel/docker-wait-for-it
-    entrypoint: ['/opt/wait-for-it.sh', 'wiki:8080', '-t', '120']
+    entrypoint: ['/opt/wait-for-it.sh', 'wiki:80', '-t', '120']
     profiles:
       - no-up

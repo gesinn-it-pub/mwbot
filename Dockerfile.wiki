@@ -5,7 +5,7 @@ FROM gesinn/mediawiki-ci:${MW_VERSION}-php${PHP_VERSION}
 WORKDIR /var/www/html
 RUN sudo -u www-data php maintenance/install.php \
     --pass=wiki4everyone \
-    --server="http://wiki:8080" \
+    --server="http://wiki" \
     --scriptpath="" \
     --dbtype=sqlite \
     --dbname=wiki \
