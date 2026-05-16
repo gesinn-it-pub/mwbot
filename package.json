@@ -7,7 +7,7 @@
     "test": "test"
   },
   "engines": {
-    "node": ">=10.0.0"
+    "node": ">=20.0.0"
   },
   "dependencies": {
     "bluebird": "^3.7.2",
@@ -16,19 +16,29 @@
     "semver": "^7.3.8"
   },
   "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "c8": "^10.0.0",
     "chai": "^4.3.7",
     "chai-as-promised": "^7.1.1",
-    "grunt": "^1.5.3",
-    "grunt-cli": "^1.4.3",
-    "grunt-eslint": "^24.0.0",
-    "grunt-mocha-cli": "^7.0.0",
-    "grunt-mocha-istanbul": "^5.0.2",
-    "istanbul": "^0.4.5",
-    "load-grunt-tasks": "^5.1.0",
-    "time-grunt": "^2.0.0"
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^10.0.0",
+    "globals": "^15.0.0",
+    "mocha": "^10.0.0",
+    "prettier": "^3.0.0"
   },
   "scripts": {
-    "test-coverage": "grunt lint test-coverage"
+    "lint": "eslint src/ test/",
+    "format:check": "prettier --check src/ test/",
+    "test": "mocha 'test/**/*.spec.js'",
+    "test:coverage": "c8 mocha 'test/*.prod.spec.js'"
+  },
+  "mocha": {
+    "timeout": 16000,
+    "reporter": "spec"
+  },
+  "c8": {
+    "reporter": ["lcov", "text", "clover"],
+    "include": ["src/**"]
   },
   "repository": {
     "type": "git",

@@ -8,7 +8,6 @@ const semlog = require('semlog');
 const semver = require('semver');
 const log = semlog.log;
 const packageJson = require('../package.json');
-const { exit } = require('process');
 
 Promise.config({
     // Enable cancellation
@@ -24,8 +23,6 @@ Promise.config({
  * @param {{}} [customRequestOptions] Custom request options
  */
 class MWBot {
-
-
     //////////////////////////////////////////
     // CONSTRUCTOR                          //
     //////////////////////////////////////////
@@ -36,7 +33,6 @@ class MWBot {
      * A bot instance has its own state (e.g. tokens) that is necessary for some operations
      */
     constructor(customOptions, customRequestOptions) {
-
         /**
          * Bot instance Login State
          * Is received from the MW Login API and contains token, userid, etc.
@@ -82,7 +78,7 @@ class MWBot {
             total: 0,
             resolved: 0,
             fulfilled: 0,
-            rejected: 0
+            rejected: 0,
         };
 
         /**
@@ -97,7 +93,7 @@ class MWBot {
             defaultSummary: 'MWBot',
             concurrency: 1,
             apiUrl: false,
-            sparqlEndpoint: 'https://query.wikidata.org/bigdata/namespace/wdq/sparql' // Wikidata
+            sparqlEndpoint: 'https://query.wikidata.org/bigdata/namespace/wdq/sparql', // Wikidata
         };
 
         /**
@@ -123,16 +119,16 @@ class MWBot {
         this.defaultRequestOptions = {
             method: 'POST',
             headers: {
-                'User-Agent': 'mwbot/' + packageJson.version
+                'User-Agent': 'mwbot/' + packageJson.version,
             },
             qs: {
-                format: 'json'
+                format: 'json',
             },
             form: {},
             timeout: 120000, // 120 seconds
             jar: request.jar(),
             time: true,
-            json: true
+            json: true,
         };
 
         /**
@@ -152,7 +148,6 @@ class MWBot {
         // SEMLOG OPTIONS
         semlog.updateConfig(this.options.semlog || {});
     }
-
 
     //////////////////////////////////////////
     // GETTER & SETTER                      //
@@ -197,7 +192,6 @@ class MWBot {
         this.options.apiUrl = apiUrl;
     }
 
-
     //////////////////////////////////////////
     // CORE REQUESTS                        //
     //////////////////////////////////////////
@@ -211,7 +205,6 @@ class MWBot {
      * @returns {bluebird}
      */
     rawRequest(requestOptions) {
-
         this.counter.total += 1;
 
         return new Promise((resolve, reject) => {
@@ -241,44 +234,41 @@ class MWBot {
      * @returns {bluebird}
      */
     request(params, customRequestOptions) {
-
         return new Promise((resolve, reject) => {
-
             this.globalRequestOptions.uri = this.options.apiUrl;
 
-            let requestOptions = MWBot.merge(this.globalRequestOptions, customRequestOptions);
+            const requestOptions = MWBot.merge(this.globalRequestOptions, customRequestOptions);
             requestOptions.form = MWBot.merge(requestOptions.form, params);
 
-            this.rawRequest(requestOptions).then((response) => {
+            this.rawRequest(requestOptions)
+                .then((response) => {
+                    if (typeof response !== 'object') {
+                        const err = new Error('invalidjson: No valid JSON response');
+                        err.code = 'invalidjson';
+                        err.info = 'No valid JSON response';
+                        err.response = response;
+                        return reject(err);
+                    }
 
-                if (typeof response !== 'object') {
-                    let err = new Error('invalidjson: No valid JSON response');
-                    err.code = 'invalidjson';
-                    err.info = 'No valid JSON response';
-                    err.response = response;
-                    return reject(err);
-                }
+                    if (response.error) {
+                        // See https://www.mediawiki.org/wiki/API:Errors_and_warnings#Errors
+                        const err = new Error(response.error.code + ': ' + response.error.info);
+                        // Enhance error object with additional information
+                        err.errorResponse = true;
+                        err.code = response.error.code;
+                        err.info = response.error.info;
+                        err.response = response;
+                        err.request = requestOptions;
+                        return reject(err);
+                    }
 
-                if (response.error) { // See https://www.mediawiki.org/wiki/API:Errors_and_warnings#Errors
-                    let err = new Error(response.error.code + ': ' + response.error.info);
-                    // Enhance error object with additional information
-                    err.errorResponse = true;
-                    err.code = response.error.code;
-                    err.info = response.error.info;
-                    err.response = response;
-                    err.request = requestOptions;
-                    return reject(err);
-                }
-
-                return resolve(response);
-
-            }).catch((err) => {
-                reject(err);
-            });
-
+                    return resolve(response);
+                })
+                .catch((err) => {
+                    reject(err);
+                });
         });
     }
-
 
     //////////////////////////////////////////
     // CORE FUNCTIONS                       //
@@ -294,64 +284,70 @@ class MWBot {
      * @returns {bluebird}
      */
     login(loginOptions) {
-
         this.loginPromise = new Promise((resolve, reject) => {
-
             this.options = MWBot.merge(this.options, loginOptions);
 
             if (!this.options.username || !this.options.password || !this.options.apiUrl) {
                 return reject(new Error('Incomplete login credentials!'));
             }
 
-            let loginRequest = {
+            const loginRequest = {
                 action: 'login',
                 lgname: this.options.username,
-                lgpassword: this.options.password
+                lgpassword: this.options.password,
             };
 
-            let loginString = this.options.username + '@' + this.options.apiUrl.split('/api.php').join('');
+            const loginString = this.options.username + '@' + this.options.apiUrl.split('/api.php').join('');
 
-            this.request(loginRequest).then((response) => {
-                if (!response.login || !response.login.result) {
-                    let err = new Error('Invalid response from API');
-                    err.response = response;
-                    if (!this.options.silent) log('[E] [MWBOT] Login failed with invalid response: ' + loginString);
-                    return reject(err);
-                } else {
-                    this.state = MWBot.merge(this.state, response.login);
-                    // Add token and re-submit login request
-                    loginRequest.lgtoken = response.login.token;
-                    return this.request(loginRequest);
-                }
-            }).then((response) => {
-                if (response.login && response.login.result === 'Success') {
-                    this.state = MWBot.merge(this.state, response.login);
-                    this.loggedIn = true;
-                    //return resolve(this.state);
-                } else {
-                    let reason = 'Unknown reason';
-                    if (response.login && response.login.result) {
-                        reason = response.login.result;
-                    }
-                    let err = new Error('Could not login: ' + reason);
-                    err.response = response;
-                    if (!this.options.silent) log('[E] [MWBOT] Login failed: ' + loginString);
-                    return reject(err);
-                }
-            }).then(() => {
-                this.getSiteinfo().then(() => {
-                    this.mwversion = semver.coerce(this.state.generator);
-                    if (!semver.valid(this.mwversion)) {
-                        return reject(new Error('Invalid MediaWiki version: ' + JSON.stringify(this.mwversion)));
+            this.request(loginRequest)
+                .then((response) => {
+                    if (!response.login || !response.login.result) {
+                        const err = new Error('Invalid response from API');
+                        err.response = response;
+                        if (!this.options.silent) log('[E] [MWBOT] Login failed with invalid response: ' + loginString);
+                        return reject(err);
                     } else {
-                        return resolve(this.state);
+                        this.state = MWBot.merge(this.state, response.login);
+                        // Add token and re-submit login request
+                        loginRequest.lgtoken = response.login.token;
+                        return this.request(loginRequest);
                     }
-                }).catch((err) => {
-                    return reject(err);
+                })
+                .then((response) => {
+                    if (response.login && response.login.result === 'Success') {
+                        this.state = MWBot.merge(this.state, response.login);
+                        this.loggedIn = true;
+                        //return resolve(this.state);
+                    } else {
+                        let reason = 'Unknown reason';
+                        if (response.login && response.login.result) {
+                            reason = response.login.result;
+                        }
+                        const err = new Error('Could not login: ' + reason);
+                        err.response = response;
+                        if (!this.options.silent) log('[E] [MWBOT] Login failed: ' + loginString);
+                        return reject(err);
+                    }
+                })
+                .then(() => {
+                    this.getSiteinfo()
+                        .then(() => {
+                            this.mwversion = semver.coerce(this.state.generator);
+                            if (!semver.valid(this.mwversion)) {
+                                return reject(
+                                    new Error('Invalid MediaWiki version: ' + JSON.stringify(this.mwversion))
+                                );
+                            } else {
+                                return resolve(this.state);
+                            }
+                        })
+                        .catch((err) => {
+                            return reject(err);
+                        });
+                })
+                .catch((err) => {
+                    reject(err);
                 });
-            }).catch((err) => {
-                reject(err);
-            });
         });
 
         return this.loginPromise;
@@ -364,23 +360,24 @@ class MWBot {
      */
     getSiteinfo() {
         return new Promise((resolve, reject) => {
-
             this.request({
                 action: 'query',
                 meta: 'siteinfo',
-                siprop: 'general'
-            }).then((response) => {
-                if (response.query && response.query.general) {
-                    this.state = MWBot.merge(this.state, response.query.general);
-                    return resolve(this.state);
-                } else {
-                    let err = new Error('[E] [MWBOT] Could not get siteinfo');
-                    err.response = response;
+                siprop: 'general',
+            })
+                .then((response) => {
+                    if (response.query && response.query.general) {
+                        this.state = MWBot.merge(this.state, response.query.general);
+                        return resolve(this.state);
+                    } else {
+                        const err = new Error('[E] [MWBOT] Could not get siteinfo');
+                        err.response = response;
+                        return reject(err);
+                    }
+                })
+                .catch((err) => {
                     return reject(err);
-                }
-            }).catch((err) => {
-                return reject(err);
-            });
+                });
         });
     }
 
@@ -391,7 +388,6 @@ class MWBot {
      */
     getEditToken() {
         return new Promise((resolve, reject) => {
-
             if (this.editToken) {
                 return resolve(this.state);
             }
@@ -400,20 +396,22 @@ class MWBot {
             this.request({
                 action: 'query',
                 meta: 'tokens',
-                type: 'csrf'
-            }).then((response) => {
-                if (response.query && response.query.tokens && response.query.tokens.csrftoken) {
-                    this.editToken = response.query.tokens.csrftoken;
-                    this.state = MWBot.merge(this.state, response.query.tokens);
-                    return resolve(this.state);
-                } else {
-                    let err = new Error('Could not get edit token');
-                    err.response = response;
+                type: 'csrf',
+            })
+                .then((response) => {
+                    if (response.query && response.query.tokens && response.query.tokens.csrftoken) {
+                        this.editToken = response.query.tokens.csrftoken;
+                        this.state = MWBot.merge(this.state, response.query.tokens);
+                        return resolve(this.state);
+                    } else {
+                        const err = new Error('Could not get edit token');
+                        err.response = response;
+                        return reject(err);
+                    }
+                })
+                .catch((err) => {
                     return reject(err);
-                }
-            }).catch((err) => {
-                return reject(err);
-            });
+                });
         });
     }
 
@@ -425,7 +423,6 @@ class MWBot {
      */
     getCreateaccountToken() {
         return new Promise((resolve, reject) => {
-
             if (this.createaccountToken) {
                 return resolve(this.state);
             }
@@ -434,20 +431,22 @@ class MWBot {
             this.request({
                 action: 'query',
                 meta: 'tokens',
-                type: 'createaccount'
-            }).then((response) => {
-                if (response.query && response.query.tokens && response.query.tokens.createaccounttoken) {
-                    this.createaccountToken = response.query.tokens.createaccounttoken;
-                    this.state = MWBot.merge(this.state, response.query.tokens);
-                    return resolve(this.state);
-                } else {
-                    let err = new Error('Could not get createaccount token');
-                    err.response = response;
+                type: 'createaccount',
+            })
+                .then((response) => {
+                    if (response.query && response.query.tokens && response.query.tokens.createaccounttoken) {
+                        this.createaccountToken = response.query.tokens.createaccounttoken;
+                        this.state = MWBot.merge(this.state, response.query.tokens);
+                        return resolve(this.state);
+                    } else {
+                        const err = new Error('Could not get createaccount token');
+                        err.response = response;
+                        return reject(err);
+                    }
+                })
+                .catch((err) => {
                     return reject(err);
-                }
-            }).catch((err) => {
-                return reject(err);
-            });
+                });
         });
     }
 
@@ -477,7 +476,6 @@ class MWBot {
         });
     }
 
-
     //////////////////////////////////////////
     // CRUD OPERATIONS                      //
     //////////////////////////////////////////
@@ -493,19 +491,22 @@ class MWBot {
      * @returns {bluebird}
      */
     create(title, content, summary, customRequestOptions) {
-        return this.request({
-            action: 'edit',
-            title: title,
-            text: content,
-            summary: summary || this.options.defaultSummary,
-            createonly: true,
-            token: this.editToken
-        }, customRequestOptions);
+        return this.request(
+            {
+                action: 'edit',
+                title: title,
+                text: content,
+                summary: summary || this.options.defaultSummary,
+                createonly: true,
+                token: this.editToken,
+            },
+            customRequestOptions
+        );
     }
 
     createProtect(title, content, summary, customRequestOptions) {
         return this.create(title, content, summary, customRequestOptions).then(() => {
-            return this.protect(title, null, '' , customRequestOptions);
+            return this.protect(title, null, '', customRequestOptions);
         });
     }
 
@@ -550,11 +551,11 @@ class MWBot {
      * @returns {bluebird}
      */
     readWithProps(title, props, redirect, customRequestOptions) {
-        let params = {
+        const params = {
             action: 'query',
             prop: 'revisions',
             rvprop: props,
-            titles: title
+            titles: title,
         };
 
         if (semver.gte(this.mwversion, '1.32.0')) {
@@ -579,11 +580,11 @@ class MWBot {
      * @returns {bluebird}
      */
     readWithPropsFromID(pageid, props, redirect, customRequestOptions) {
-        let params = {
+        const params = {
             action: 'query',
             prop: 'revisions',
             rvprop: props,
-            pageids: pageid
+            pageids: pageid,
         };
 
         if (semver.gte(this.mwversion, '1.32.0')) {
@@ -608,19 +609,22 @@ class MWBot {
      * @returns {bluebird}
      */
     edit(title, content, summary, customRequestOptions) {
-        return this.request({
-            action: 'edit',
-            title: title,
-            text: content,
-            summary: summary || this.options.defaultSummary,
-            token: this.editToken,
-            bot: true
-        }, customRequestOptions);
+        return this.request(
+            {
+                action: 'edit',
+                title: title,
+                text: content,
+                summary: summary || this.options.defaultSummary,
+                token: this.editToken,
+                bot: true,
+            },
+            customRequestOptions
+        );
     }
 
     editProtect(title, content, summary, customRequestOptions) {
         return this.edit(title, content, summary, customRequestOptions).then(() => {
-            return this.protect(title, null, '' , customRequestOptions);
+            return this.protect(title, null, '', customRequestOptions);
         });
     }
 
@@ -635,15 +639,18 @@ class MWBot {
      * @returns {bluebird}
      */
     update(title, content, summary, customRequestOptions) {
-        return this.request({
-            action: 'edit',
-            title: title,
-            text: content,
-            summary: summary || this.options.defaultSummary,
-            nocreate: true,
-            bot: true,
-            token: this.editToken
-        }, customRequestOptions);
+        return this.request(
+            {
+                action: 'edit',
+                title: title,
+                text: content,
+                summary: summary || this.options.defaultSummary,
+                nocreate: true,
+                bot: true,
+                token: this.editToken,
+            },
+            customRequestOptions
+        );
     }
 
     /**
@@ -657,15 +664,18 @@ class MWBot {
      * @returns {bluebird}
      */
     updateFromID(pageid, content, summary, customRequestOptions) {
-        return this.request({
-            action: 'edit',
-            pageid: pageid,
-            text: content,
-            summary: summary || this.options.defaultSummary,
-            nocreate: true,
-            bot: true,
-            token: this.editToken
-        }, customRequestOptions);
+        return this.request(
+            {
+                action: 'edit',
+                pageid: pageid,
+                text: content,
+                summary: summary || this.options.defaultSummary,
+                nocreate: true,
+                bot: true,
+                token: this.editToken,
+            },
+            customRequestOptions
+        );
     }
 
     /**
@@ -678,12 +688,15 @@ class MWBot {
      * @returns {bluebird}
      */
     delete(title, reason, customRequestOptions) {
-        return this.request({
-            action: 'delete',
-            title: title,
-            reason: reason || this.options.defaultSummary,
-            token: this.editToken
-        }, customRequestOptions);
+        return this.request(
+            {
+                action: 'delete',
+                title: title,
+                reason: reason || this.options.defaultSummary,
+                token: this.editToken,
+            },
+            customRequestOptions
+        );
     }
 
     /**
@@ -697,14 +710,17 @@ class MWBot {
      * @returns {bluebird}
      */
     protect(title, protections, reason, customRequestOptions) {
-        return this.request({
-            action: 'protect',
-            title: title,
-            protections: protections || this.options.protections || 'edit=sysop',
-            expiry: 'infinite',
-            reason: reason || this.options.defaultSummary,
-            token: this.editToken
-        }, customRequestOptions);
+        return this.request(
+            {
+                action: 'protect',
+                title: title,
+                protections: protections || this.options.protections || 'edit=sysop',
+                expiry: 'infinite',
+                reason: reason || this.options.defaultSummary,
+                token: this.editToken,
+            },
+            customRequestOptions
+        );
     }
 
     /**
@@ -718,14 +734,17 @@ class MWBot {
      * @returns {bluebird}
      */
     move(oldTitle, newTitle, reason, customRequestOptions) {
-        return this.request({
-            action: 'move',
-            from: oldTitle,
-            to: newTitle,
-            reason: reason || this.options.defaultSummary,
-            token: this.editToken,
-            bot: true
-        }, customRequestOptions);
+        return this.request(
+            {
+                action: 'move',
+                from: oldTitle,
+                to: newTitle,
+                reason: reason || this.options.defaultSummary,
+                token: this.editToken,
+                bot: true,
+            },
+            customRequestOptions
+        );
     }
 
     /**
@@ -740,41 +759,42 @@ class MWBot {
      * @returns {bluebird}
      */
     upload(title, pathToFile, comment, customParams, customRequestOptions) {
-
         try {
-            let file = fs.createReadStream(pathToFile);
+            const file = fs.createReadStream(pathToFile);
 
-            let params = MWBot.merge({
-                action: 'upload',
-                filename: title || path.basename(pathToFile),
-                file: file,
-                comment: comment || '',
-                token: this.editToken,
-                ignorewarnings: 1
-            }, customParams);
+            const params = MWBot.merge(
+                {
+                    action: 'upload',
+                    filename: title || path.basename(pathToFile),
+                    file: file,
+                    comment: comment || '',
+                    token: this.editToken,
+                    ignorewarnings: 1,
+                },
+                customParams
+            );
 
-            let uploadRequestOptions = MWBot.merge(this.globalRequestOptions, {
-
+            const uploadRequestOptions = MWBot.merge(this.globalRequestOptions, {
                 // https://www.npmjs.com/package/request#support-for-har-12
                 har: {
                     method: 'POST',
                     postData: {
                         mimeType: 'multipart/form-data',
-                        params: []
-                    }
-                }
+                        params: [],
+                    },
+                },
             });
 
             // Convert params to HAR 1.2 notation
-            for (let paramName in params) {
-                let param = params[paramName];
+            for (const paramName in params) {
+                const param = params[paramName];
                 uploadRequestOptions.har.postData.params.push({
                     name: paramName,
-                    value: param
+                    value: param,
                 });
             }
 
-            let requestOptions = MWBot.merge(uploadRequestOptions, customRequestOptions);
+            const requestOptions = MWBot.merge(uploadRequestOptions, customRequestOptions);
             return this.request({}, requestOptions);
         } catch (e) {
             return Promise.reject(e);
@@ -793,12 +813,14 @@ class MWBot {
      * @returns {bluebird}
      */
     uploadOverwrite(title, pathToFile, comment, customParams, customRequestOptions) {
-        let params = MWBot.merge({
-            ignorewarnings: 1
-        }, customParams);
+        const params = MWBot.merge(
+            {
+                ignorewarnings: 1,
+            },
+            customParams
+        );
         return this.upload(title, pathToFile, comment, params, customRequestOptions);
     }
-
 
     //////////////////////////////////////////
     // CONVENIENCE FUNCTIONS                //
@@ -818,14 +840,12 @@ class MWBot {
      * @param {object}  [customRequestOptions]
      */
     batch(jobs, summary, concurrency, customRequestOptions) {
-
         return new Promise((resolve, reject) => {
-
             summary = summary || this.options.defaultSummary;
             concurrency = concurrency || this.options.concurrency;
 
             let jobQueue = [];
-            let results = {};
+            const results = {};
             let operation = 'map';
 
             // If no concurrency is needed, use bluebird Promise.mapSeries instead of .map
@@ -839,27 +859,34 @@ class MWBot {
             if (Array.isArray(jobs)) {
                 jobQueue = jobs;
             } else {
-                for (let operation in jobs) {
-                    let operationJobs = jobs[operation];
+                for (const operation in jobs) {
+                    const operationJobs = jobs[operation];
                     if (Array.isArray(operationJobs)) {
                         if (operation === 'upload' || operation === 'uploadOverwrite') {
-                            for (let filePath of operationJobs) {
-                                jobQueue.push([operation, path.basename(filePath), filePath, summary, false, customRequestOptions]);
+                            for (const filePath of operationJobs) {
+                                jobQueue.push([
+                                    operation,
+                                    path.basename(filePath),
+                                    filePath,
+                                    summary,
+                                    false,
+                                    customRequestOptions,
+                                ]);
                             }
                         } else {
-                            for (let pageName of operationJobs) {
+                            for (const pageName of operationJobs) {
                                 jobQueue.push([operation, pageName, summary, customRequestOptions]);
                             }
                         }
                     } else {
                         if (operation === 'upload' || operation === 'uploadOverwrite') {
-                            for (let fileName in operationJobs) {
-                                let filePath = operationJobs[fileName];
+                            for (const fileName in operationJobs) {
+                                const filePath = operationJobs[fileName];
                                 jobQueue.push([operation, fileName, filePath, summary, false, customRequestOptions]);
                             }
                         } else {
-                            for (let pageName in operationJobs) {
-                                let content = operationJobs[pageName];
+                            for (const pageName in operationJobs) {
+                                const content = operationJobs[pageName];
                                 jobQueue.push([operation, pageName, content, summary, customRequestOptions]);
                             }
                         }
@@ -868,24 +895,25 @@ class MWBot {
             }
 
             let currentCounter = 0;
-            let totalCounter = jobQueue.length;
+            const totalCounter = jobQueue.length;
 
             // Dynamically invoke either .map or .mapSeries on bluebird Promise
-            Promise[operation](jobQueue, (job) => {
+            Promise[operation](
+                jobQueue,
+                (job) => {
+                    const operation = job[0];
+                    const pageName = job[1];
 
-                let operation = job[0];
-                let pageName = job[1];
+                    if (!this[operation]) {
+                        return reject(new Error('Unsupported operation: ' + operation));
+                    }
 
-                if (!this[operation]) {
-                    return reject(new Error('Unsupported operation: ' + operation));
-                }
+                    // Dynamically invoke the mwbot CRUD function with the parameters from the job array
+                    return this[operation](pageName, job[2], job[3], job[4])
+                        .then((response) => {
+                            currentCounter += 1;
 
-                // Dynamically invoke the mwbot CRUD function with the parameters from the job array
-                return this[operation](pageName, job[2], job[3], job[4]).then((response) => {
-
-                    currentCounter += 1;
-
-                    /*
+                            /*
                     if (currentCounter % 10 === 0) {
                         console.log(this.editToken);
                         // Force the login token to become invalid
@@ -893,99 +921,108 @@ class MWBot {
                     }
                     */
 
-                    let status = '[=] ';
-                    let reason = '';
-                    let debugMessages = [];
+                            let status = '[=] ';
+                            let reason = '';
+                            const debugMessages = [];
 
-                    if (operation === 'delete') {
-                        status = '[-] ';
-                    } else if (response.edit && response.edit.new === '') {
-                        status = '[+] ';
-                    } else if (response.edit && response.edit.newrevid) {
-                        status = '[C] ';
-                    } else if (response.query && response.query.pages && response.query.pages['-1']) {
-                        status = '[?] ';
-                        reason = 'missing';
-                    } else if (response.query && response.query.pages) {
-                        status = '[S] ';
-                    } else if (response.upload && response.upload.result === 'Success') {
-                        status = '[S] ';
-                    } else if (response.upload && response.upload.result === 'Warning') {
-                        status = '[/] ';
-                        if (response.upload.warnings && response.upload.warnings.duplicate) {
-                            reason = 'duplicate';
-                            debugMessages.push('[D] [MWBOT] Duplicate: ' + response.upload.warnings.duplicate.join(', '));
-                        }
-                        if (response.upload.warnings && response.upload.warnings.exists) {
-                            reason = 'exists';
-                            debugMessages.push('[D] [MWBOT] Exists: ' + response.upload.warnings.exists);
-                        }
-                    }
+                            if (operation === 'delete') {
+                                status = '[-] ';
+                            } else if (response.edit && response.edit.new === '') {
+                                status = '[+] ';
+                            } else if (response.edit && response.edit.newrevid) {
+                                status = '[C] ';
+                            } else if (response.query && response.query.pages && response.query.pages['-1']) {
+                                status = '[?] ';
+                                reason = 'missing';
+                            } else if (response.query && response.query.pages) {
+                                status = '[S] ';
+                            } else if (response.upload && response.upload.result === 'Success') {
+                                status = '[S] ';
+                            } else if (response.upload && response.upload.result === 'Warning') {
+                                status = '[/] ';
+                                if (response.upload.warnings && response.upload.warnings.duplicate) {
+                                    reason = 'duplicate';
+                                    debugMessages.push(
+                                        '[D] [MWBOT] Duplicate: ' + response.upload.warnings.duplicate.join(', ')
+                                    );
+                                }
+                                if (response.upload.warnings && response.upload.warnings.exists) {
+                                    reason = 'exists';
+                                    debugMessages.push('[D] [MWBOT] Exists: ' + response.upload.warnings.exists);
+                                }
+                            }
 
-                    MWBot.logStatus(status, currentCounter, totalCounter, operation, pageName, reason);
+                            MWBot.logStatus(status, currentCounter, totalCounter, operation, pageName, reason);
 
-                    for (let msg of debugMessages) {
-                        if (!this.options.silent) log(msg);
-                    }
+                            for (const msg of debugMessages) {
+                                if (!this.options.silent) log(msg);
+                            }
 
-                    if (!results[operation]) {
-                        results[operation] = {};
-                    }
-                    results[operation][pageName] = response;
+                            if (!results[operation]) {
+                                results[operation] = {};
+                            }
+                            results[operation][pageName] = response;
+                        })
+                        .catch((err) => {
+                            currentCounter += 1;
 
-                }).catch((err) => {
-                    currentCounter += 1;
+                            let status = '[E] ';
+                            let reason = '';
 
-                    let status = '[E] ';
-                    let reason = '';
+                            if (err.response && err.response.error && err.response.error.code) {
+                                const code = err.response.error.code;
+                                if (code === 'articleexists' || code === 'fileexists-no-change') {
+                                    status = '[/] ';
+                                    reason = code;
+                                } else if (code === 'missingtitle') {
+                                    status = '[?] ';
+                                    reason = code;
+                                } else if (code === 'badtoken') {
+                                    // in case of fatal errors, cancel further jobQueue processing
+                                    console.log(this.editToken);
+                                    throw err;
+                                }
+                            }
 
-                    if (err.response && err.response.error && err.response.error.code) {
-                        let code = err.response.error.code;
-                        if (code === 'articleexists' || code === 'fileexists-no-change') {
-                            status = '[/] ';
-                            reason = code;
-                        } else if (code === 'missingtitle') {
-                            status = '[?] ';
-                            reason = code;
-                        } else if (code === 'badtoken') {
-                            // in case of fatal errors, cancel further jobQueue processing
-                            console.log(this.editToken);
-                            throw err;
-                        }
-                    }
+                            MWBot.logStatus(status, currentCounter, totalCounter, operation, pageName, reason);
 
-                    MWBot.logStatus(status, currentCounter, totalCounter, operation, pageName, reason);
+                            if (status === '[E] ' && !this.options.silent) {
+                                log(err);
+                                if (err.response) {
+                                    log(err.response);
+                                }
+                            } else if (
+                                this.options.verbose &&
+                                err.response &&
+                                err.response.error &&
+                                err.response.error.info
+                            ) {
+                                log('[D] ' + err.response.error.info);
+                            }
 
-                    if (status === '[E] ' && !this.options.silent) {
-                        log(err);
-                        if (err.response) {
-                            log(err.response);
-                        }
-                    } else if (this.options.verbose && err.response && err.response.error && err.response.error.info) {
-                        log('[D] ' + err.response.error.info);
-                    }
+                            if (!results[operation]) {
+                                results[operation] = {};
+                            }
 
-                    if (!results[operation]) {
-                        results[operation] = {};
-                    }
-
-                    results[operation][pageName] = err;
-                });
-
-            }, {
-                concurrency: concurrency
-            }).then(() => {
-                return resolve(results);
-            }).catch((err) => {
-                // If an error happens, return the results nonetheless, as it contains all the errors
-                // embedded in its data structure
-                if (!this.options.silent) {
-                    log('[E] [MWBOT] At least one exception occured during the batch job:');
-                    log(err);
+                            results[operation][pageName] = err;
+                        });
+                },
+                {
+                    concurrency: concurrency,
                 }
-                return reject(results);
-            });
-
+            )
+                .then(() => {
+                    return resolve(results);
+                })
+                .catch((err) => {
+                    // If an error happens, return the results nonetheless, as it contains all the errors
+                    // embedded in its data structure
+                    if (!this.options.silent) {
+                        log('[E] [MWBOT] At least one exception occured during the batch job:');
+                        log(err);
+                    }
+                    return reject(results);
+                });
         });
     }
 
@@ -999,23 +1036,24 @@ class MWBot {
      * @returns {bluebird}
      */
     askQuery(query, apiUrl, customRequestOptions) {
-
         apiUrl = apiUrl || this.options.apiUrl;
 
-        let requestOptions = MWBot.merge({
-            method: 'GET',
-            uri: apiUrl,
-            json: true,
-            qs: {
-                action: 'ask',
-                format: 'json',
-                query: query
-            }
-        }, customRequestOptions);
+        const requestOptions = MWBot.merge(
+            {
+                method: 'GET',
+                uri: apiUrl,
+                json: true,
+                qs: {
+                    action: 'ask',
+                    format: 'json',
+                    query: query,
+                },
+            },
+            customRequestOptions
+        );
 
         return this.rawRequest(requestOptions);
     }
-
 
     /**
      * Executes a SPARQL Query
@@ -1028,18 +1066,20 @@ class MWBot {
      * @returns {bluebird}
      */
     sparqlQuery(query, endpointUrl, customRequestOptions) {
-
         endpointUrl = endpointUrl || this.options.sparqlEndpoint;
 
-        let requestOptions = MWBot.merge({
-            method: 'GET',
-            uri: endpointUrl,
-            json: true,
-            qs: {
-                format: 'json',
-                query: query
-            }
-        }, customRequestOptions);
+        const requestOptions = MWBot.merge(
+            {
+                method: 'GET',
+                uri: endpointUrl,
+                json: true,
+                qs: {
+                    format: 'json',
+                    query: query,
+                },
+            },
+            customRequestOptions
+        );
 
         return this.rawRequest(requestOptions);
     }
@@ -1076,7 +1116,6 @@ class MWBot {
      * @param reason
      */
     static logStatus(status, currentCounter, totalCounter, operation, pageName, reason) {
-
         operation = operation || '';
 
         if (operation === 'createProtect') {
@@ -1101,7 +1140,17 @@ class MWBot {
             reason = ' (' + reason + ')';
         }
 
-        log(status + '[' + semlog.pad(currentCounter, 4) + '/' + semlog.pad(totalCounter, 4) + ']' + operation + pageName + reason);
+        log(
+            status +
+                '[' +
+                semlog.pad(currentCounter, 4) +
+                '/' +
+                semlog.pad(totalCounter, 4) +
+                ']' +
+                operation +
+                pageName +
+                reason
+        );
     }
 }
 

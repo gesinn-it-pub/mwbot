@@ -1,7 +1,5 @@
 'use strict';
 
-/*global describe, it*/
-
 const MWBot = require('../src/');
 const log = require('semlog').log;
 
@@ -13,9 +11,9 @@ let loginCredentials = require('./mocking/loginCredentials.json');
 
 // use local login credentials if available
 try {
-    let loginCredentialsLocal = require('./mocking/loginCredentials.local.json');
+    const loginCredentialsLocal = require('./mocking/loginCredentials.local.json');
     if (loginCredentialsLocal) loginCredentials = loginCredentialsLocal;
-} catch (e) {
+} catch {
     //ignore
 }
 
@@ -24,7 +22,7 @@ describe('MWBot Read', function () {
     this.timeout(10000);
 
     it('successfully reads a page with read()', async function () {
-        let bot = new MWBot();
+        const bot = new MWBot();
 
         await bot.login(loginCredentials.valid);
 
@@ -46,22 +44,26 @@ describe('MWBot Read', function () {
 
     it('successfully reads a page read() with stacked promises', function () {
         this.timeout(3000);
-        let bot = new MWBot();
+        const bot = new MWBot();
 
-        bot.login(loginCredentials.valid).then(() => {
-            bot.read('Test Page', {timeout: 8000}).then((response) => {
-                expect(response).to.have.any.keys('query');
-                expect(response.query).to.have.any.keys('pages');
-            }).catch((err) => {
+        bot.login(loginCredentials.valid)
+            .then(() => {
+                bot.read('Test Page', { timeout: 8000 })
+                    .then((response) => {
+                        expect(response).to.have.any.keys('query');
+                        expect(response.query).to.have.any.keys('pages');
+                    })
+                    .catch((err) => {
+                        log(err);
+                    });
+            })
+            .catch((err) => {
                 log(err);
             });
-        }).catch((err) => {
-            log(err);
-        });
     });
 
     it('successfully reads a page with readFromID()', async function () {
-        let bot = new MWBot();
+        const bot = new MWBot();
 
         await bot.login(loginCredentials.valid);
 
@@ -82,7 +84,7 @@ describe('MWBot Read', function () {
     });
 
     it('successfully reads multiple pages with read()', async function () {
-        let bot = new MWBot();
+        const bot = new MWBot();
 
         await bot.login(loginCredentials.valid);
 
@@ -98,7 +100,7 @@ describe('MWBot Read', function () {
     });
 
     it('rejects reading a non-existing page with read()', async function () {
-        let bot = new MWBot();
+        const bot = new MWBot();
 
         await bot.login(loginCredentials.valid);
 
@@ -114,5 +116,4 @@ describe('MWBot Read', function () {
             assert.fail(err, 'Success', err);
         }
     });
-
 });

@@ -20,7 +20,7 @@ bash:
 
 .PHONY: test-coverage
 test-coverage:
-	$(compose) run --rm mwbot -c 'npm run test-coverage'
+	$(compose) run --rm mwbot -c 'npm run test:coverage'
 
 .PHONY: build
 build:
