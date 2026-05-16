@@ -1,7 +1,10 @@
 services:
 
   mwbot:
-    build: .
+    build:
+      context: .
+      args:
+        NODE_VERSION: ${NODE_VERSION:-20}
     volumes:
       - ./coverage:/work/coverage
 
@@ -9,9 +12,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.wiki
+      args:
+        MW_VERSION: ${MW_VERSION:-1.43}
+        PHP_VERSION: ${PHP_VERSION:-8.2}
 
   wait-for-wiki:
     image: mintel/docker-wait-for-it
-    entrypoint: ['/opt/wait-for-it.sh', 'wiki:80', '-t', '120']
+    entrypoint: ['/opt/wait-for-it.sh', 'wiki:8080', '-t', '120']
     profiles:
       - no-up

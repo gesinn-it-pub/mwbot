@@ -1,5 +1,10 @@
-NODE_VERSION ?= 18
+NODE_VERSION ?= 20
 MW_VERSION ?= 1.43
+PHP_VERSION ?= 8.2
+
+export NODE_VERSION
+export MW_VERSION
+export PHP_VERSION
 
 compose = docker compose
 
@@ -19,7 +24,7 @@ test-coverage:
 
 .PHONY: build
 build:
-	$(compose) build --build-arg NODE_VERSION=$(NODE_VERSION) --build-arg MW_VERSION=$(MW_VERSION)
+	$(compose) build wiki mwbot
 
 .PHONY: up
 up:

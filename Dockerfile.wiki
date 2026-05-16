@@ -1,12 +1,11 @@
 ARG MW_VERSION
-FROM mediawiki:${MW_VERSION}
-
-RUN apt update && apt install -y sudo && rm -rf /var/lib/apt/lists/*
+ARG PHP_VERSION
+FROM gesinn/mediawiki-ci:${MW_VERSION}-php${PHP_VERSION}
 
 WORKDIR /var/www/html
 RUN sudo -u www-data php maintenance/install.php \
     --pass=wiki4everyone \
-    --server="http://wiki" \
+    --server="http://wiki:8080" \
     --scriptpath="" \
     --dbtype=sqlite \
     --dbname=wiki \
