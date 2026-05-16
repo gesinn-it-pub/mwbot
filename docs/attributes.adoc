@@ -1,0 +1,2 @@
+:project_name: MWBot
+:project_type: nodejs
