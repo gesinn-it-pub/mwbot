@@ -1,6 +1,6 @@
 {
   "name": "mwbot",
-  "version": "2.1.3",
+  "version": "2.2.0",
   "description": "A simple, flexible MediaWiki Bot",
   "main": "src/index.js",
   "directories": {
@@ -37,8 +37,14 @@
     "reporter": "spec"
   },
   "c8": {
-    "reporter": ["lcov", "text", "clover"],
-    "include": ["src/**"]
+    "reporter": [
+      "lcov",
+      "text",
+      "clover"
+    ],
+    "include": [
+      "src/**"
+    ]
   },
   "repository": {
     "type": "git",
