@@ -1,2 +1,3 @@
 :project_name: MWBot
 :project_type: nodejs
+:npm-registry: npmjs
