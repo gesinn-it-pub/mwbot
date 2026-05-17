@@ -5,13 +5,13 @@ MWBot
 [![codecov](https://codecov.io/github/gesinn-it-pub/mwbot/branch/master/graph/badge.svg?token=s0zci3GftF)](https://codecov.io/github/gesinn-it-pub/mwbot)
 [![npm version](https://badge.fury.io/js/mwbot.svg)](https://badge.fury.io/js/mwbot)
 ![node-current](https://img.shields.io/node/v/mwbot)
-![mw-version](https://img.shields.io/badge/MW-1.35--1.43-brightgreen)
+![mw-version](https://img.shields.io/badge/MW-1.39--1.43-brightgreen)
 ![npm](https://img.shields.io/npm/dw/mwbot)
 
 ## Description
 MWBot is a Node.js module for interacting with the MediaWiki API created and originally developed by [@Fannon](https://github.com/Fannon/).
 
-The library makes use of the Promise pattern and behind the scene, the NPM [request](https://www.npmjs.com/package/request) library.
+The library makes use of the Promise pattern and behind the scenes uses the native Node.js `fetch` API together with `tough-cookie` for cookie-based session management.
 
 The design goal is to be as flexible as possible, with the ability to overwrite options and behaviour at any point.
 The library also lets you freely choose the abstraction/convenience level on which you want to work.
@@ -74,7 +74,7 @@ let bot = new MWBot({
     verbose: true
 });
 ```
-Construct with custom [request](https://www.npmjs.com/package/request) options
+Construct with custom request options (e.g. timeout):
 ```js
 let bot = new MWBot({}, {
     timeout: 160000
@@ -94,9 +94,9 @@ bot.setOptions({
 });
 ````
 #### setGlobalRequestOptions(customRequestOptions)
-Overwrite/extend the [request](https://www.npmjs.com/package/request) options
-This may be important for more advanced usecases, 
-e.g. changing the user agent or adding additional authentification or certificates.
+Overwrite/extend the default request options.
+This may be important for more advanced usecases,
+e.g. changing the user agent or adding additional authentication headers or certificates.
 ```js
 bot.setGlobalRequestOptions({
     method: 'POST',
@@ -104,12 +104,9 @@ bot.setGlobalRequestOptions({
         format: 'json'
     },
     headers: {
-        'User-Agent': 'mwbot/1.0.3'
+        'User-Agent': 'MyBot/1.0.0 (https://example.org/; bot@example.org)'
     },
-    timeout: 120000, // 120 seconds
-    jar: true,
-    time: true,
-    json: true
+    timeout: 120000 // 120 seconds
 })
 ```
 
@@ -183,7 +180,7 @@ To fetch more than one page, separate the page names with `|`
 bot.read('Test Page|MediaWiki:Sidebar', {timeout: 8000}).then((response) => {
     // Success
     // The MediaWiki API Result is somewhat unwieldy:
-    console.log(response.query.pages['1']['revisions'][0]['*']);
+    console.log(response.query.pages['1']['revisions'][0].slots.main['*']);
 }).catch((err) => {
     // Error
 });
@@ -196,7 +193,7 @@ To fetch more than one page, separate the page names with `|`. To define multipl
 ```js
 bot.readWithProps('Test Page|MediaWiki:Sidebar', 'user|userid|content', true, {timeout: 8000}).then((response) => {
     // Success
-    console.log(response.query.pages['1']['revisions'][0]['*']);
+    console.log(response.query.pages['1']['revisions'][0].slots.main['*']);
 }).catch((err) => {
     // Error
 });
@@ -370,14 +367,12 @@ bot.request({
 ```
 
 #### rawRequest(requestOptions)
-This executes a standard [request](https://www.npmjs.com/package/request) request.
-It uses the some default requestOptions, but you can overwrite any of them.
-Use this if you need full flexibility or do generic HTTP requests.
+Executes a raw HTTP request via the native Node.js `fetch` API.
+Use this if you need full flexibility or want to make generic HTTP requests.
 ```js
 bot.rawRequest({
     method: 'GET',
     uri: 'https://jsonplaceholder.typicode.com/comments',
-    json: true,
     qs: {
         postId: 1
     }
@@ -396,24 +391,23 @@ Is used internally to print .batch() status messages.
 MWBot.logStatus('[+] ', counter, total, 'USER', user.userName);
 ```
 #### MWBot.Promise
-Injection of a [bluebird.js Promise](http://bluebirdjs.com/docs/getting-started.html) 
+Exposes the native Node.js `Promise` constructor.
 
 #### MWBot.map
-Injection of a [bluebird.js Promise.map](http://bluebirdjs.com/docs/api/promise.map.html) (for concurrent batch requests)
+Exposes [p-map](https://github.com/sindresorhus/p-map) for concurrent batch requests.
 
 #### MWBot.mapSeries
-Injection of a [bluebird.js Promise.mapSeries](http://bluebirdjs.com/docs/api/promise.mapseries.html) (for sequential batch requests)
+Exposes a sequential mapper for batch requests (equivalent to p-map with concurrency 1).
 
 
 ## Tips and Tricks
-Learn how to use the Promise Pattern! 
-It handles a lot, like concurrency, parallel or sequential requests, etc.
+Learn how to use the Promise pattern!
+It handles concurrency, parallel and sequential requests, and more.
 
-I can recommend the [bluebird.js](http://bluebirdjs.com/) Promise library.
-This is the Promise library that mwbot is using internally, too.
+mwbot exposes `MWBot.map` ([p-map](https://github.com/sindresorhus/p-map)) and `MWBot.mapSeries` for batch operations:
 
-* If you want to do batch request concurrently, use [Promise.map](http://bluebirdjs.com/docs/api/promise.map.html)
-* If you want to do batch request in strictly sequential order, use [Promise.mapSeries](http://bluebirdjs.com/docs/api/mapseries.html)
+* For concurrent batch requests: use `MWBot.map(items, fn, { concurrency: N })`
+* For strictly sequential batch requests: use `MWBot.mapSeries(items, fn)`
 
 ## Complete Examples
 ### Fetch content of a page, change it and upload the changed page
@@ -426,7 +420,7 @@ bot.loginGetEditToken({
 }).then(() => {
     return bot.read('Main Page');
 }).then((response) => {
-    let pageContent = response.query.pages['1']['revisions'][0]['*'];
+    let pageContent = response.query.pages['1']['revisions'][0].slots.main['*'];
     pageContent += ' Appendix';
     return bot.update('Main Page', pageContent);
 }).then((response) => {
@@ -436,10 +430,10 @@ bot.loginGetEditToken({
 });
 ```
 
-### Concurrent execution of batch jobs with bluebird.js Promise.map
+### Concurrent execution of batch jobs with MWBot.map (p-map)
 This example takes a list of pages and executes a purge action on it.
-It also demonstrates how to (re)use the static MWBot.logStatus helper function
-* See http://bluebirdjs.com/docs/api/promise.map.html
+It also demonstrates how to (re)use the static MWBot.logStatus helper function.
+* See https://github.com/sindresorhus/p-map
 ```js
 let bot = new MWBot();
 
@@ -493,7 +487,7 @@ bot.loginGetEditToken({
 
 ## Testing
 
-To run CI locally, use `make ci` or `NODE_VERSION=16 MW_VERSION=1.38 make ci`.
+To run CI locally, use `make ci` or e.g. `NODE_VERSION=20 MW_VERSION=1.43 make ci`.
 
 To develop against a running Wiki, run
 ```sh
