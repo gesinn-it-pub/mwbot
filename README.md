@@ -15,8 +15,10 @@ The library makes use of the Promise pattern and behind the scenes uses the nati
 
 The design goal is to be as flexible as possible, with the ability to overwrite options and behaviour at any point.
 The library also lets you freely choose the abstraction/convenience level on which you want to work.
-You can use convenience functions that bundles (with concurrency) multiple API requests into one function, 
+You can use convenience functions that bundles (with concurrency) multiple API requests into one function,
 but you can also handcraft your own custom MediaWiki API and pure HTTP requests.
+
+**Requirements:** Node.js ≥ 20, MediaWiki ≥ 1.39.
 
 ## Documentation
 Since this library is based on promise, it can be used either via the promise notation, or using async/await.
@@ -96,13 +98,15 @@ bot.setOptions({
 #### setGlobalRequestOptions(customRequestOptions)
 Overwrite/extend the default request options.
 This may be important for more advanced usecases,
-e.g. changing the user agent or adding additional authentication headers or certificates.
+e.g. setting a custom user agent or adding authentication headers.
+
+> **User-Agent:** mwbot sends `mwbot/<version>` by default. If you are running against
+> Wikimedia wikis, the [Wikimedia User-Agent policy](https://meta.wikimedia.org/wiki/User-Agent_policy)
+> requires an identifying user agent. Use the recommended format:
+> `BotName/version (https://example.org/; bot@example.org)`
+
 ```js
 bot.setGlobalRequestOptions({
-    method: 'POST',
-    qs: {
-        format: 'json'
-    },
     headers: {
         'User-Agent': 'MyBot/1.0.0 (https://example.org/; bot@example.org)'
     },
@@ -128,29 +132,36 @@ bot.login({
 ```
 
 #### .getEditToken()
-Fetches an edit token that is needed for certain MediaWiki API actions, like editing pages.
+Fetches a CSRF edit token required for write operations (edit, create, delete, move, etc.).
+After a successful call the token is available as both `bot.editToken` and `bot.state.csrftoken`.
 ```js
-bot.getEditToken().then((response) => {
-    // Success
+bot.getEditToken().then(() => {
+    // token is now in bot.editToken
+    return bot.edit('Test Page', 'New content', 'My summary');
 }).catch((err) => {
     // Error: Could not get edit token
 });
-````
-
-#### loginGetEditToken(loginOptions)
-Combines .login() and getEditToken() into one operation for convenience.
-
-#### setApiUrl(apiUrl)
-If no login is necessary for the bot actions, it is sufficient to just set the API URL instead of loggin in.
-```js
-bot.setApiUrl('https://www.semantic-mediawiki.org/w/api.php');
 ```
 
-Note that it is also possible to set the API URL with the constructor:
+#### loginGetEditToken(loginOptions)
+Combines `.login()` and `.getEditToken()` into one operation. This is the recommended flow for bots that need to write to the wiki.
+
+#### setApiUrl(apiUrl)
+For read-only operations no login is needed — just set the API URL and call `read()` directly.
 ```js
-let bot = new MWBot({
-    apiUrl: 'https://www.semantic-mediawiki.org/w/api.php'
-});
+bot.setApiUrl('https://en.wikipedia.org/w/api.php');
+```
+
+Or equivalently via the constructor:
+```js
+const bot = new MWBot({ apiUrl: 'https://en.wikipedia.org/w/api.php' });
+```
+
+Example — read a page without logging in:
+```js
+const bot = new MWBot({ apiUrl: 'https://en.wikipedia.org/w/api.php' });
+const response = await bot.read('Main Page');
+console.log(response.query.pages['1'].revisions[0].slots.main['*']);
 ```
 
 ### CRUD Operations
