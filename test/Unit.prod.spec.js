@@ -114,7 +114,7 @@ describe('MWBot login()', function () {
 
     it('rejects when first response has no login object', function () {
         const bot = new MWBot({ apiUrl: API_URL });
-        mockRaw(bot, {}); // response without login field
+        mockRaw(bot, {}); // response without query.tokens.logintoken
 
         return expect(bot.login({ username: 'Bot', password: 'pass', apiUrl: API_URL })).to.be.rejectedWith(
             'Invalid response from API'
@@ -125,7 +125,7 @@ describe('MWBot login()', function () {
         const bot = new MWBot({ apiUrl: API_URL });
         mockRawSequence(
             bot,
-            { login: { result: 'NeedToken', token: 'abc123' } },
+            { query: { tokens: { logintoken: 'abc123' } } },
             { login: { result: 'WrongPassword' } }
         );
 
@@ -138,7 +138,7 @@ describe('MWBot login()', function () {
         const bot = new MWBot({ apiUrl: API_URL });
         mockRawSequence(
             bot,
-            { login: { result: 'NeedToken', token: 'abc123' } },
+            { query: { tokens: { logintoken: 'abc123' } } },
             { login: { result: 'Success', lguserid: 1, lgusername: 'TestBot' } },
             { query: { general: { generator: 'MediaWiki 1.43.0', sitename: 'TestWiki' } } }
         );
@@ -153,7 +153,7 @@ describe('MWBot login()', function () {
         const bot = new MWBot({ apiUrl: API_URL });
         mockRawSequence(
             bot,
-            { login: { result: 'NeedToken', token: 'abc' } },
+            { query: { tokens: { logintoken: 'abc' } } },
             { login: { result: 'Success', lguserid: 1 } },
             { query: { general: { generator: 'not-a-version', sitename: 'Wiki' } } }
         );
@@ -274,7 +274,7 @@ describe('MWBot loginGetCreateaccountToken()', function () {
         const bot = new MWBot({ apiUrl: API_URL });
         mockRawSequence(
             bot,
-            { login: { result: 'NeedToken', token: 'abc' } },
+            { query: { tokens: { logintoken: 'abc' } } },
             { login: { result: 'Success', lguserid: 1, lgusername: 'Bot' } },
             { query: { general: { generator: 'MediaWiki 1.43.0' } } },
             { query: { tokens: { createaccounttoken: 'ca+\\' } } }
@@ -283,6 +283,37 @@ describe('MWBot loginGetCreateaccountToken()', function () {
         return bot.loginGetCreateaccountToken({ username: 'Bot', password: 'pass', apiUrl: API_URL }).then(() => {
             expect(bot.loggedIn).to.equal(true);
             expect(bot.createaccountToken).to.equal('ca+\\');
+        });
+    });
+});
+
+// ============================================================
+// logout()
+// ============================================================
+describe('MWBot logout()', function () {
+    it('calls action=logout and resets state when editToken is already set', function () {
+        const bot = new MWBot({ apiUrl: API_URL });
+        bot.loggedIn = true;
+        bot.editToken = 'csrf+\\';
+        bot.state = { lgusername: 'TestBot' };
+        mockRaw(bot, { logout: {} });
+
+        return bot.logout().then(() => {
+            expect(bot.loggedIn).to.equal(false);
+            expect(bot.editToken).to.equal(false);
+            expect(bot.state).to.deep.equal({});
+        });
+    });
+
+    it('fetches a CSRF token first when editToken is not set', function () {
+        const bot = new MWBot({ apiUrl: API_URL });
+        bot.loggedIn = true;
+        bot.state = { lgusername: 'TestBot' };
+        mockRawSequence(bot, { query: { tokens: { csrftoken: 'csrf+\\' } } }, { logout: {} });
+
+        return bot.logout().then(() => {
+            expect(bot.loggedIn).to.equal(false);
+            expect(bot.editToken).to.equal(false);
         });
     });
 });

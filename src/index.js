@@ -352,33 +352,33 @@ class MWBot {
                 return reject(new Error('Incomplete login credentials!'));
             }
 
-            const loginRequest = {
-                action: 'login',
-                lgname: this.options.username,
-                lgpassword: this.options.password,
-            };
-
             const loginString = this.options.username + '@' + this.options.apiUrl.split('/api.php').join('');
 
-            this.request(loginRequest)
+            // Step 1: fetch login token via tokens API (MW 1.27+)
+            this.request({
+                action: 'query',
+                meta: 'tokens',
+                type: 'login',
+            })
                 .then((response) => {
-                    if (!response.login || !response.login.result) {
+                    if (!response.query?.tokens?.logintoken) {
                         const err = new Error('Invalid response from API');
                         err.response = response;
                         if (!this.options.silent) log('[E] [MWBOT] Login failed with invalid response: ' + loginString);
                         return reject(err);
-                    } else {
-                        this.state = MWBot.merge(this.state, response.login);
-                        // Add token and re-submit login request
-                        loginRequest.lgtoken = response.login.token;
-                        return this.request(loginRequest);
                     }
+                    // Step 2: login with token
+                    return this.request({
+                        action: 'login',
+                        lgname: this.options.username,
+                        lgpassword: this.options.password,
+                        lgtoken: response.query.tokens.logintoken,
+                    });
                 })
                 .then((response) => {
                     if (response.login && response.login.result === 'Success') {
                         this.state = MWBot.merge(this.state, response.login);
                         this.loggedIn = true;
-                        //return resolve(this.state);
                     } else {
                         let reason = 'Unknown reason';
                         if (response.login && response.login.result) {
@@ -539,6 +539,30 @@ class MWBot {
         return this.login(loginOptions).then(() => {
             return this.getCreateaccountToken();
         });
+    }
+
+    /**
+     * Logs out and resets the bot instance state.
+     *
+     * @see https://www.mediawiki.org/wiki/API:Logout
+     *
+     * @returns {Promise}
+     */
+    logout() {
+        const doLogout = (token) =>
+            this.request({ action: 'logout', token }).then(() => {
+                this.loggedIn = false;
+                this.editToken = false;
+                this.createaccountToken = false;
+                this.state = {};
+                this.mwversion = {};
+                this.cookieJar = new CookieJar();
+            });
+
+        if (this.editToken) {
+            return doLogout(this.editToken);
+        }
+        return this.getEditToken().then(() => doLogout(this.editToken));
     }
 
     //////////////////////////////////////////
