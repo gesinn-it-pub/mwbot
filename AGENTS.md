@@ -256,6 +256,70 @@ Guidelines:
 - Use `chore` only for repository maintenance tasks that do not affect
   runtime behavior, dependencies, CI configuration, or tests
 
+# Publish Workflow
+
+**Publish workflow**
+
+Publishing is triggered automatically when a GitHub Release is
+published. The workflow runs all tests before publishing.
+
+**Registry:** [npmjs.org](https://www.npmjs.com)
+
+Authentication uses [npm
+provenance](https://docs.npmjs.com/generating-provenance-statements) via
+OIDC (OpenID Connect) — no static `NPM_TOKEN` secret is required.
+
+The package must be configured as a Trusted Publisher on npmjs.org
+(one-time setup per package): npmjs.org → Package Settings → Publishing
+→ Trusted Publishers → add this repository.
+
+# Release Workflow
+
+# Release Workflow
+
+## Steps
+
+1.  Bump version in `package.json` (no git tag, no commit):
+
+    ``` console
+    npm version <major|minor|patch> --no-git-tag-version
+    ```
+
+2.  Commit:
+
+        prepared x.x.x [skip ci]
+
+3.  Draft release notes (see below) and present for approval.
+
+4.  After explicit user approval — push and create GitHub release:
+
+    ``` console
+    git push
+    gh release create x.x.x --title "x.x.x" --notes "<release notes>"
+    ```
+
+    Creating the GitHub release triggers the publish workflow
+    automatically.
+
+## Release notes
+
+List commits since the last release tag as bullet points, grouped by
+type. Include the short commit SHA in parentheses.
+
+Present release notes inside a fenced markdown code block for easy
+copying. Wait for explicit user approval before pushing or creating the
+GitHub release.
+
+Example:
+
+``` markdown
+## Features
+- feat(api): add new endpoint for autocomplete (a1b2c3d)
+
+## Fixes
+- fix(parser): handle empty token list (e4f5g6h)
+```
+
 # Versioning
 
 # Versioning and Releases
