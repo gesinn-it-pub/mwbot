@@ -10,10 +10,10 @@
     "node": ">=20.0.0"
   },
   "dependencies": {
-    "bluebird": "^3.7.2",
-    "request": "^2.88.2",
-    "semlog": "^0.6.10",
-    "semver": "^7.3.8"
+    "p-map": "^5.5.0",
+    "semlog": "^0.7.0",
+    "semver": "^7.3.8",
+    "tough-cookie": "^5.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",

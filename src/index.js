@@ -2,17 +2,27 @@
 
 const fs = require('fs');
 const path = require('path');
-const Promise = require('bluebird');
-const request = require('request');
+const pMap = require('p-map');
+const { CookieJar } = require('tough-cookie');
 const semlog = require('semlog');
 const semver = require('semver');
 const log = semlog.log;
 const packageJson = require('../package.json');
 
-Promise.config({
-    // Enable cancellation
-    cancellation: true,
-});
+/**
+ * Maps over an iterable sequentially, awaiting each item before starting the next.
+ *
+ * @param {Iterable} iterable
+ * @param {Function} mapper
+ * @returns {Promise<Array>}
+ */
+async function pMapSeries(iterable, mapper) {
+    const results = [];
+    for (const item of iterable) {
+        results.push(await mapper(item));
+    }
+    return results;
+}
 
 /**
  * MWBot, a Node.js module for interacting with the MediaWiki API.
@@ -112,7 +122,7 @@ class MWBot {
         this.options = MWBot.merge(this.defaultOptions, this.customOptions);
 
         /**
-         * Default options for the NPM request library
+         * Default options for HTTP requests
          *
          * @type {Object}
          */
@@ -126,10 +136,14 @@ class MWBot {
             },
             form: {},
             timeout: 120000, // 120 seconds
-            jar: request.jar(),
-            time: true,
-            json: true,
         };
+
+        /**
+         * Cookie jar for session cookie persistence across requests
+         *
+         * @type {CookieJar}
+         */
+        this.cookieJar = new CookieJar();
 
         /**
          * Custom request options
@@ -197,32 +211,79 @@ class MWBot {
     //////////////////////////////////////////
 
     /**
-     * Executes a promisified raw request
-     * Uses the npm request library
+     * Executes a promisified raw request using the Node.js built-in fetch API.
+     * Cookies are persisted automatically via the instance's CookieJar.
      *
      * @param {object} requestOptions
      *
-     * @returns {bluebird}
+     * @returns {Promise}
      */
     rawRequest(requestOptions) {
         this.counter.total += 1;
+        this.counter.resolved += 1;
 
-        return new Promise((resolve, reject) => {
-            this.counter.resolved += 1;
-            if (!requestOptions.uri) {
-                this.counter.rejected += 1;
-                return reject(new Error('No URI provided!'));
-            }
-            request(requestOptions, (error, response, body) => {
-                if (error) {
-                    this.counter.rejected += 1;
-                    return reject(error);
-                } else {
-                    this.counter.fulfilled += 1;
-                    return resolve(body);
+        if (!requestOptions.uri) {
+            this.counter.rejected += 1;
+            return Promise.reject(new Error('No URI provided!'));
+        }
+
+        // Build URL, appending query-string parameters when present
+        let url = requestOptions.uri;
+        if (requestOptions.qs && Object.keys(requestOptions.qs).length > 0) {
+            url += '?' + new URLSearchParams(requestOptions.qs).toString();
+        }
+
+        const headers = {
+            ...(this.globalRequestOptions?.headers ?? {}),
+            ...(requestOptions.headers ?? {}),
+        };
+
+        // Attach cookies from the jar for this URL
+        const cookieString = this.cookieJar.getCookieStringSync(url);
+        if (cookieString) {
+            headers['Cookie'] = cookieString;
+        }
+
+        // Build request body: FormData for multipart uploads, URLSearchParams for regular POSTs
+        let body;
+        if (requestOptions.formData instanceof FormData) {
+            body = requestOptions.formData;
+            // fetch sets Content-Type with the multipart boundary automatically
+        } else if (requestOptions.form && Object.keys(requestOptions.form).length > 0) {
+            body = new URLSearchParams(requestOptions.form);
+        }
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), requestOptions.timeout ?? 120000);
+
+        return fetch(url, {
+            method: requestOptions.method ?? 'POST',
+            headers,
+            body,
+            signal: controller.signal,
+        })
+            .then((response) => {
+                // Persist Set-Cookie headers from the response
+                for (const cookie of response.headers.getSetCookie()) {
+                    this.cookieJar.setCookieSync(cookie, url);
                 }
+                return response.text();
+            })
+            .then((text) => {
+                this.counter.fulfilled += 1;
+                try {
+                    return JSON.parse(text);
+                } catch {
+                    return text;
+                }
+            })
+            .catch((err) => {
+                this.counter.rejected += 1;
+                throw err;
+            })
+            .finally(() => {
+                clearTimeout(timeoutId);
             });
-        });
     }
 
     /**
@@ -231,7 +292,7 @@ class MWBot {
      * @param {object} params               Request Parameters
      * @param {object} customRequestOptions Custom request options
      *
-     * @returns {bluebird}
+     * @returns {Promise}
      */
     request(params, customRequestOptions) {
         return new Promise((resolve, reject) => {
@@ -281,7 +342,7 @@ class MWBot {
      *
      * @param {object} [loginOptions]
      *
-     * @returns {bluebird}
+     * @returns {Promise}
      */
     login(loginOptions) {
         this.loginPromise = new Promise((resolve, reject) => {
@@ -356,7 +417,7 @@ class MWBot {
     /**
      * Gets overall site information.
      *
-     * @returns {bluebird}
+     * @returns {Promise}
      */
     getSiteinfo() {
         return new Promise((resolve, reject) => {
@@ -384,7 +445,7 @@ class MWBot {
     /**
      * Gets an edit token
      *
-     * @returns {bluebird}
+     * @returns {Promise}
      */
     getEditToken() {
         return new Promise((resolve, reject) => {
@@ -419,7 +480,7 @@ class MWBot {
      * Gets an edit token
      * Requires MW 1.27+
      *
-     * @returns {bluebird}
+     * @returns {Promise}
      */
     getCreateaccountToken() {
         return new Promise((resolve, reject) => {
@@ -455,7 +516,7 @@ class MWBot {
      *
      * @param loginOptions
      *
-     * @returns {bluebird}
+     * @returns {Promise}
      */
     loginGetEditToken(loginOptions) {
         return this.login(loginOptions).then(() => {
@@ -468,7 +529,7 @@ class MWBot {
      *
      * @param loginOptions
      *
-     * @returns {bluebird}
+     * @returns {Promise}
      */
     loginGetCreateaccountToken(loginOptions) {
         return this.login(loginOptions).then(() => {
@@ -488,7 +549,7 @@ class MWBot {
      * @param {string}  [summary]
      * @param {object}  [customRequestOptions]
      *
-     * @returns {bluebird}
+     * @returns {Promise}
      */
     create(title, content, summary, customRequestOptions) {
         return this.request(
@@ -519,7 +580,7 @@ class MWBot {
      * @param {boolean} redirect    If the page is a redirection, follow it or stay in the page
      * @param {object}      [customRequestOptions]
      *
-     * @returns {bluebird}
+     * @returns {Promise}
      */
     read(title, redirect, customRequestOptions) {
         return this.readWithProps(title, 'content', redirect, customRequestOptions);
@@ -534,7 +595,7 @@ class MWBot {
      * @param {boolean} redirect    If the page is a redirection, follow it or stay in the page
      * @param {object}      [customRequestOptions]
      *
-     * @returns {bluebird}
+     * @returns {Promise}
      */
     readFromID(pageid, redirect, customRequestOptions) {
         return this.readWithPropsFromID(pageid, 'content', redirect, customRequestOptions);
@@ -548,7 +609,7 @@ class MWBot {
      * @param {boolean} redirect    If the page is a redirection, follow it or stay in the page
      * @param {object}      [customRequestOptions]
      *
-     * @returns {bluebird}
+     * @returns {Promise}
      */
     readWithProps(title, props, redirect, customRequestOptions) {
         const params = {
@@ -577,7 +638,7 @@ class MWBot {
      * @param {boolean} redirect    If the page is a redirection, follow it or stay in the page
      * @param {object}      [customRequestOptions]
      *
-     * @returns {bluebird}
+     * @returns {Promise}
      */
     readWithPropsFromID(pageid, props, redirect, customRequestOptions) {
         const params = {
@@ -606,7 +667,7 @@ class MWBot {
      * @param {string}  [summary]
      * @param {object}      [customRequestOptions]
      *
-     * @returns {bluebird}
+     * @returns {Promise}
      */
     edit(title, content, summary, customRequestOptions) {
         return this.request(
@@ -636,7 +697,7 @@ class MWBot {
      * @param {string}  [summary]
      * @param {object}      [customRequestOptions]
      *
-     * @returns {bluebird}
+     * @returns {Promise}
      */
     update(title, content, summary, customRequestOptions) {
         return this.request(
@@ -661,7 +722,7 @@ class MWBot {
      * @param {string}  [summary]
      * @param {object}      [customRequestOptions]
      *
-     * @returns {bluebird}
+     * @returns {Promise}
      */
     updateFromID(pageid, content, summary, customRequestOptions) {
         return this.request(
@@ -685,7 +746,7 @@ class MWBot {
      * @param {string}  [reason]
      * @param {object}  [customRequestOptions]
      *
-     * @returns {bluebird}
+     * @returns {Promise}
      */
     delete(title, reason, customRequestOptions) {
         return this.request(
@@ -707,7 +768,7 @@ class MWBot {
      * @param {string}  [reason]
      * @param {object}  [customRequestOptions]
      *
-     * @returns {bluebird}
+     * @returns {Promise}
      */
     protect(title, protections, reason, customRequestOptions) {
         return this.request(
@@ -731,7 +792,7 @@ class MWBot {
      * @param {string}  [reason]
      * @param {object}  [customRequestOptions]
      *
-     * @returns {bluebird}
+     * @returns {Promise}
      */
     move(oldTitle, newTitle, reason, customRequestOptions) {
         return this.request(
@@ -756,17 +817,18 @@ class MWBot {
      * @param {object}  [customParams]
      * @param {object}  [customRequestOptions]
      *
-     * @returns {bluebird}
+     * @returns {Promise}
      */
     upload(title, pathToFile, comment, customParams, customRequestOptions) {
         try {
-            const file = fs.createReadStream(pathToFile);
+            // Read file synchronously and wrap in a Blob for multipart upload
+            const fileBuffer = fs.readFileSync(pathToFile);
+            const formData = new FormData();
 
             const params = MWBot.merge(
                 {
                     action: 'upload',
                     filename: title || path.basename(pathToFile),
-                    file: file,
                     comment: comment || '',
                     token: this.editToken,
                     ignorewarnings: 1,
@@ -774,28 +836,25 @@ class MWBot {
                 customParams
             );
 
-            const uploadRequestOptions = MWBot.merge(this.globalRequestOptions, {
-                // https://www.npmjs.com/package/request#support-for-har-12
-                har: {
-                    method: 'POST',
-                    postData: {
-                        mimeType: 'multipart/form-data',
-                        params: [],
-                    },
-                },
-            });
-
-            // Convert params to HAR 1.2 notation
-            for (const paramName in params) {
-                const param = params[paramName];
-                uploadRequestOptions.har.postData.params.push({
-                    name: paramName,
-                    value: param,
-                });
+            for (const [key, value] of Object.entries(params)) {
+                formData.append(key, String(value));
             }
 
-            const requestOptions = MWBot.merge(uploadRequestOptions, customRequestOptions);
-            return this.request({}, requestOptions);
+            formData.append('file', new Blob([fileBuffer]), path.basename(pathToFile));
+
+            const requestOptions = MWBot.merge(
+                {
+                    uri: this.options.apiUrl,
+                    method: 'POST',
+                    headers: this.globalRequestOptions.headers,
+                    qs: this.globalRequestOptions.qs,
+                    timeout: this.globalRequestOptions.timeout,
+                    formData,
+                },
+                customRequestOptions
+            );
+
+            return this.rawRequest(requestOptions);
         } catch (e) {
             return Promise.reject(e);
         }
@@ -810,7 +869,7 @@ class MWBot {
      * @param {object}  [customParams]
      * @param {object}  [customRequestOptions]
      *
-     * @returns {bluebird}
+     * @returns {Promise}
      */
     uploadOverwrite(title, pathToFile, comment, customParams, customRequestOptions) {
         const params = MWBot.merge(
@@ -846,13 +905,6 @@ class MWBot {
 
             let jobQueue = [];
             const results = {};
-            let operation = 'map';
-
-            // If no concurrency is needed, use bluebird Promise.mapSeries instead of .map
-            // This ensures that tasks are executed in exactly the sequence as defined
-            if (!concurrency || concurrency === 1) {
-                operation = 'mapSeries';
-            }
 
             // Jobs can be written in object or array notation
             // If it is written in the more convenient object notation, convert it to array notation
@@ -897,119 +949,113 @@ class MWBot {
             let currentCounter = 0;
             const totalCounter = jobQueue.length;
 
-            // Dynamically invoke either .map or .mapSeries on bluebird Promise
-            Promise[operation](
-                jobQueue,
-                (job) => {
-                    const operation = job[0];
-                    const pageName = job[1];
+            // Use pMapSeries for strictly sequential execution (concurrency=1),
+            // pMap for concurrent execution with the given concurrency limit
+            const useMapSeries = !concurrency || concurrency === 1;
 
-                    if (!this[operation]) {
-                        return reject(new Error('Unsupported operation: ' + operation));
-                    }
+            const jobHandler = (job) => {
+                const operation = job[0];
+                const pageName = job[1];
 
-                    // Dynamically invoke the mwbot CRUD function with the parameters from the job array
-                    return this[operation](pageName, job[2], job[3], job[4])
-                        .then((response) => {
-                            currentCounter += 1;
-
-                            /*
-                    if (currentCounter % 10 === 0) {
-                        console.log(this.editToken);
-                        // Force the login token to become invalid
-                        this.loginGetEditToken(this.loginOptions);
-                    }
-                    */
-
-                            let status = '[=] ';
-                            let reason = '';
-                            const debugMessages = [];
-
-                            if (operation === 'delete') {
-                                status = '[-] ';
-                            } else if (response.edit && response.edit.new === '') {
-                                status = '[+] ';
-                            } else if (response.edit && response.edit.newrevid) {
-                                status = '[C] ';
-                            } else if (response.query && response.query.pages && response.query.pages['-1']) {
-                                status = '[?] ';
-                                reason = 'missing';
-                            } else if (response.query && response.query.pages) {
-                                status = '[S] ';
-                            } else if (response.upload && response.upload.result === 'Success') {
-                                status = '[S] ';
-                            } else if (response.upload && response.upload.result === 'Warning') {
-                                status = '[/] ';
-                                if (response.upload.warnings && response.upload.warnings.duplicate) {
-                                    reason = 'duplicate';
-                                    debugMessages.push(
-                                        '[D] [MWBOT] Duplicate: ' + response.upload.warnings.duplicate.join(', ')
-                                    );
-                                }
-                                if (response.upload.warnings && response.upload.warnings.exists) {
-                                    reason = 'exists';
-                                    debugMessages.push('[D] [MWBOT] Exists: ' + response.upload.warnings.exists);
-                                }
-                            }
-
-                            MWBot.logStatus(status, currentCounter, totalCounter, operation, pageName, reason);
-
-                            for (const msg of debugMessages) {
-                                if (!this.options.silent) log(msg);
-                            }
-
-                            if (!results[operation]) {
-                                results[operation] = {};
-                            }
-                            results[operation][pageName] = response;
-                        })
-                        .catch((err) => {
-                            currentCounter += 1;
-
-                            let status = '[E] ';
-                            let reason = '';
-
-                            if (err.response && err.response.error && err.response.error.code) {
-                                const code = err.response.error.code;
-                                if (code === 'articleexists' || code === 'fileexists-no-change') {
-                                    status = '[/] ';
-                                    reason = code;
-                                } else if (code === 'missingtitle') {
-                                    status = '[?] ';
-                                    reason = code;
-                                } else if (code === 'badtoken') {
-                                    // in case of fatal errors, cancel further jobQueue processing
-                                    console.log(this.editToken);
-                                    throw err;
-                                }
-                            }
-
-                            MWBot.logStatus(status, currentCounter, totalCounter, operation, pageName, reason);
-
-                            if (status === '[E] ' && !this.options.silent) {
-                                log(err);
-                                if (err.response) {
-                                    log(err.response);
-                                }
-                            } else if (
-                                this.options.verbose &&
-                                err.response &&
-                                err.response.error &&
-                                err.response.error.info
-                            ) {
-                                log('[D] ' + err.response.error.info);
-                            }
-
-                            if (!results[operation]) {
-                                results[operation] = {};
-                            }
-
-                            results[operation][pageName] = err;
-                        });
-                },
-                {
-                    concurrency: concurrency,
+                if (!this[operation]) {
+                    return reject(new Error('Unsupported operation: ' + operation));
                 }
+
+                // Dynamically invoke the mwbot CRUD function with the parameters from the job array
+                return this[operation](pageName, job[2], job[3], job[4])
+                    .then((response) => {
+                        currentCounter += 1;
+
+                        let status = '[=] ';
+                        let reason = '';
+                        const debugMessages = [];
+
+                        if (operation === 'delete') {
+                            status = '[-] ';
+                        } else if (response.edit && response.edit.new === '') {
+                            status = '[+] ';
+                        } else if (response.edit && response.edit.newrevid) {
+                            status = '[C] ';
+                        } else if (response.query && response.query.pages && response.query.pages['-1']) {
+                            status = '[?] ';
+                            reason = 'missing';
+                        } else if (response.query && response.query.pages) {
+                            status = '[S] ';
+                        } else if (response.upload && response.upload.result === 'Success') {
+                            status = '[S] ';
+                        } else if (response.upload && response.upload.result === 'Warning') {
+                            status = '[/] ';
+                            if (response.upload.warnings && response.upload.warnings.duplicate) {
+                                reason = 'duplicate';
+                                debugMessages.push(
+                                    '[D] [MWBOT] Duplicate: ' + response.upload.warnings.duplicate.join(', ')
+                                );
+                            }
+                            if (response.upload.warnings && response.upload.warnings.exists) {
+                                reason = 'exists';
+                                debugMessages.push('[D] [MWBOT] Exists: ' + response.upload.warnings.exists);
+                            }
+                        }
+
+                        MWBot.logStatus(status, currentCounter, totalCounter, operation, pageName, reason);
+
+                        for (const msg of debugMessages) {
+                            if (!this.options.silent) log(msg);
+                        }
+
+                        if (!results[operation]) {
+                            results[operation] = {};
+                        }
+                        results[operation][pageName] = response;
+                    })
+                    .catch((err) => {
+                        currentCounter += 1;
+
+                        let status = '[E] ';
+                        let reason = '';
+
+                        if (err.response && err.response.error && err.response.error.code) {
+                            const code = err.response.error.code;
+                            if (code === 'articleexists' || code === 'fileexists-no-change') {
+                                status = '[/] ';
+                                reason = code;
+                            } else if (code === 'missingtitle') {
+                                status = '[?] ';
+                                reason = code;
+                            } else if (code === 'badtoken') {
+                                // in case of fatal errors, cancel further jobQueue processing
+                                console.log(this.editToken);
+                                throw err;
+                            }
+                        }
+
+                        MWBot.logStatus(status, currentCounter, totalCounter, operation, pageName, reason);
+
+                        if (status === '[E] ' && !this.options.silent) {
+                            log(err);
+                            if (err.response) {
+                                log(err.response);
+                            }
+                        } else if (
+                            this.options.verbose &&
+                            err.response &&
+                            err.response.error &&
+                            err.response.error.info
+                        ) {
+                            log('[D] ' + err.response.error.info);
+                        }
+
+                        if (!results[operation]) {
+                            results[operation] = {};
+                        }
+
+                        results[operation][pageName] = err;
+                    });
+            };
+
+            (useMapSeries
+                ? pMapSeries(jobQueue, jobHandler)
+                : pMap(jobQueue, jobHandler, { concurrency })
             )
                 .then(() => {
                     return resolve(results);
@@ -1033,7 +1079,7 @@ class MWBot {
      * @param {string} [apiUrl]
      * @param {object} [customRequestOptions]
      *
-     * @returns {bluebird}
+     * @returns {Promise}
      */
     askQuery(query, apiUrl, customRequestOptions) {
         apiUrl = apiUrl || this.options.apiUrl;
@@ -1063,7 +1109,7 @@ class MWBot {
      * @param {string} [endpointUrl]
      * @param {object} [customRequestOptions]
      *
-     * @returns {bluebird}
+     * @returns {Promise}
      */
     sparqlQuery(query, endpointUrl, customRequestOptions) {
         endpointUrl = endpointUrl || this.options.sparqlEndpoint;
@@ -1155,21 +1201,19 @@ class MWBot {
 }
 
 /**
- * Provide bluebird.js Promise
- * @link http://bluebirdjs.com/docs/api/new-promise.html
+ * Expose the native Promise constructor
  */
 MWBot.Promise = Promise;
 
 /**
- * Provide bluebird.js Promise.map for concurrent batch requests
- * @link http://bluebirdjs.com/docs/api/promise.map.html
+ * Expose p-map for concurrent batch requests
+ * @link https://github.com/sindresorhus/p-map
  */
-MWBot.map = Promise.map;
+MWBot.map = pMap;
 
 /**
- * Provide bluebird.js Promise.mapSeries for sequential batch requests
- * @link http://bluebirdjs.com/docs/api/promise.mapseries.html
+ * Expose pMapSeries for sequential batch requests
  */
-MWBot.mapSeries = Promise.mapSeries;
+MWBot.mapSeries = pMapSeries;
 
 module.exports = MWBot;

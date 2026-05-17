@@ -32,11 +32,12 @@ jobs:
           corepack enable npm
           corepack prepare npm@^11 --activate
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Build and run full test suite in Docker
+        run: make ci
 
-      - name: Test
-        run: npm test
+      - name: Ensure containers are stopped
+        run: make down
+        if: always()
 
       - name: Publish
         run: |
