@@ -1053,6 +1053,12 @@ class MWBot {
                             } else if (code === 'missingtitle') {
                                 status = '[?] ';
                                 reason = code;
+                            } else if (code === 'cantedit') {
+                                // cantedit from action=protect means the page is already protected
+                                // at a level the bot cannot change. The content edit already
+                                // succeeded → idempotent, treat as non-fatal skip.
+                                status = '[/] ';
+                                reason = 'already-protected';
                             } else if (code === 'badtoken') {
                                 // in case of fatal errors, cancel further jobQueue processing
                                 console.log(this.editToken);
@@ -1084,10 +1090,7 @@ class MWBot {
                     });
             };
 
-            (useMapSeries
-                ? pMapSeries(jobQueue, jobHandler)
-                : pMap(jobQueue, jobHandler, { concurrency })
-            )
+            (useMapSeries ? pMapSeries(jobQueue, jobHandler) : pMap(jobQueue, jobHandler, { concurrency }))
                 .then(() => {
                     return resolve(results);
                 })
