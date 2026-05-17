@@ -391,20 +391,9 @@ class MWBot {
                     }
                 })
                 .then(() => {
-                    this.getSiteinfo()
-                        .then(() => {
-                            this.mwversion = semver.coerce(this.state.generator);
-                            if (!semver.valid(this.mwversion)) {
-                                return reject(
-                                    new Error('Invalid MediaWiki version: ' + JSON.stringify(this.mwversion))
-                                );
-                            } else {
-                                return resolve(this.state);
-                            }
-                        })
-                        .catch((err) => {
-                            return reject(err);
-                        });
+                    this._ensureMwVersion()
+                        .then(() => resolve(this.state))
+                        .catch((err) => reject(err));
                 })
                 .catch((err) => {
                     reject(err);
@@ -412,6 +401,24 @@ class MWBot {
         });
 
         return this.loginPromise;
+    }
+
+    /**
+     * Ensures this.mwversion is populated, fetching siteinfo if needed.
+     * This allows read operations to work without a prior login() call.
+     *
+     * @returns {Promise}
+     */
+    _ensureMwVersion() {
+        if (semver.valid(this.mwversion)) {
+            return Promise.resolve();
+        }
+        return this.getSiteinfo().then(() => {
+            this.mwversion = semver.coerce(this.state.generator);
+            if (!semver.valid(this.mwversion)) {
+                throw new Error('Invalid MediaWiki version: ' + JSON.stringify(this.mwversion));
+            }
+        });
     }
 
     /**
@@ -453,7 +460,6 @@ class MWBot {
                 return resolve(this.state);
             }
 
-            // MW >= 1.24
             this.request({
                 action: 'query',
                 meta: 'tokens',
@@ -477,8 +483,7 @@ class MWBot {
     }
 
     /**
-     * Gets an edit token
-     * Requires MW 1.27+
+     * Gets a createaccount token
      *
      * @returns {Promise}
      */
@@ -488,7 +493,6 @@ class MWBot {
                 return resolve(this.state);
             }
 
-            // MW 1.27+
             this.request({
                 action: 'query',
                 meta: 'tokens',
@@ -616,12 +620,9 @@ class MWBot {
             action: 'query',
             prop: 'revisions',
             rvprop: props,
+            rvslots: 'main',
             titles: title,
         };
-
-        if (semver.gte(this.mwversion, '1.32.0')) {
-            params.rvslots = 'main';
-        }
 
         if (!redirect) {
             params.redirects = 'true';
@@ -645,12 +646,9 @@ class MWBot {
             action: 'query',
             prop: 'revisions',
             rvprop: props,
+            rvslots: 'main',
             pageids: pageid,
         };
-
-        if (semver.gte(this.mwversion, '1.32.0')) {
-            params.rvslots = 'main';
-        }
 
         if (!redirect) {
             params.redirects = 'true';
