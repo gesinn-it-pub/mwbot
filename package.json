@@ -10,7 +10,7 @@
     "node": ">=20.0.0"
   },
   "dependencies": {
-    "p-map": "^5.5.0",
+    "p-map": "^4.0.0",
     "semlog": "^0.7.0",
     "semver": "^7.3.8",
     "tough-cookie": "^5.1.0"
