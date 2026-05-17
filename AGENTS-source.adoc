@@ -75,6 +75,14 @@ See `.github/workflows/ci.yml` for the current matrix.
 
 include::docs/gesinn-it-docs-master-pub/sections/universal/conventional-commits-policy.adoc[]
 
+== Publish Workflow
+
+include::docs/gesinn-it-docs-master-pub/snippets/nodejs/ci-publish.adoc[]
+
+== Release Workflow
+
+include::docs/gesinn-it-docs-master-pub/sections/nodejs/release-workflow.adoc[]
+
 == Versioning
 
 include::docs/gesinn-it-docs-master-pub/sections/universal/semver-policy.adoc[]
