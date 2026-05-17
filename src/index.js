@@ -854,7 +854,16 @@ class MWBot {
                 customRequestOptions
             );
 
-            return this.rawRequest(requestOptions);
+            return this.rawRequest(requestOptions).then((response) => {
+                if (response && typeof response === 'object' && response.error) {
+                    const err = new Error(response.error.code + ': ' + response.error.info);
+                    err.code = response.error.code;
+                    err.info = response.error.info;
+                    err.response = response;
+                    throw err;
+                }
+                return response;
+            });
         } catch (e) {
             return Promise.reject(e);
         }
