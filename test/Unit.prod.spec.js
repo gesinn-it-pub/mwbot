@@ -367,4 +367,63 @@ describe('MWBot createProtect() / editProtect()', function () {
 
         return expect(bot.createProtect('TestPage', 'content')).to.be.rejectedWith('articleexists');
     });
+
+    // Regression: editProtect/createProtect used to return only the protect response, discarding
+    // the edit response entirely.  The batch() status logic checks response.edit.new / response.edit.newrevid
+    // to decide between [+] / [C] / [=].  Without the edit data, every editProtect job was
+    // logged as [=] (no-change) regardless of whether the page was actually created or updated —
+    // making it impossible to diagnose silent upload failures on a fresh wiki.
+
+    it('editProtect resolves with combined response including edit.new for new pages', function () {
+        const bot = new MWBot({ apiUrl: API_URL });
+        bot.editToken = 'csrf+\\';
+
+        bot.rawRequest = (opts) => {
+            if (opts.form.action === 'edit') {
+                return Promise.resolve({ edit: { result: 'Success', new: '', newrevid: 42 } });
+            }
+            return Promise.resolve({ protect: { title: 'TestPage', protections: [] } });
+        };
+
+        return bot.editProtect('TestPage', 'content', 'summary').then((response) => {
+            expect(response).to.have.property('protect');
+            expect(response).to.have.nested.property('edit.new', '');
+            expect(response).to.have.nested.property('edit.newrevid', 42);
+        });
+    });
+
+    it('editProtect resolves with combined response including edit.newrevid for existing pages', function () {
+        const bot = new MWBot({ apiUrl: API_URL });
+        bot.editToken = 'csrf+\\';
+
+        bot.rawRequest = (opts) => {
+            if (opts.form.action === 'edit') {
+                return Promise.resolve({ edit: { result: 'Success', newrevid: 99 } });
+            }
+            return Promise.resolve({ protect: { title: 'TestPage', protections: [] } });
+        };
+
+        return bot.editProtect('TestPage', 'updated content', 'summary').then((response) => {
+            expect(response).to.have.property('protect');
+            expect(response).to.have.nested.property('edit.newrevid', 99);
+        });
+    });
+
+    it('createProtect resolves with combined response including edit.new for new pages', function () {
+        const bot = new MWBot({ apiUrl: API_URL });
+        bot.editToken = 'csrf+\\';
+
+        bot.rawRequest = (opts) => {
+            if (opts.form.action === 'edit') {
+                return Promise.resolve({ edit: { result: 'Success', new: '', newrevid: 55 } });
+            }
+            return Promise.resolve({ protect: { title: 'TestPage', protections: [] } });
+        };
+
+        return bot.createProtect('TestPage', 'content', 'summary').then((response) => {
+            expect(response).to.have.property('protect');
+            expect(response).to.have.nested.property('edit.new', '');
+            expect(response).to.have.nested.property('edit.newrevid', 55);
+        });
+    });
 });

@@ -594,9 +594,18 @@ class MWBot {
     }
 
     createProtect(title, content, summary, customRequestOptions) {
-        return this.create(title, content, summary, customRequestOptions).then(() => {
-            return this.protect(title, null, '', customRequestOptions);
-        });
+        let editResponse;
+        return this.create(title, content, summary, customRequestOptions)
+            .then((response) => {
+                editResponse = response;
+                return this.protect(title, null, '', customRequestOptions);
+            })
+            .then((protectResponse) => {
+                // Forward the edit response so that batch() can determine the
+                // correct status ([+] new / [C] changed / [=] no-change) from
+                // response.edit.new / response.edit.newrevid.
+                return Object.assign({}, protectResponse, { edit: editResponse.edit });
+            });
     }
 
     /**
@@ -706,9 +715,18 @@ class MWBot {
     }
 
     editProtect(title, content, summary, customRequestOptions) {
-        return this.edit(title, content, summary, customRequestOptions).then(() => {
-            return this.protect(title, null, '', customRequestOptions);
-        });
+        let editResponse;
+        return this.edit(title, content, summary, customRequestOptions)
+            .then((response) => {
+                editResponse = response;
+                return this.protect(title, null, '', customRequestOptions);
+            })
+            .then((protectResponse) => {
+                // Forward the edit response so that batch() can determine the
+                // correct status ([+] new / [C] changed / [=] no-change) from
+                // response.edit.new / response.edit.newrevid.
+                return Object.assign({}, protectResponse, { edit: editResponse.edit });
+            });
     }
 
     /**
