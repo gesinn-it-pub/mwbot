@@ -4,7 +4,7 @@ services:
     build:
       context: .
       args:
-        NODE_VERSION: ${NODE_VERSION:-20}
+        NODE_VERSION: ${NODE_VERSION:-22}
     volumes:
       - ./coverage:/work/coverage
 

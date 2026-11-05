@@ -10,23 +10,22 @@ on:
 jobs:
 
   ci:
-    name: "MW ${{ matrix.mw }} / PHP ${{ matrix.php }}"
+    name: "MW ${{ matrix.mw }} / PHP ${{ matrix.php }} / Node ${{ matrix.node }}"
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
         include:
-          - { mw: '1.39', php: '8.1' }
-          - { mw: '1.43', php: '8.2', coverage: true }
-          - { mw: '1.44', php: '8.3' }
-          - { mw: '1.45', php: '8.3' }
+          - { mw: '1.39', php: '8.1', node: '22' }
+          - { mw: '1.43', php: '8.2', node: '22', coverage: true }
+          - { mw: '1.46', php: '8.5', node: '24' }
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Run CI
-        run: MW_VERSION=${{ matrix.mw }} PHP_VERSION=${{ matrix.php }} make ci
+        run: MW_VERSION=${{ matrix.mw }} PHP_VERSION=${{ matrix.php }} NODE_VERSION=${{ matrix.node }} make ci
 
       - name: Ensure down
         run: make down
