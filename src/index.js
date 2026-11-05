@@ -8,48 +8,9 @@ const semlog = require('semlog');
 const semver = require('semver');
 const log = semlog.log;
 const packageJson = require('../package.json');
-
-/**
- * Maps over an iterable sequentially, awaiting each item before starting the next.
- *
- * @param {Iterable} iterable
- * @param {Function} mapper
- * @returns {Promise<Array>}
- */
-// Operations that can be used in batch() jobs, mapped to the bot method they invoke.
-// The job array supplies the method arguments: [operation, ...args].
-const BATCH_OPERATIONS = {
-    create: (bot, ...args) => bot.create(...args),
-    createProtect: (bot, ...args) => bot.createProtect(...args),
-    read: (bot, ...args) => bot.read(...args),
-    readFromID: (bot, ...args) => bot.readFromID(...args),
-    readWithProps: (bot, ...args) => bot.readWithProps(...args),
-    readWithPropsFromID: (bot, ...args) => bot.readWithPropsFromID(...args),
-    edit: (bot, ...args) => bot.edit(...args),
-    editProtect: (bot, ...args) => bot.editProtect(...args),
-    update: (bot, ...args) => bot.update(...args),
-    updateFromID: (bot, ...args) => bot.updateFromID(...args),
-    delete: (bot, ...args) => bot.delete(...args),
-    protect: (bot, ...args) => bot.protect(...args),
-    move: (bot, ...args) => bot.move(...args),
-    upload: (bot, ...args) => bot.upload(...args),
-    uploadOverwrite: (bot, ...args) => bot.uploadOverwrite(...args),
-};
-
-class UnsupportedOperationError extends Error {
-    constructor(operation) {
-        super('Unsupported operation: ' + operation);
-        this.name = 'UnsupportedOperationError';
-    }
-}
-
-async function pMapSeries(iterable, mapper) {
-    const results = [];
-    for (const item of iterable) {
-        results.push(await mapper(item));
-    }
-    return results;
-}
+const BATCH_OPERATIONS = require('./batchOperations');
+const UnsupportedOperationError = require('./UnsupportedOperationError');
+const pMapSeries = require('./pMapSeries');
 
 /**
  * MWBot, a Node.js module for interacting with the MediaWiki API.
