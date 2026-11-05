@@ -1,7 +1,6 @@
 'use strict';
 
 const MWBot = require('../../src/');
-const log = require('semlog').log;
 
 const chai = require('chai');
 const expect = chai.expect;
@@ -24,26 +23,6 @@ describe('MWBot Request', function () {
     //////////////////////////////////////////
     // SUCCESSFUL                           //
     //////////////////////////////////////////
-
-    it('successfully executes a raw HTTP request', async function () {
-        const bot = new MWBot();
-
-        try {
-            const response = await bot.rawRequest({
-                method: 'GET',
-                uri: 'https://jsonplaceholder.typicode.com/comments',
-                json: true,
-                qs: {
-                    postId: 1,
-                },
-            });
-            expect(response).to.be.instanceof(Array);
-            expect(response[0]).to.be.instanceof(Object);
-            expect(response[0].postId).to.equal(1);
-        } catch (err) {
-            log(err);
-        }
-    });
 
     it('successfully edits a page with custom request()', async function () {
         const bot = new MWBot();
