@@ -16,7 +16,7 @@
     "tough-cookie": "^5.1.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.0.0",
+    "@eslint/js": "^10.0.1",
     "c8": "^10.0.0",
     "chai": "^4.3.7",
     "chai-as-promised": "^7.1.1",
