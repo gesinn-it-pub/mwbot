@@ -33,45 +33,44 @@ function mockRawSequence(bot, ...bodies) {
 // request()
 // ============================================================
 describe('MWBot request()', function () {
-    it('rejects with invalidjson when response is not an object', function () {
+    it('rejects with invalidjson when response is not an object', async function () {
         const bot = new MWBot({ apiUrl: API_URL });
         mockRaw(bot, 'not json');
 
-        return expect(bot.request({ action: 'query' })).to.be.rejectedWith('invalidjson');
+        await expect(bot.request({ action: 'query' })).to.be.rejectedWith('invalidjson');
     });
 
-    it('rejects and exposes code/info when response.error is set', function () {
+    it('rejects and exposes code/info when response.error is set', async function () {
         const bot = new MWBot({ apiUrl: API_URL });
         mockRaw(bot, { error: { code: 'permissiondenied', info: 'Action requires login' } });
 
-        return bot.request({ action: 'edit' }).then(
-            () => {
-                throw new Error('should have rejected');
-            },
-            (err) => {
-                expect(err).to.be.instanceof(Error);
-                expect(err.code).to.equal('permissiondenied');
-                expect(err.info).to.equal('Action requires login');
-                expect(err.errorResponse).to.equal(true);
-                expect(err.request).to.be.an('object');
-            }
-        );
+        let err;
+        try {
+            await bot.request({ action: 'edit' });
+        } catch (e) {
+            err = e;
+        }
+
+        expect(err, 'should have rejected').to.be.instanceof(Error);
+        expect(err.code).to.equal('permissiondenied');
+        expect(err.info).to.equal('Action requires login');
+        expect(err.errorResponse).to.equal(true);
+        expect(err.request).to.be.an('object');
     });
 
-    it('resolves with the response body on success', function () {
+    it('resolves with the response body on success', async function () {
         const bot = new MWBot({ apiUrl: API_URL });
         mockRaw(bot, { query: { pages: { 1: { title: 'Main Page' } } } });
 
-        return bot.request({ action: 'query' }).then((response) => {
-            expect(response.query.pages[1].title).to.equal('Main Page');
-        });
+        const response = await bot.request({ action: 'query' });
+        expect(response.query.pages[1].title).to.equal('Main Page');
     });
 
-    it('rejects with transport error when rawRequest rejects', function () {
+    it('rejects with transport error when rawRequest rejects', async function () {
         const bot = new MWBot({ apiUrl: API_URL });
         bot.rawRequest = () => Promise.reject(new Error('ECONNREFUSED'));
 
-        return expect(bot.request({ action: 'query' })).to.be.rejectedWith('ECONNREFUSED');
+        await expect(bot.request({ action: 'query' })).to.be.rejectedWith('ECONNREFUSED');
     });
 });
 
@@ -79,10 +78,10 @@ describe('MWBot request()', function () {
 // rawRequest()
 // ============================================================
 describe('MWBot rawRequest()', function () {
-    it('rejects when no URI is provided', function () {
+    it('rejects when no URI is provided', async function () {
         const bot = new MWBot();
         // no uri in requestOptions → rejection
-        return expect(bot.rawRequest({})).to.be.rejectedWith('No URI provided!');
+        await expect(bot.rawRequest({})).to.be.rejectedWith('No URI provided!');
     });
 
     it('increments the total counter on each call', function () {
@@ -98,39 +97,39 @@ describe('MWBot rawRequest()', function () {
 // login()
 // ============================================================
 describe('MWBot login()', function () {
-    it('rejects when apiUrl is missing', function () {
+    it('rejects when apiUrl is missing', async function () {
         const bot = new MWBot();
-        return expect(bot.login({ username: 'Bot', password: 'pass' })).to.be.rejectedWith(
+        await expect(bot.login({ username: 'Bot', password: 'pass' })).to.be.rejectedWith(
             'Incomplete login credentials!'
         );
     });
 
-    it('rejects when username is missing', function () {
+    it('rejects when username is missing', async function () {
         const bot = new MWBot({ apiUrl: API_URL });
-        return expect(bot.login({ password: 'pass', apiUrl: API_URL })).to.be.rejectedWith(
+        await expect(bot.login({ password: 'pass', apiUrl: API_URL })).to.be.rejectedWith(
             'Incomplete login credentials!'
         );
     });
 
-    it('rejects when first response has no login object', function () {
+    it('rejects when first response has no login object', async function () {
         const bot = new MWBot({ apiUrl: API_URL });
         mockRaw(bot, {}); // response without query.tokens.logintoken
 
-        return expect(bot.login({ username: 'Bot', password: 'pass', apiUrl: API_URL })).to.be.rejectedWith(
+        await expect(bot.login({ username: 'Bot', password: 'pass', apiUrl: API_URL })).to.be.rejectedWith(
             'Invalid response from API'
         );
     });
 
-    it('rejects with reason when login result is not Success', function () {
+    it('rejects with reason when login result is not Success', async function () {
         const bot = new MWBot({ apiUrl: API_URL });
         mockRawSequence(bot, { query: { tokens: { logintoken: 'abc123' } } }, { login: { result: 'WrongPassword' } });
 
-        return expect(bot.login({ username: 'Bot', password: 'wrong', apiUrl: API_URL })).to.be.rejectedWith(
+        await expect(bot.login({ username: 'Bot', password: 'wrong', apiUrl: API_URL })).to.be.rejectedWith(
             'Could not login: WrongPassword'
         );
     });
 
-    it('resolves and sets loggedIn=true on successful login', function () {
+    it('resolves and sets loggedIn=true on successful login', async function () {
         const bot = new MWBot({ apiUrl: API_URL });
         mockRawSequence(
             bot,
@@ -139,13 +138,12 @@ describe('MWBot login()', function () {
             { query: { general: { generator: 'MediaWiki 1.43.0', sitename: 'TestWiki' } } }
         );
 
-        return bot.login({ username: 'TestBot', password: 'pass', apiUrl: API_URL }).then((state) => {
-            expect(bot.loggedIn).to.equal(true);
-            expect(state.lgusername).to.equal('TestBot');
-        });
+        const state = await bot.login({ username: 'TestBot', password: 'pass', apiUrl: API_URL });
+        expect(bot.loggedIn).to.equal(true);
+        expect(state.lgusername).to.equal('TestBot');
     });
 
-    it('rejects when MediaWiki version cannot be parsed', function () {
+    it('rejects when MediaWiki version cannot be parsed', async function () {
         const bot = new MWBot({ apiUrl: API_URL });
         mockRawSequence(
             bot,
@@ -154,7 +152,7 @@ describe('MWBot login()', function () {
             { query: { general: { generator: 'not-a-version', sitename: 'Wiki' } } }
         );
 
-        return expect(bot.login({ username: 'Bot', password: 'pass', apiUrl: API_URL })).to.be.rejectedWith(
+        await expect(bot.login({ username: 'Bot', password: 'pass', apiUrl: API_URL })).to.be.rejectedWith(
             'Invalid MediaWiki version'
         );
     });
@@ -164,28 +162,27 @@ describe('MWBot login()', function () {
 // getSiteinfo()
 // ============================================================
 describe('MWBot getSiteinfo()', function () {
-    it('resolves and merges query.general into state', function () {
+    it('resolves and merges query.general into state', async function () {
         const bot = new MWBot({ apiUrl: API_URL });
         mockRaw(bot, { query: { general: { generator: 'MediaWiki 1.43.0', sitename: 'TestWiki' } } });
 
-        return bot.getSiteinfo().then((state) => {
-            expect(state.generator).to.equal('MediaWiki 1.43.0');
-            expect(state.sitename).to.equal('TestWiki');
-        });
+        const state = await bot.getSiteinfo();
+        expect(state.generator).to.equal('MediaWiki 1.43.0');
+        expect(state.sitename).to.equal('TestWiki');
     });
 
-    it('rejects when query.general is missing from response', function () {
+    it('rejects when query.general is missing from response', async function () {
         const bot = new MWBot({ apiUrl: API_URL });
         mockRaw(bot, { query: {} });
 
-        return expect(bot.getSiteinfo()).to.be.rejectedWith('Could not get siteinfo');
+        await expect(bot.getSiteinfo()).to.be.rejectedWith('Could not get siteinfo');
     });
 
-    it('rejects when query is missing from response', function () {
+    it('rejects when query is missing from response', async function () {
         const bot = new MWBot({ apiUrl: API_URL });
         mockRaw(bot, {});
 
-        return expect(bot.getSiteinfo()).to.be.rejectedWith('Could not get siteinfo');
+        await expect(bot.getSiteinfo()).to.be.rejectedWith('Could not get siteinfo');
     });
 });
 
@@ -193,39 +190,37 @@ describe('MWBot getSiteinfo()', function () {
 // getEditToken()
 // ============================================================
 describe('MWBot getEditToken()', function () {
-    it('resolves immediately when editToken is already set', function () {
+    it('resolves immediately when editToken is already set', async function () {
         const bot = new MWBot({ apiUrl: API_URL });
         bot.editToken = 'existing+\\';
         bot.rawRequest = () => {
             throw new Error('should not be called');
         };
 
-        return bot.getEditToken().then((state) => {
-            expect(state).to.equal(bot.state);
-        });
+        const state = await bot.getEditToken();
+        expect(state).to.equal(bot.state);
     });
 
-    it('fetches, stores and resolves with csrf token', function () {
+    it('fetches, stores and resolves with csrf token', async function () {
         const bot = new MWBot({ apiUrl: API_URL });
         mockRaw(bot, { query: { tokens: { csrftoken: 'csrf+\\' } } });
 
-        return bot.getEditToken().then(() => {
-            expect(bot.editToken).to.equal('csrf+\\');
-        });
+        await bot.getEditToken();
+        expect(bot.editToken).to.equal('csrf+\\');
     });
 
-    it('rejects when csrftoken is absent from response', function () {
+    it('rejects when csrftoken is absent from response', async function () {
         const bot = new MWBot({ apiUrl: API_URL });
         mockRaw(bot, { query: { tokens: {} } });
 
-        return expect(bot.getEditToken()).to.be.rejectedWith('Could not get edit token');
+        await expect(bot.getEditToken()).to.be.rejectedWith('Could not get edit token');
     });
 
-    it('rejects when query.tokens is absent from response', function () {
+    it('rejects when query.tokens is absent from response', async function () {
         const bot = new MWBot({ apiUrl: API_URL });
         mockRaw(bot, { query: {} });
 
-        return expect(bot.getEditToken()).to.be.rejectedWith('Could not get edit token');
+        await expect(bot.getEditToken()).to.be.rejectedWith('Could not get edit token');
     });
 });
 
@@ -233,32 +228,30 @@ describe('MWBot getEditToken()', function () {
 // getCreateaccountToken()
 // ============================================================
 describe('MWBot getCreateaccountToken()', function () {
-    it('resolves immediately when createaccountToken is already set', function () {
+    it('resolves immediately when createaccountToken is already set', async function () {
         const bot = new MWBot({ apiUrl: API_URL });
         bot.createaccountToken = 'existing+\\';
         bot.rawRequest = () => {
             throw new Error('should not be called');
         };
 
-        return bot.getCreateaccountToken().then((state) => {
-            expect(state).to.equal(bot.state);
-        });
+        const state = await bot.getCreateaccountToken();
+        expect(state).to.equal(bot.state);
     });
 
-    it('fetches, stores and resolves with createaccount token', function () {
+    it('fetches, stores and resolves with createaccount token', async function () {
         const bot = new MWBot({ apiUrl: API_URL });
         mockRaw(bot, { query: { tokens: { createaccounttoken: 'ca+\\' } } });
 
-        return bot.getCreateaccountToken().then(() => {
-            expect(bot.createaccountToken).to.equal('ca+\\');
-        });
+        await bot.getCreateaccountToken();
+        expect(bot.createaccountToken).to.equal('ca+\\');
     });
 
-    it('rejects when createaccounttoken is absent from response', function () {
+    it('rejects when createaccounttoken is absent from response', async function () {
         const bot = new MWBot({ apiUrl: API_URL });
         mockRaw(bot, { query: { tokens: {} } });
 
-        return expect(bot.getCreateaccountToken()).to.be.rejectedWith('Could not get createaccount token');
+        await expect(bot.getCreateaccountToken()).to.be.rejectedWith('Could not get createaccount token');
     });
 });
 
@@ -266,7 +259,7 @@ describe('MWBot getCreateaccountToken()', function () {
 // loginGetCreateaccountToken()
 // ============================================================
 describe('MWBot loginGetCreateaccountToken()', function () {
-    it('logs in and then fetches the createaccount token', function () {
+    it('logs in and then fetches the createaccount token', async function () {
         const bot = new MWBot({ apiUrl: API_URL });
         mockRawSequence(
             bot,
@@ -276,10 +269,9 @@ describe('MWBot loginGetCreateaccountToken()', function () {
             { query: { tokens: { createaccounttoken: 'ca+\\' } } }
         );
 
-        return bot.loginGetCreateaccountToken({ username: 'Bot', password: 'pass', apiUrl: API_URL }).then(() => {
-            expect(bot.loggedIn).to.equal(true);
-            expect(bot.createaccountToken).to.equal('ca+\\');
-        });
+        await bot.loginGetCreateaccountToken({ username: 'Bot', password: 'pass', apiUrl: API_URL });
+        expect(bot.loggedIn).to.equal(true);
+        expect(bot.createaccountToken).to.equal('ca+\\');
     });
 });
 
@@ -287,30 +279,28 @@ describe('MWBot loginGetCreateaccountToken()', function () {
 // logout()
 // ============================================================
 describe('MWBot logout()', function () {
-    it('calls action=logout and resets state when editToken is already set', function () {
+    it('calls action=logout and resets state when editToken is already set', async function () {
         const bot = new MWBot({ apiUrl: API_URL });
         bot.loggedIn = true;
         bot.editToken = 'csrf+\\';
         bot.state = { lgusername: 'TestBot' };
         mockRaw(bot, { logout: {} });
 
-        return bot.logout().then(() => {
-            expect(bot.loggedIn).to.equal(false);
-            expect(bot.editToken).to.equal(false);
-            expect(bot.state).to.deep.equal({});
-        });
+        await bot.logout();
+        expect(bot.loggedIn).to.equal(false);
+        expect(bot.editToken).to.equal(false);
+        expect(bot.state).to.deep.equal({});
     });
 
-    it('fetches a CSRF token first when editToken is not set', function () {
+    it('fetches a CSRF token first when editToken is not set', async function () {
         const bot = new MWBot({ apiUrl: API_URL });
         bot.loggedIn = true;
         bot.state = { lgusername: 'TestBot' };
         mockRawSequence(bot, { query: { tokens: { csrftoken: 'csrf+\\' } } }, { logout: {} });
 
-        return bot.logout().then(() => {
-            expect(bot.loggedIn).to.equal(false);
-            expect(bot.editToken).to.equal(false);
-        });
+        await bot.logout();
+        expect(bot.loggedIn).to.equal(false);
+        expect(bot.editToken).to.equal(false);
     });
 });
 
@@ -318,7 +308,7 @@ describe('MWBot logout()', function () {
 // createProtect() / editProtect()
 // ============================================================
 describe('MWBot createProtect() / editProtect()', function () {
-    it('createProtect calls create then protect', function () {
+    it('createProtect calls create then protect', async function () {
         const bot = new MWBot({ apiUrl: API_URL });
         bot.editToken = 'csrf+\\';
 
@@ -331,12 +321,11 @@ describe('MWBot createProtect() / editProtect()', function () {
             return Promise.resolve({ protect: { title: 'TestPage', protections: [] } });
         };
 
-        return bot.createProtect('TestPage', 'content', 'summary').then(() => {
-            expect(calls).to.deep.equal(['edit', 'protect']);
-        });
+        await bot.createProtect('TestPage', 'content', 'summary');
+        expect(calls).to.deep.equal(['edit', 'protect']);
     });
 
-    it('editProtect calls edit then protect', function () {
+    it('editProtect calls edit then protect', async function () {
         const bot = new MWBot({ apiUrl: API_URL });
         bot.editToken = 'csrf+\\';
 
@@ -349,19 +338,18 @@ describe('MWBot createProtect() / editProtect()', function () {
             return Promise.resolve({ protect: { title: 'TestPage', protections: [] } });
         };
 
-        return bot.editProtect('TestPage', 'updated content', 'summary').then(() => {
-            expect(calls).to.deep.equal(['edit', 'protect']);
-        });
+        await bot.editProtect('TestPage', 'updated content', 'summary');
+        expect(calls).to.deep.equal(['edit', 'protect']);
     });
 
-    it('createProtect rejects when create fails', function () {
+    it('createProtect rejects when create fails', async function () {
         const bot = new MWBot({ apiUrl: API_URL });
         bot.editToken = 'csrf+\\';
         mockRaw(bot, {
             error: { code: 'articleexists', info: 'The article you tried to create has been created already.' },
         });
 
-        return expect(bot.createProtect('TestPage', 'content')).to.be.rejectedWith('articleexists');
+        await expect(bot.createProtect('TestPage', 'content')).to.be.rejectedWith('articleexists');
     });
 
     // Regression: editProtect/createProtect used to return only the protect response, discarding
@@ -370,7 +358,7 @@ describe('MWBot createProtect() / editProtect()', function () {
     // logged as [=] (no-change) regardless of whether the page was actually created or updated —
     // making it impossible to diagnose silent upload failures on a fresh wiki.
 
-    it('editProtect resolves with combined response including edit.new for new pages', function () {
+    it('editProtect resolves with combined response including edit.new for new pages', async function () {
         const bot = new MWBot({ apiUrl: API_URL });
         bot.editToken = 'csrf+\\';
 
@@ -381,14 +369,13 @@ describe('MWBot createProtect() / editProtect()', function () {
             return Promise.resolve({ protect: { title: 'TestPage', protections: [] } });
         };
 
-        return bot.editProtect('TestPage', 'content', 'summary').then((response) => {
-            expect(response).to.have.property('protect');
-            expect(response).to.have.nested.property('edit.new', '');
-            expect(response).to.have.nested.property('edit.newrevid', 42);
-        });
+        const response = await bot.editProtect('TestPage', 'content', 'summary');
+        expect(response).to.have.property('protect');
+        expect(response).to.have.nested.property('edit.new', '');
+        expect(response).to.have.nested.property('edit.newrevid', 42);
     });
 
-    it('editProtect resolves with combined response including edit.newrevid for existing pages', function () {
+    it('editProtect resolves with combined response including edit.newrevid for existing pages', async function () {
         const bot = new MWBot({ apiUrl: API_URL });
         bot.editToken = 'csrf+\\';
 
@@ -399,13 +386,12 @@ describe('MWBot createProtect() / editProtect()', function () {
             return Promise.resolve({ protect: { title: 'TestPage', protections: [] } });
         };
 
-        return bot.editProtect('TestPage', 'updated content', 'summary').then((response) => {
-            expect(response).to.have.property('protect');
-            expect(response).to.have.nested.property('edit.newrevid', 99);
-        });
+        const response = await bot.editProtect('TestPage', 'updated content', 'summary');
+        expect(response).to.have.property('protect');
+        expect(response).to.have.nested.property('edit.newrevid', 99);
     });
 
-    it('createProtect resolves with combined response including edit.new for new pages', function () {
+    it('createProtect resolves with combined response including edit.new for new pages', async function () {
         const bot = new MWBot({ apiUrl: API_URL });
         bot.editToken = 'csrf+\\';
 
@@ -416,11 +402,10 @@ describe('MWBot createProtect() / editProtect()', function () {
             return Promise.resolve({ protect: { title: 'TestPage', protections: [] } });
         };
 
-        return bot.createProtect('TestPage', 'content', 'summary').then((response) => {
-            expect(response).to.have.property('protect');
-            expect(response).to.have.nested.property('edit.new', '');
-            expect(response).to.have.nested.property('edit.newrevid', 55);
-        });
+        const response = await bot.createProtect('TestPage', 'content', 'summary');
+        expect(response).to.have.property('protect');
+        expect(response).to.have.nested.property('edit.new', '');
+        expect(response).to.have.nested.property('edit.newrevid', 55);
     });
 });
 
