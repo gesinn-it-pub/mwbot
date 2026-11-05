@@ -42,4 +42,15 @@ jobs:
       - name: Publish
         run: |
           unset NODE_AUTH_TOKEN
-          npm publish --access public
+          version=$(node -p "require('./package.json').version")
+          current_latest=$(npm view mwbot dist-tags.latest 2>/dev/null || echo "0.0.0")
+          # This is the 2.x maintenance branch. Once a newer major is "latest", a 2.x release must not move it.
+          if [[ "$version" == *-* ]]; then
+            tag=next-2
+          elif [[ "${current_latest%%.*}" -gt 2 ]]; then
+            tag=latest-2
+          else
+            tag=latest
+          fi
+          echo "Publishing $version with tag $tag (current latest: $current_latest)"
+          npm publish --access public --tag "$tag"
