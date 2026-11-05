@@ -33,7 +33,7 @@ jobs:
         if: always()
 
       - name: Upload code coverage
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v7
         with:
           files: coverage/clover.xml
         if: matrix.coverage == true
