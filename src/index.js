@@ -16,6 +16,13 @@ const packageJson = require('../package.json');
  * @param {Function} mapper
  * @returns {Promise<Array>}
  */
+class UnsupportedOperationError extends Error {
+    constructor(operation) {
+        super('Unsupported operation: ' + operation);
+        this.name = 'UnsupportedOperationError';
+    }
+}
+
 async function pMapSeries(iterable, mapper) {
     const results = [];
     for (const item of iterable) {
@@ -876,181 +883,173 @@ class MWBot {
      * @param {number}  [concurrency]
      * @param {object}  [customRequestOptions]
      */
-    batch(jobs, summary, concurrency, customRequestOptions) {
-        return new Promise((resolve, reject) => {
-            summary = summary || this.options.defaultSummary;
-            concurrency = concurrency || this.options.concurrency;
+    async batch(jobs, summary, concurrency, customRequestOptions) {
+        summary = summary || this.options.defaultSummary;
+        concurrency = concurrency || this.options.concurrency;
 
-            let jobQueue = [];
-            const results = {};
+        let jobQueue = [];
+        const results = {};
 
-            // Jobs can be written in object or array notation
-            // If it is written in the more convenient object notation, convert it to array notation
-            if (Array.isArray(jobs)) {
-                jobQueue = jobs;
-            } else {
-                for (const operation in jobs) {
-                    const operationJobs = jobs[operation];
-                    if (Array.isArray(operationJobs)) {
-                        if (operation === 'upload' || operation === 'uploadOverwrite') {
-                            for (const filePath of operationJobs) {
-                                jobQueue.push([
-                                    operation,
-                                    path.basename(filePath),
-                                    filePath,
-                                    summary,
-                                    false,
-                                    customRequestOptions,
-                                ]);
-                            }
-                        } else {
-                            for (const pageName of operationJobs) {
-                                jobQueue.push([operation, pageName, summary, customRequestOptions]);
-                            }
+        // Jobs can be written in object or array notation
+        // If it is written in the more convenient object notation, convert it to array notation
+        if (Array.isArray(jobs)) {
+            jobQueue = jobs;
+        } else {
+            for (const operation in jobs) {
+                const operationJobs = jobs[operation];
+                if (Array.isArray(operationJobs)) {
+                    if (operation === 'upload' || operation === 'uploadOverwrite') {
+                        for (const filePath of operationJobs) {
+                            jobQueue.push([
+                                operation,
+                                path.basename(filePath),
+                                filePath,
+                                summary,
+                                false,
+                                customRequestOptions,
+                            ]);
                         }
                     } else {
-                        if (operation === 'upload' || operation === 'uploadOverwrite') {
-                            for (const fileName in operationJobs) {
-                                const filePath = operationJobs[fileName];
-                                jobQueue.push([operation, fileName, filePath, summary, false, customRequestOptions]);
-                            }
-                        } else {
-                            for (const pageName in operationJobs) {
-                                const content = operationJobs[pageName];
-                                jobQueue.push([operation, pageName, content, summary, customRequestOptions]);
-                            }
+                        for (const pageName of operationJobs) {
+                            jobQueue.push([operation, pageName, summary, customRequestOptions]);
+                        }
+                    }
+                } else {
+                    if (operation === 'upload' || operation === 'uploadOverwrite') {
+                        for (const fileName in operationJobs) {
+                            const filePath = operationJobs[fileName];
+                            jobQueue.push([operation, fileName, filePath, summary, false, customRequestOptions]);
+                        }
+                    } else {
+                        for (const pageName in operationJobs) {
+                            const content = operationJobs[pageName];
+                            jobQueue.push([operation, pageName, content, summary, customRequestOptions]);
                         }
                     }
                 }
             }
+        }
 
-            let currentCounter = 0;
-            const totalCounter = jobQueue.length;
+        let currentCounter = 0;
+        const totalCounter = jobQueue.length;
 
-            // Use pMapSeries for strictly sequential execution (concurrency=1),
-            // pMap for concurrent execution with the given concurrency limit
-            const useMapSeries = !concurrency || concurrency === 1;
+        // Use pMapSeries for strictly sequential execution (concurrency=1),
+        // pMap for concurrent execution with the given concurrency limit
+        const useMapSeries = !concurrency || concurrency === 1;
 
-            const jobHandler = (job) => {
-                const operation = job[0];
-                const pageName = job[1];
+        const jobHandler = async (job) => {
+            const operation = job[0];
+            const pageName = job[1];
 
-                if (!this[operation]) {
-                    return reject(new Error('Unsupported operation: ' + operation));
+            if (!this[operation]) {
+                throw new UnsupportedOperationError(operation);
+            }
+
+            try {
+                // Dynamically invoke the mwbot CRUD function with the parameters from the job array
+                const response = await this[operation](pageName, job[2], job[3], job[4]);
+                currentCounter += 1;
+
+                let status = '[=] ';
+                let reason = '';
+                const debugMessages = [];
+
+                if (operation === 'delete') {
+                    status = '[-] ';
+                } else if (response.edit?.new === '') {
+                    status = '[+] ';
+                } else if (response.edit?.newrevid) {
+                    status = '[C] ';
+                } else if (response.query?.pages?.['-1']) {
+                    status = '[?] ';
+                    reason = 'missing';
+                } else if (response.query?.pages) {
+                    status = '[S] ';
+                } else if (response.upload?.result === 'Success') {
+                    status = '[S] ';
+                } else if (response.upload?.result === 'Warning') {
+                    status = '[/] ';
+                    if (response.upload.warnings?.duplicate) {
+                        reason = 'duplicate';
+                        debugMessages.push('[D] [MWBOT] Duplicate: ' + response.upload.warnings.duplicate.join(', '));
+                    }
+                    if (response.upload.warnings?.exists) {
+                        reason = 'exists';
+                        debugMessages.push('[D] [MWBOT] Exists: ' + response.upload.warnings.exists);
+                    }
                 }
 
-                // Dynamically invoke the mwbot CRUD function with the parameters from the job array
-                return this[operation](pageName, job[2], job[3], job[4])
-                    .then((response) => {
-                        currentCounter += 1;
+                MWBot.logStatus(status, currentCounter, totalCounter, operation, pageName, reason);
 
-                        let status = '[=] ';
-                        let reason = '';
-                        const debugMessages = [];
+                for (const msg of debugMessages) {
+                    if (!this.options.silent) log(msg);
+                }
 
-                        if (operation === 'delete') {
-                            status = '[-] ';
-                        } else if (response.edit && response.edit.new === '') {
-                            status = '[+] ';
-                        } else if (response.edit && response.edit.newrevid) {
-                            status = '[C] ';
-                        } else if (response.query && response.query.pages && response.query.pages['-1']) {
-                            status = '[?] ';
-                            reason = 'missing';
-                        } else if (response.query && response.query.pages) {
-                            status = '[S] ';
-                        } else if (response.upload && response.upload.result === 'Success') {
-                            status = '[S] ';
-                        } else if (response.upload && response.upload.result === 'Warning') {
-                            status = '[/] ';
-                            if (response.upload.warnings && response.upload.warnings.duplicate) {
-                                reason = 'duplicate';
-                                debugMessages.push(
-                                    '[D] [MWBOT] Duplicate: ' + response.upload.warnings.duplicate.join(', ')
-                                );
-                            }
-                            if (response.upload.warnings && response.upload.warnings.exists) {
-                                reason = 'exists';
-                                debugMessages.push('[D] [MWBOT] Exists: ' + response.upload.warnings.exists);
-                            }
-                        }
+                if (!results[operation]) {
+                    results[operation] = {};
+                }
+                results[operation][pageName] = response;
+            } catch (err) {
+                currentCounter += 1;
 
-                        MWBot.logStatus(status, currentCounter, totalCounter, operation, pageName, reason);
+                let status = '[E] ';
+                let reason = '';
 
-                        for (const msg of debugMessages) {
-                            if (!this.options.silent) log(msg);
-                        }
-
-                        if (!results[operation]) {
-                            results[operation] = {};
-                        }
-                        results[operation][pageName] = response;
-                    })
-                    .catch((err) => {
-                        currentCounter += 1;
-
-                        let status = '[E] ';
-                        let reason = '';
-
-                        if (err.response && err.response.error && err.response.error.code) {
-                            const code = err.response.error.code;
-                            if (code === 'articleexists' || code === 'fileexists-no-change') {
-                                status = '[/] ';
-                                reason = code;
-                            } else if (code === 'missingtitle') {
-                                status = '[?] ';
-                                reason = code;
-                            } else if (code === 'cantedit') {
-                                // cantedit from action=protect means the page is already protected
-                                // at a level the bot cannot change. The content edit already
-                                // succeeded → idempotent, treat as non-fatal skip.
-                                status = '[/] ';
-                                reason = 'already-protected';
-                            } else if (code === 'badtoken') {
-                                // in case of fatal errors, cancel further jobQueue processing
-                                console.log(this.editToken);
-                                throw err;
-                            }
-                        }
-
-                        MWBot.logStatus(status, currentCounter, totalCounter, operation, pageName, reason);
-
-                        if (status === '[E] ' && !this.options.silent) {
-                            log(err);
-                            if (err.response) {
-                                log(err.response);
-                            }
-                        } else if (
-                            this.options.verbose &&
-                            err.response &&
-                            err.response.error &&
-                            err.response.error.info
-                        ) {
-                            log('[D] ' + err.response.error.info);
-                        }
-
-                        if (!results[operation]) {
-                            results[operation] = {};
-                        }
-
-                        results[operation][pageName] = err;
-                    });
-            };
-
-            (useMapSeries ? pMapSeries(jobQueue, jobHandler) : pMap(jobQueue, jobHandler, { concurrency }))
-                .then(() => {
-                    return resolve(results);
-                })
-                .catch((err) => {
-                    // If an error happens, return the results nonetheless, as it contains all the errors
-                    // embedded in its data structure
-                    if (!this.options.silent) {
-                        log('[E] [MWBOT] At least one exception occured during the batch job:');
-                        log(err);
+                if (err.response?.error?.code) {
+                    const code = err.response.error.code;
+                    if (code === 'articleexists' || code === 'fileexists-no-change') {
+                        status = '[/] ';
+                        reason = code;
+                    } else if (code === 'missingtitle') {
+                        status = '[?] ';
+                        reason = code;
+                    } else if (code === 'cantedit') {
+                        // cantedit from action=protect means the page is already protected
+                        // at a level the bot cannot change. The content edit already
+                        // succeeded → idempotent, treat as non-fatal skip.
+                        status = '[/] ';
+                        reason = 'already-protected';
+                    } else if (code === 'badtoken') {
+                        // in case of fatal errors, cancel further jobQueue processing
+                        console.log(this.editToken);
+                        throw err;
                     }
-                    return reject(results);
-                });
-        });
+                }
+
+                MWBot.logStatus(status, currentCounter, totalCounter, operation, pageName, reason);
+
+                if (status === '[E] ' && !this.options.silent) {
+                    log(err);
+                    if (err.response) {
+                        log(err.response);
+                    }
+                } else if (this.options.verbose && err.response?.error?.info) {
+                    log('[D] ' + err.response.error.info);
+                }
+
+                if (!results[operation]) {
+                    results[operation] = {};
+                }
+
+                results[operation][pageName] = err;
+            }
+        };
+
+        try {
+            await (useMapSeries ? pMapSeries(jobQueue, jobHandler) : pMap(jobQueue, jobHandler, { concurrency }));
+            return results;
+        } catch (err) {
+            if (err instanceof UnsupportedOperationError) {
+                throw err;
+            }
+            // If an error happens, return the results nonetheless, as it contains all the errors
+            // embedded in its data structure
+            if (!this.options.silent) {
+                log('[E] [MWBOT] At least one exception occured during the batch job:');
+                log(err);
+            }
+            throw results;
+        }
     }
 
     /**
