@@ -42,4 +42,10 @@ jobs:
       - name: Publish
         run: |
           unset NODE_AUTH_TOKEN
-          npm publish --access public
+          # Pre-releases (e.g. 3.0.0-rc.1) go to the "next" tag so that "latest" stays on the last stable version
+          version=$(node -p "require('./package.json').version")
+          if [[ "$version" == *-* ]]; then
+            npm publish --access public --tag next
+          else
+            npm publish --access public
+          fi
