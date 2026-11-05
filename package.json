@@ -43,6 +43,11 @@
     "reporter": "spec"
   },
   "c8": {
+    "check-coverage": true,
+    "lines": 88,
+    "statements": 88,
+    "branches": 85,
+    "functions": 75,
     "reporter": [
       "lcov",
       "text",

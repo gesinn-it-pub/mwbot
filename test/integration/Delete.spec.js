@@ -1,6 +1,7 @@
 'use strict';
 
 const MWBot = require('../../src/');
+const crypto = require('crypto');
 //const log = require('semlog').log;
 
 const chai = require('chai');
@@ -14,12 +15,12 @@ describe('MWBot Delete', function () {
 
     it('successfully deletes a page with delete()', async function () {
         const bot = new MWBot();
-        const title = 'Page To Be Deleted';
+        const title = 'Page To Be Deleted ' + crypto.randomBytes(8).toString('hex');
 
         await bot.loginGetEditToken(loginCredentials.valid);
         await bot.create(title, 'Test Page to be deleted.', 'Test');
 
-        const r3 = await bot.delete('Page To Be Deleted', 'Delete Test');
+        const r3 = await bot.delete(title, 'Delete Test');
         expect(r3.delete.title).to.equal(title);
         expect(r3.delete.logid).to.be.above(0);
         expect(r3.warnings).to.equal(undefined);
