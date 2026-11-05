@@ -1,0 +1,20 @@
+# Development, test and CI files are not part of the published package.
+# Note: .npmignore replaces .gitignore for npm publish, so entries of
+# .gitignore that matter here are repeated.
+
+.github/
+.editorconfig
+.idea/
+.prettierrc
+eslint.config.js
+
+Dockerfile
+Dockerfile.wiki
+docker-compose.yml
+docker-compose.override*
+Makefile
+
+coverage/
+docs/
+test/
+npm-debug.log
