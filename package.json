@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "p-map": "^7.1.1",
-    "semlog": "^0.7.0",
+    "semlog": "^1.0.0",
     "semver": "^7.3.8",
     "tough-cookie": "^6.0.2"
   },
