@@ -539,19 +539,13 @@ class MWBot {
         );
     }
 
-    createProtect(title, content, summary, customRequestOptions) {
-        let editResponse;
-        return this.create(title, content, summary, customRequestOptions)
-            .then((response) => {
-                editResponse = response;
-                return this.protect(title, null, '', customRequestOptions);
-            })
-            .then((protectResponse) => {
-                // Forward the edit response so that batch() can determine the
-                // correct status ([+] new / [C] changed / [=] no-change) from
-                // response.edit.new / response.edit.newrevid.
-                return Object.assign({}, protectResponse, { edit: editResponse.edit });
-            });
+    async createProtect(title, content, summary, customRequestOptions) {
+        const editResponse = await this.create(title, content, summary, customRequestOptions);
+        const protectResponse = await this.protect(title, null, '', customRequestOptions);
+        // Forward the edit response so that batch() can determine the
+        // correct status ([+] new / [C] changed / [=] no-change) from
+        // response.edit.new / response.edit.newrevid.
+        return Object.assign({}, protectResponse, { edit: editResponse.edit });
     }
 
     /**
@@ -660,19 +654,13 @@ class MWBot {
         );
     }
 
-    editProtect(title, content, summary, customRequestOptions) {
-        let editResponse;
-        return this.edit(title, content, summary, customRequestOptions)
-            .then((response) => {
-                editResponse = response;
-                return this.protect(title, null, '', customRequestOptions);
-            })
-            .then((protectResponse) => {
-                // Forward the edit response so that batch() can determine the
-                // correct status ([+] new / [C] changed / [=] no-change) from
-                // response.edit.new / response.edit.newrevid.
-                return Object.assign({}, protectResponse, { edit: editResponse.edit });
-            });
+    async editProtect(title, content, summary, customRequestOptions) {
+        const editResponse = await this.edit(title, content, summary, customRequestOptions);
+        const protectResponse = await this.protect(title, null, '', customRequestOptions);
+        // Forward the edit response so that batch() can determine the
+        // correct status ([+] new / [C] changed / [=] no-change) from
+        // response.edit.new / response.edit.newrevid.
+        return Object.assign({}, protectResponse, { edit: editResponse.edit });
     }
 
     /**
@@ -805,54 +793,49 @@ class MWBot {
      *
      * @returns {Promise}
      */
-    upload(title, pathToFile, comment, customParams, customRequestOptions) {
-        try {
-            // Read file synchronously and wrap in a Blob for multipart upload
-            const fileBuffer = fs.readFileSync(pathToFile);
-            const formData = new FormData();
+    async upload(title, pathToFile, comment, customParams, customRequestOptions) {
+        // Read file synchronously and wrap in a Blob for multipart upload
+        const fileBuffer = fs.readFileSync(pathToFile);
+        const formData = new FormData();
 
-            const params = MWBot.merge(
-                {
-                    action: 'upload',
-                    filename: title || path.basename(pathToFile),
-                    comment: comment || '',
-                    token: this.editToken,
-                    ignorewarnings: 1,
-                },
-                customParams
-            );
+        const params = MWBot.merge(
+            {
+                action: 'upload',
+                filename: title || path.basename(pathToFile),
+                comment: comment || '',
+                token: this.editToken,
+                ignorewarnings: 1,
+            },
+            customParams
+        );
 
-            for (const [key, value] of Object.entries(params)) {
-                formData.append(key, String(value));
-            }
-
-            formData.append('file', new Blob([fileBuffer]), path.basename(pathToFile));
-
-            const requestOptions = MWBot.merge(
-                {
-                    uri: this.options.apiUrl,
-                    method: 'POST',
-                    headers: this.globalRequestOptions.headers,
-                    qs: this.globalRequestOptions.qs,
-                    timeout: this.globalRequestOptions.timeout,
-                    formData,
-                },
-                customRequestOptions
-            );
-
-            return this.rawRequest(requestOptions).then((response) => {
-                if (response && typeof response === 'object' && response.error) {
-                    const err = new Error(response.error.code + ': ' + response.error.info);
-                    err.code = response.error.code;
-                    err.info = response.error.info;
-                    err.response = response;
-                    throw err;
-                }
-                return response;
-            });
-        } catch (e) {
-            return Promise.reject(e);
+        for (const [key, value] of Object.entries(params)) {
+            formData.append(key, String(value));
         }
+
+        formData.append('file', new Blob([fileBuffer]), path.basename(pathToFile));
+
+        const requestOptions = MWBot.merge(
+            {
+                uri: this.options.apiUrl,
+                method: 'POST',
+                headers: this.globalRequestOptions.headers,
+                qs: this.globalRequestOptions.qs,
+                timeout: this.globalRequestOptions.timeout,
+                formData,
+            },
+            customRequestOptions
+        );
+
+        const response = await this.rawRequest(requestOptions);
+        if (response && typeof response === 'object' && response.error) {
+            const err = new Error(response.error.code + ': ' + response.error.info);
+            err.code = response.error.code;
+            err.info = response.error.info;
+            err.response = response;
+            throw err;
+        }
+        return response;
     }
 
     /**
