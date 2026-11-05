@@ -2,7 +2,7 @@ import MWBot from '../../src/index.js';
 import semlog from 'semlog';
 const log = semlog.log;
 
-import chai from 'chai';
+import * as chai from 'chai';
 const expect = chai.expect;
 
 import loginCredentials from '../helpers/credentials.js';
