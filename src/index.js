@@ -11,6 +11,7 @@ const packageJson = require('../package.json');
 const BATCH_OPERATIONS = require('./batchOperations');
 const UnsupportedOperationError = require('./UnsupportedOperationError');
 const pMapSeries = require('./pMapSeries');
+const { statusForResponse, statusForError } = require('./batchStatus');
 
 /**
  * MWBot, a Node.js module for interacting with the MediaWiki API.
@@ -930,34 +931,7 @@ class MWBot {
                 const response = await BATCH_OPERATIONS[operation](this, pageName, job[2], job[3], job[4]);
                 currentCounter += 1;
 
-                let status = '[=] ';
-                let reason = '';
-                const debugMessages = [];
-
-                if (operation === 'delete') {
-                    status = '[-] ';
-                } else if (response.edit?.new === '') {
-                    status = '[+] ';
-                } else if (response.edit?.newrevid) {
-                    status = '[C] ';
-                } else if (response.query?.pages?.['-1']) {
-                    status = '[?] ';
-                    reason = 'missing';
-                } else if (response.query?.pages) {
-                    status = '[S] ';
-                } else if (response.upload?.result === 'Success') {
-                    status = '[S] ';
-                } else if (response.upload?.result === 'Warning') {
-                    status = '[/] ';
-                    if (response.upload.warnings?.duplicate) {
-                        reason = 'duplicate';
-                        debugMessages.push('[D] [MWBOT] Duplicate: ' + response.upload.warnings.duplicate.join(', '));
-                    }
-                    if (response.upload.warnings?.exists) {
-                        reason = 'exists';
-                        debugMessages.push('[D] [MWBOT] Exists: ' + response.upload.warnings.exists);
-                    }
-                }
+                const { status, reason, debugMessages } = statusForResponse(operation, response);
 
                 MWBot.logStatus(status, currentCounter, totalCounter, operation, pageName, reason);
 
@@ -972,27 +946,10 @@ class MWBot {
             } catch (err) {
                 currentCounter += 1;
 
-                let status = '[E] ';
-                let reason = '';
-
-                if (err.response?.error?.code) {
-                    const code = err.response.error.code;
-                    if (code === 'articleexists' || code === 'fileexists-no-change') {
-                        status = '[/] ';
-                        reason = code;
-                    } else if (code === 'missingtitle') {
-                        status = '[?] ';
-                        reason = code;
-                    } else if (code === 'cantedit') {
-                        // cantedit from action=protect means the page is already protected
-                        // at a level the bot cannot change. The content edit already
-                        // succeeded → idempotent, treat as non-fatal skip.
-                        status = '[/] ';
-                        reason = 'already-protected';
-                    } else if (code === 'badtoken') {
-                        // in case of fatal errors, cancel further jobQueue processing
-                        throw err;
-                    }
+                const { status, reason, fatal } = statusForError(err);
+                if (fatal) {
+                    // in case of fatal errors, cancel further jobQueue processing
+                    throw err;
                 }
 
                 MWBot.logStatus(status, currentCounter, totalCounter, operation, pageName, reason);
