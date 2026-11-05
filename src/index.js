@@ -16,6 +16,26 @@ const packageJson = require('../package.json');
  * @param {Function} mapper
  * @returns {Promise<Array>}
  */
+// Operations that can be used in batch() jobs, mapped to the bot method they invoke.
+// The job array supplies the method arguments: [operation, ...args].
+const BATCH_OPERATIONS = {
+    create: (bot, ...args) => bot.create(...args),
+    createProtect: (bot, ...args) => bot.createProtect(...args),
+    read: (bot, ...args) => bot.read(...args),
+    readFromID: (bot, ...args) => bot.readFromID(...args),
+    readWithProps: (bot, ...args) => bot.readWithProps(...args),
+    readWithPropsFromID: (bot, ...args) => bot.readWithPropsFromID(...args),
+    edit: (bot, ...args) => bot.edit(...args),
+    editProtect: (bot, ...args) => bot.editProtect(...args),
+    update: (bot, ...args) => bot.update(...args),
+    updateFromID: (bot, ...args) => bot.updateFromID(...args),
+    delete: (bot, ...args) => bot.delete(...args),
+    protect: (bot, ...args) => bot.protect(...args),
+    move: (bot, ...args) => bot.move(...args),
+    upload: (bot, ...args) => bot.upload(...args),
+    uploadOverwrite: (bot, ...args) => bot.uploadOverwrite(...args),
+};
+
 class UnsupportedOperationError extends Error {
     constructor(operation) {
         super('Unsupported operation: ' + operation);
@@ -941,13 +961,12 @@ class MWBot {
             const operation = job[0];
             const pageName = job[1];
 
-            if (!this[operation]) {
+            if (!Object.hasOwn(BATCH_OPERATIONS, operation)) {
                 throw new UnsupportedOperationError(operation);
             }
 
             try {
-                // Dynamically invoke the mwbot CRUD function with the parameters from the job array
-                const response = await this[operation](pageName, job[2], job[3], job[4]);
+                const response = await BATCH_OPERATIONS[operation](this, pageName, job[2], job[3], job[4]);
                 currentCounter += 1;
 
                 let status = '[=] ';

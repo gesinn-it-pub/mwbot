@@ -123,11 +123,7 @@ describe('MWBot login()', function () {
 
     it('rejects with reason when login result is not Success', function () {
         const bot = new MWBot({ apiUrl: API_URL });
-        mockRawSequence(
-            bot,
-            { query: { tokens: { logintoken: 'abc123' } } },
-            { login: { result: 'WrongPassword' } }
-        );
+        mockRawSequence(bot, { query: { tokens: { logintoken: 'abc123' } } }, { login: { result: 'WrongPassword' } });
 
         return expect(bot.login({ username: 'Bot', password: 'wrong', apiUrl: API_URL })).to.be.rejectedWith(
             'Could not login: WrongPassword'
@@ -425,5 +421,40 @@ describe('MWBot createProtect() / editProtect()', function () {
             expect(response).to.have.nested.property('edit.new', '');
             expect(response).to.have.nested.property('edit.newrevid', 55);
         });
+    });
+});
+
+// ---------------------------------------------------------------------------
+// batch() operation whitelist
+// ---------------------------------------------------------------------------
+
+describe('MWBot batch() operations', function () {
+    it('rejects with an Error for an unsupported operation', async function () {
+        const bot = new MWBot({ apiUrl: API_URL, silent: true });
+
+        await expect(bot.batch([['noSuchOperation', 'TestPage']])).to.be.rejectedWith(
+            'Unsupported operation: noSuchOperation'
+        );
+    });
+
+    it('does not allow invoking methods that are not batch operations', async function () {
+        const bot = new MWBot({ apiUrl: API_URL, silent: true });
+
+        await expect(bot.batch([['logout', 'TestPage']])).to.be.rejectedWith('Unsupported operation: logout');
+        await expect(bot.batch([['constructor', 'TestPage']])).to.be.rejectedWith('Unsupported operation: constructor');
+    });
+
+    it('invokes a supported operation with the job arguments', async function () {
+        const bot = new MWBot({ apiUrl: API_URL, silent: true });
+        const calls = [];
+        bot.delete = async (...args) => {
+            calls.push(args);
+            return { delete: { title: args[0] } };
+        };
+
+        const results = await bot.batch([['delete', 'TestPage', 'some reason']]);
+
+        expect(calls).to.deep.equal([['TestPage', 'some reason', undefined, undefined]]);
+        expect(results).to.have.nested.property('delete.TestPage.delete.title', 'TestPage');
     });
 });
