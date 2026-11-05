@@ -33,18 +33,33 @@
 
 Reine Refactorings ohne Verhaltensänderung, in kleinen Commits, nach jedem Schritt Testlauf.
 
-## Phase 4 – Major-Release 3.0.0 (breaking, gebündelt) (#84)
+## Phase 4 – Major-Release 3.0.0: ESM-only, Node ≥ 22 (breaking) (#84)
 
 - ESM: `"type": "module"`, alle `require()` → `import`, `eslint.config.js` auf ESM
-- `engines` auf `>=22` (Node 20 ist seit April 2026 EOL)
-- formatversion=2 als Standard (#3)
-- danach ESM-only-Dependencies möglich (z. B. `chai-as-promised` 8)
-- Migrationshinweise in README/Release Notes
+- Nur ESM, kein Dual-Package. `exports`-Feld und zusätzlich `export { MWBot as 'module.exports' }`, damit
+  `const MWBot = require('mwbot')` (inkl. `MWBot.logStatus`) ab Node 22.12 weiter die Klasse liefert
+- Prüfen, dass `require('mwbot')` unter Node 22.12+ keine ExperimentalWarning auf stderr ausgibt
+- `engines` auf `>=22` (Node 20 ist seit April 2026 EOL); `require()` erst ab 22.12 dokumentieren
+- Option-Namen (Bot- und Request-Optionen) bleiben stabil
+- danach ESM-only-Dependencies möglich (`p-map` 7, `chai-as-promised` 8), Dependabot-Ignore für `p-map` entfernen
+- README, `examples/` und Release Notes (Migrationshinweise) aktualisieren
+- vorher Wartungszweig `2.x` für Sicherheitsfixes anlegen
+- vorab `3.0.0-rc.1` veröffentlichen, damit abhängige Projekte dagegen testen können
 - JSDoc verbessern oder vollständige `.d.ts` generieren
 
-## Phase 5 – Features (MINOR, additiv)
+## Phase 5 – formatversion=2 (breaking, getrennt von ESM) (#3)
 
-Nach Phase 3, unabhängig von Phase 4 releasebar. Zuerst kleine Änderungen mit klarem Nutzen:
+formatversion=2 ändert die Antwortstruktur (`query.pages` als Array statt Objekt, `missing: true` statt `''`,
+Revisionsinhalt unter `content` statt `*`) und bricht abhängige Projekte still. Deshalb nicht in 3.0.0, damit
+sich Fehler nicht überlagern.
+
+- zuerst eine Option, mit der die Format-Version explizit gesetzt werden kann (Default bleibt 1)
+- konkrete Feldänderungen im Changelog dokumentieren
+- Default erst in einem eigenen Major umstellen
+
+## Phase 6 – Features (MINOR, additiv)
+
+Nach Phase 3, unabhängig von Phase 4 und 5 releasebar. Zuerst kleine Änderungen mit klarem Nutzen:
 
 - `assert`-Parameter (#72), `move()`-Optionen (#63)
 - `edit()`: Section-Editing, `appendtext`/`prependtext`, Konflikt-Erkennung (#64, #65, #66)
@@ -59,6 +74,7 @@ Nach Phase 3, unabhängig von Phase 4 releasebar. Zuerst kleine Änderungen mit 
 |---|---|---|---|
 | 1 – Toolchain | minimal | PATCH | ✅ 2.2.0 |
 | 2 – fetch + p-map | mittel (HTTP/Cookie) | PATCH | ✅ 2.2.0 |
-| 3 – async/await, batch-Map | gering | PATCH/MINOR | offen |
-| 4 – ESM, Node ≥ 22, formatversion=2 | hoch für Nutzer | MAJOR (3.0.0) | offen |
-| 5 – Features | gering | MINOR | offen |
+| 3 – async/await, batch-Map, Modulaufteilung | gering | MINOR | ✅ 2.4.0 |
+| 4 – ESM-only, Node ≥ 22 | hoch für Nutzer | MAJOR (3.0.0) | offen |
+| 5 – formatversion=2 | hoch (stille Fehler) | MAJOR | offen |
+| 6 – Features | gering | MINOR | offen |
