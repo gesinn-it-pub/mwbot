@@ -17,3 +17,23 @@ updates:
       interval: "weekly"
     commit-message:
       prefix: "ci(github)"
+
+  # Maintenance branch 2.x (CommonJS): only minor and patch updates, no major upgrades
+  - package-ecosystem: "npm"
+    directory: "/"
+    target-branch: "2.x"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "deps"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: "2.x"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "ci(github)"
