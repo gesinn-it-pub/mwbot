@@ -1,14 +1,11 @@
-'use strict';
+import MWBot from '../../src/index.js';
 
-const MWBot = require('../../src/');
-
-const chai = require('chai');
+import chai from 'chai';
 const expect = chai.expect;
 
-const loginCredentials = require('../helpers/credentials');
+import loginCredentials from '../helpers/credentials.js';
 
 describe('MWBot Read', function () {
-    'use strict';
     this.timeout(10000);
 
     it('successfully reads a page with read()', async function () {

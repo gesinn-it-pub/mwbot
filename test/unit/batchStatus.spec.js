@@ -1,8 +1,7 @@
-'use strict';
+import chai from 'chai';
+const { expect } = chai;
 
-const { expect } = require('chai');
-
-const { statusForResponse, statusForError } = require('../../src/batchStatus');
+import { statusForResponse, statusForError } from '../../src/batchStatus.js';
 
 describe('batchStatus statusForResponse()', function () {
     it('reports a deleted page', function () {

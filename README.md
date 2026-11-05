@@ -18,14 +18,17 @@ The library also lets you freely choose the abstraction/convenience level on whi
 You can use convenience functions that bundles (with concurrency) multiple API requests into one function,
 but you can also handcraft your own custom MediaWiki API and pure HTTP requests.
 
-**Requirements:** Node.js ≥ 20, MediaWiki ≥ 1.39.
+**Requirements:** Node.js ≥ 22.13, MediaWiki ≥ 1.39.
+
+mwbot is an ES module. Use `import MWBot from 'mwbot';`. In CommonJS code on Node.js ≥ 22.13,
+`const MWBot = require('mwbot');` returns the same class.
 
 ## Documentation
 Since this library is based on promise, it can be used either via the promise notation, or using async/await.
 
 ### Typical Example (Promise .then/.catch)
 ```js
-const MWBot = require('mwbot');
+import MWBot from 'mwbot';
 
 let bot = new MWBot();
 

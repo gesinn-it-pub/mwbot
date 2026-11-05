@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Thrown by batch() when a job uses an operation that is not supported.
  */
@@ -10,4 +8,4 @@ class UnsupportedOperationError extends Error {
     }
 }
 
-module.exports = UnsupportedOperationError;
+export default UnsupportedOperationError;

@@ -1,11 +1,9 @@
-'use strict';
-
-const chai = require('chai');
-const chaiAsPromised = require('chai-as-promised');
+import chai from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-const MWBot = require('../../src/');
+import MWBot from '../../src/index.js';
 
 const API_URL = 'http://example.com/api.php';
 

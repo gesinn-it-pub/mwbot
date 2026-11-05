@@ -1,17 +1,16 @@
-'use strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import pMap from 'p-map';
+import { CookieJar } from 'tough-cookie';
+import semlog from 'semlog';
+import semver from 'semver';
+import packageJson from '../package.json' with { type: 'json' };
+import BATCH_OPERATIONS from './batchOperations.js';
+import UnsupportedOperationError from './UnsupportedOperationError.js';
+import pMapSeries from './pMapSeries.js';
+import { statusForResponse, statusForError } from './batchStatus.js';
 
-const fs = require('fs');
-const path = require('path');
-const pMap = require('p-map');
-const { CookieJar } = require('tough-cookie');
-const semlog = require('semlog');
-const semver = require('semver');
 const log = semlog.log;
-const packageJson = require('../package.json');
-const BATCH_OPERATIONS = require('./batchOperations');
-const UnsupportedOperationError = require('./UnsupportedOperationError');
-const pMapSeries = require('./pMapSeries');
-const { statusForResponse, statusForError } = require('./batchStatus');
 
 /**
  * MWBot, a Node.js module for interacting with the MediaWiki API.
@@ -1132,4 +1131,4 @@ MWBot.map = pMap;
  */
 MWBot.mapSeries = pMapSeries;
 
-module.exports = MWBot;
+export default MWBot;

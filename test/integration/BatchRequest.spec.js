@@ -1,11 +1,9 @@
-'use strict';
+import MWBot from '../../src/index.js';
 
-const MWBot = require('../../src/');
-
-const chai = require('chai');
+import chai from 'chai';
 const expect = chai.expect;
 
-const loginCredentials = require('../helpers/credentials');
+import loginCredentials from '../helpers/credentials.js';
 
 describe('MWBot Batch Request', function () {
     this.timeout(50000);
@@ -93,15 +91,15 @@ describe('MWBot Batch Request', function () {
 
         const response = await bot.batch({
             upload: [
-                __dirname + '/../mocking/example1.png',
-                __dirname + '/../mocking/example2.png',
-                __dirname + '/../mocking/example3.png',
-                __dirname + '/../mocking/NonExistingImage.png',
+                import.meta.dirname + '/../mocking/example1.png',
+                import.meta.dirname + '/../mocking/example2.png',
+                import.meta.dirname + '/../mocking/example3.png',
+                import.meta.dirname + '/../mocking/NonExistingImage.png',
             ],
             uploadOverwrite: {
-                'ExampleImage1.png': __dirname + '/../mocking/example1.png',
-                'ExampleImage2.png': __dirname + '/../mocking/example2.png',
-                'ExampleImage3.png': __dirname + '/../mocking/example3.png',
+                'ExampleImage1.png': import.meta.dirname + '/../mocking/example1.png',
+                'ExampleImage2.png': import.meta.dirname + '/../mocking/example2.png',
+                'ExampleImage3.png': import.meta.dirname + '/../mocking/example3.png',
             },
         });
 

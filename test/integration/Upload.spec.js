@@ -1,15 +1,11 @@
-'use strict';
+import MWBot from '../../src/index.js';
 
-const MWBot = require('../../src/');
-//const log = require('semlog').log;
-
-const chai = require('chai');
+import chai from 'chai';
 const expect = chai.expect;
 
-const loginCredentials = require('../helpers/credentials');
+import loginCredentials from '../helpers/credentials.js';
 
 describe('MWBot Upload', function () {
-    'use strict';
     this.timeout(20000);
 
     it('successfully uploads and overwrites an image with uploadOverwrite()', async function () {
@@ -27,7 +23,7 @@ describe('MWBot Upload', function () {
         // upload
         const r3 = await bot.uploadOverwrite(
             'ExampleImage.png',
-            __dirname + '/../mocking/example2.png',
+            import.meta.dirname + '/../mocking/example2.png',
             'Test Reasons'
         );
         expect(r3.upload.result).to.equal('Success');
@@ -38,7 +34,11 @@ describe('MWBot Upload', function () {
         let result;
         let error;
         try {
-            result = await bot.upload('ExampleImage.png', __dirname + '/../mocking/example2.png', 'Test Reasons');
+            result = await bot.upload(
+                'ExampleImage.png',
+                import.meta.dirname + '/../mocking/example2.png',
+                'Test Reasons'
+            );
         } catch (err) {
             error = err;
         }
@@ -64,7 +64,7 @@ describe('MWBot Upload', function () {
         }
 
         // upload
-        const r4 = await bot.upload(false, __dirname + '/../mocking/example2.png', 'Test Reasons');
+        const r4 = await bot.upload(false, import.meta.dirname + '/../mocking/example2.png', 'Test Reasons');
         expect(r4.upload.result).to.equal('Success');
         expect(r4.warnings).to.equal(undefined);
     });
@@ -76,7 +76,7 @@ describe('MWBot Upload', function () {
 
         // upload
         await expect(
-            bot.upload(false, __dirname + '/../mocking/non-existing-file.png', 'Test Reasons')
+            bot.upload(false, import.meta.dirname + '/../mocking/non-existing-file.png', 'Test Reasons')
         ).to.be.rejectedWith('ENOENT');
     });
 });

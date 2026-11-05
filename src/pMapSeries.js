@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Maps over an iterable sequentially, awaiting each item before starting the next.
  *
@@ -15,4 +13,4 @@ async function pMapSeries(iterable, mapper) {
     return results;
 }
 
-module.exports = pMapSeries;
+export default pMapSeries;

@@ -1,7 +1,6 @@
-'use strict';
-
-const MWBot = require('../../src/');
-const expect = require('chai').expect;
+import MWBot from '../../src/index.js';
+import chai from 'chai';
+const { expect } = chai;
 
 describe('MWBot', function () {
     it('can be constructed', function () {

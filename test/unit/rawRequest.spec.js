@@ -1,12 +1,10 @@
-'use strict';
-
-const http = require('http');
-const chai = require('chai');
-const chaiAsPromised = require('chai-as-promised');
+import http from 'node:http';
+import chai from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-const MWBot = require('../../src/');
+import MWBot from '../../src/index.js';
 
 describe('MWBot rawRequest()', function () {
     let server;

@@ -1,10 +1,8 @@
-'use strict';
-
 /**
  * Operations that can be used in batch() jobs, mapped to the bot method they invoke.
  * The job array supplies the method arguments: [operation, ...args].
  */
-module.exports = {
+const BATCH_OPERATIONS = {
     create: (bot, ...args) => bot.create(...args),
     createProtect: (bot, ...args) => bot.createProtect(...args),
     read: (bot, ...args) => bot.read(...args),
@@ -21,3 +19,5 @@ module.exports = {
     upload: (bot, ...args) => bot.upload(...args),
     uploadOverwrite: (bot, ...args) => bot.uploadOverwrite(...args),
 };
+
+export default BATCH_OPERATIONS;

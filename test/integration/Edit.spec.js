@@ -1,16 +1,12 @@
-'use strict';
+import MWBot from '../../src/index.js';
+import crypto from 'node:crypto';
 
-const MWBot = require('../../src/');
-//const log = require('semlog').log;
-const crypto = require('crypto');
-
-const chai = require('chai');
+import chai from 'chai';
 const expect = chai.expect;
 
-const loginCredentials = require('../helpers/credentials');
+import loginCredentials from '../helpers/credentials.js';
 
 describe('MWBot Edit', function () {
-    'use strict';
     this.timeout(10000);
 
     it('successfully creates a page with edit()', async function () {

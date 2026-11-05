@@ -1,9 +1,9 @@
 // Usage: WP_USER=MyBot WP_PASSWORD=secret node edit-page.js
 
 // use this line instead in your own bot
-// const MWBot = require('mwbot');
+// import MWBot from 'mwbot';
 
-const MWBot = require('../src/index');
+import MWBot from '../src/index.js';
 
 const botUserName = process.env.WP_USER ?? '<WP username of your bot>';
 const botPassword = process.env.WP_PASSWORD ?? '<WP password of your bot>';

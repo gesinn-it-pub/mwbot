@@ -1,13 +1,9 @@
-'use strict';
+import MWBot from '../../src/index.js';
 
-const MWBot = require('../../src/');
-
-const chai = require('chai');
+import chai from 'chai';
 const expect = chai.expect;
 
 describe('MWBot ASK Query Request', function () {
-    'use strict';
-
     it('queries semantic-mediawiki for cities', async function () {
         this.timeout(8000);
 

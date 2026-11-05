@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Determines the log status of a successful batch job.
  *
@@ -74,4 +72,4 @@ function statusForError(err) {
     return { status, reason, fatal };
 }
 
-module.exports = { statusForResponse, statusForError };
+export { statusForResponse, statusForError };

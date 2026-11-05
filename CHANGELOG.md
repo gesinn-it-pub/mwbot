@@ -6,6 +6,10 @@ This project adheres to [Semantic Versioning](https://semver.org/) and
 
 ## [Unreleased]
 
+### Breaking Changes
+- mwbot is now an ES module (`import MWBot from 'mwbot'`). `require('mwbot')` keeps returning the class on Node.js 22.13 and later
+- Require Node.js 22.13 or later (was 20)
+
 ## [2.4.0] - 2026-11-05
 
 Modernizes the internals and tightens `batch()`. The public API is otherwise unchanged.

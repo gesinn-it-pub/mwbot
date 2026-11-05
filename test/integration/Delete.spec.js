@@ -1,16 +1,12 @@
-'use strict';
+import MWBot from '../../src/index.js';
+import crypto from 'node:crypto';
 
-const MWBot = require('../../src/');
-const crypto = require('crypto');
-//const log = require('semlog').log;
-
-const chai = require('chai');
+import chai from 'chai';
 const expect = chai.expect;
 
-const loginCredentials = require('../helpers/credentials');
+import loginCredentials from '../helpers/credentials.js';
 
 describe('MWBot Delete', function () {
-    'use strict';
     this.timeout(10000);
 
     it('successfully deletes a page with delete()', async function () {

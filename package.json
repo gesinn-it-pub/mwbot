@@ -2,12 +2,17 @@
   "name": "mwbot",
   "version": "2.4.0",
   "description": "A simple, flexible MediaWiki Bot",
+  "type": "module",
   "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./package.json": "./package.json"
+  },
   "directories": {
     "test": "test"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.13.0"
   },
   "dependencies": {
     "p-map": "^4.0.0",
@@ -36,8 +41,8 @@
     "test:coverage": "c8 mocha 'test/unit/**/*.spec.js' 'test/integration/**/*.spec.js'"
   },
   "mocha": {
-    "require": [
-      "test/helpers/setup.js"
+    "import": [
+      "./test/helpers/setup.js"
     ],
     "timeout": 16000,
     "reporter": "spec"

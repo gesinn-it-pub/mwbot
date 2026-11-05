@@ -1,11 +1,9 @@
-'use strict';
-
-const MWBot = require('../../src/');
-const chai = require('chai');
+import MWBot from '../../src/index.js';
+import chai from 'chai';
 const expect = chai.expect;
-const semver = require('semver');
+import semver from 'semver';
 
-const loginCredentials = require('../helpers/credentials');
+import loginCredentials from '../helpers/credentials.js';
 
 describe('MWBot Login', function () {
     this.timeout(10000);

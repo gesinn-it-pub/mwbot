@@ -1,16 +1,13 @@
-'use strict';
+import MWBot from '../../src/index.js';
+import semlog from 'semlog';
+const log = semlog.log;
 
-const MWBot = require('../../src/');
-const log = require('semlog').log;
-
-const chai = require('chai');
+import chai from 'chai';
 const expect = chai.expect;
 
-const loginCredentials = require('../helpers/credentials');
+import loginCredentials from '../helpers/credentials.js';
 
 describe('MWBot advanced requests', function () {
-    'use strict';
-
     //////////////////////////////////////////
     // SUCESSFULL                           //
     //////////////////////////////////////////
