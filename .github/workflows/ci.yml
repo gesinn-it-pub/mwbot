@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Run CI
         run: MW_VERSION=${{ matrix.mw }} PHP_VERSION=${{ matrix.php }} NODE_VERSION=${{ matrix.node }} make ci
