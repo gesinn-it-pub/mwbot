@@ -36,14 +36,16 @@ Reine Refactorings ohne Verhaltensänderung, in kleinen Commits, nach jedem Schr
 ## Phase 4 – Major-Release 3.0.0: ESM-only, Node ≥ 22 (breaking) (#84)
 
 - ESM: `"type": "module"`, alle `require()` → `import`, `eslint.config.js` auf ESM
-- Nur ESM, kein Dual-Package. `exports`-Feld und zusätzlich `export { MWBot as 'module.exports' }`, damit
-  `const MWBot = require('mwbot')` (inkl. `MWBot.logStatus`) ab Node 22.12 weiter die Klasse liefert
-- Prüfen, dass `require('mwbot')` unter Node 22.12+ keine ExperimentalWarning auf stderr ausgibt
-- `engines` auf `>=22` (Node 20 ist seit April 2026 EOL); `require()` erst ab 22.12 dokumentieren
+- Nur ESM, kein Dual-Package. `exports`-Feld, dazu drei Exports: `export class MWBot` (named), `export default MWBot`
+  und `export { MWBot as 'module.exports' }`, damit sowohl `import MWBot from 'mwbot'` als auch
+  `const MWBot = require('mwbot')` (inkl. `MWBot.logStatus` und Prototype-Stubs) die Klasse liefern
+- Geprüft (22.12, 22.13, 22.23, 24.22): `require()` liefert die Klasse; nur Node 22.12.0 gibt eine
+  ExperimentalWarning auf stderr aus, ab 22.13 nicht mehr
+- `engines` auf `>=22.13` (Node 20 ist seit April 2026 EOL); `require()` ohne Warnung erst ab 22.13 dokumentieren
 - Option-Namen (Bot- und Request-Optionen) bleiben stabil
 - danach ESM-only-Dependencies möglich (`p-map` 7, `chai-as-promised` 8), Dependabot-Ignore für `p-map` entfernen
 - README, `examples/` und Release Notes (Migrationshinweise) aktualisieren
-- vorher Wartungszweig `2.x` für Sicherheitsfixes anlegen
+- Wartungszweig `2.x` für Sicherheitsfixes ist angelegt (Stand nach 2.4.0)
 - vorab `3.0.0-rc.1` veröffentlichen, damit abhängige Projekte dagegen testen können
 - JSDoc verbessern oder vollständige `.d.ts` generieren
 
