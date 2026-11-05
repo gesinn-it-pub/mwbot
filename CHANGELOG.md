@@ -6,6 +6,10 @@ This project adheres to [Semantic Versioning](https://semver.org/) and
 
 ## [Unreleased]
 
+## [3.0.0-rc.1] - 2026-11-05
+
+Release candidate for 3.0.0. mwbot is now an ES module and requires Node.js 22.13 or later. Please test it before the final release: `npm install mwbot@next`.
+
 ### Breaking Changes
 - mwbot is now an ES module (`import MWBot from 'mwbot'`). `require('mwbot')` keeps returning the class on Node.js 22.13 and later [`657bb79`](https://github.com/gesinn-it-pub/mwbot/commit/657bb79) ([#84](https://github.com/gesinn-it-pub/mwbot/issues/84))
 - Require Node.js 22.13 or later (was 20) [`657bb79`](https://github.com/gesinn-it-pub/mwbot/commit/657bb79) ([#84](https://github.com/gesinn-it-pub/mwbot/issues/84))
@@ -26,5 +30,6 @@ Modernizes the internals and tightens `batch()`. The public API is otherwise unc
 ### Fixed
 - Stop printing the edit token to the console when a batch job fails with `badtoken` [`db2ad4f`](https://github.com/gesinn-it-pub/mwbot/commit/db2ad4f)
 
-[Unreleased]: https://github.com/gesinn-it-pub/mwbot/compare/2.4.0...HEAD
+[Unreleased]: https://github.com/gesinn-it-pub/mwbot/compare/3.0.0-rc.1...HEAD
+[3.0.0-rc.1]: https://github.com/gesinn-it-pub/mwbot/compare/2.4.0...3.0.0-rc.1
 [2.4.0]: https://github.com/gesinn-it-pub/mwbot/compare/2.3.3...2.4.0
