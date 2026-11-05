@@ -11,7 +11,7 @@ This project adheres to [Semantic Versioning](https://semver.org/) and
 - Require Node.js 22.13 or later (was 20) [`657bb79`](https://github.com/gesinn-it-pub/mwbot/commit/657bb79) ([#84](https://github.com/gesinn-it-pub/mwbot/issues/84))
 
 ### Changed
-- Bump p-map from 4.0.0 to 7.1.1; it is exposed as `MWBot.map`
+- Bump p-map from 4.0.0 to 7.1.1; it is exposed as `MWBot.map` [`34c7545`](https://github.com/gesinn-it-pub/mwbot/commit/34c7545)
 
 ## [2.4.0] - 2026-11-05
 
