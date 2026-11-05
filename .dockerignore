@@ -1,0 +1,8 @@
+# Do not copy host artifacts into the image: dependencies are installed
+# inside the image, and a host node_modules would overwrite them.
+node_modules
+coverage
+.git
+.idea
+npm-debug.log
+package-lock.json
