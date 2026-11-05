@@ -42,24 +42,15 @@ describe('MWBot Read', function () {
         }
     });
 
-    it('successfully reads a page read() with stacked promises', function () {
+    it('successfully reads a page read() with a custom timeout', async function () {
         this.timeout(3000);
         const bot = new MWBot();
 
-        bot.login(loginCredentials.valid)
-            .then(() => {
-                bot.read('Test Page', { timeout: 8000 })
-                    .then((response) => {
-                        expect(response).to.have.any.keys('query');
-                        expect(response.query).to.have.any.keys('pages');
-                    })
-                    .catch((err) => {
-                        log(err);
-                    });
-            })
-            .catch((err) => {
-                log(err);
-            });
+        await bot.login(loginCredentials.valid);
+        const response = await bot.read('Test Page', undefined, { timeout: 8000 });
+
+        expect(response).to.have.any.keys('query');
+        expect(response.query).to.have.any.keys('pages');
     });
 
     it('successfully reads a page with readFromID()', async function () {

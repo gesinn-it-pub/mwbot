@@ -51,24 +51,34 @@ describe('MWBot Login', async function () {
         }
     });
 
-    it('aborts because of timeout', function () {
+    it('aborts because of timeout', async function () {
         const bot = new MWBot();
         bot.setGlobalRequestOptions({
             timeout: 1, // 1ms
         });
 
-        bot.login(loginCredentials.valid).catch((err) => {
-            expect(err).to.be.an.instanceof(Error);
-            expect(err.message).to.include('TIMEDOUT');
-        });
+        let error;
+        try {
+            await bot.login(loginCredentials.valid);
+        } catch (err) {
+            error = err;
+        }
+
+        expect(error).to.be.an.instanceof(Error);
+        expect(error.name).to.equal('AbortError');
     });
 
-    it('crashes with invalid API URL', function () {
+    it('crashes with invalid API URL', async function () {
         const bot = new MWBot();
 
-        bot.login(loginCredentials.invalidApiUrl).catch((err) => {
-            expect(err).to.be.an.instanceof(Error);
-        });
+        let error;
+        try {
+            await bot.login(loginCredentials.invalidApiUrl);
+        } catch (err) {
+            error = err;
+        }
+
+        expect(error).to.be.an.instanceof(Error);
     });
 
     it('succeeds and get edit token afterwards', async function () {

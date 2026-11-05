@@ -64,22 +64,14 @@ describe('MWBot Request', function () {
         }
     });
 
-    it('successfully updates a page with update()', function () {
+    it('successfully updates a page with update()', async function () {
         const bot = new MWBot();
 
-        bot.loginGetEditToken(loginCredentials.valid)
-            .then(() => {
-                return bot.edit('Test Page', '=Some more Wikitext=', 'Test Upload');
-            })
-            .then(() => {
-                return bot.update('Test Page', '=Some more Wikitext=');
-            })
-            .then((response) => {
-                expect(response.edit.result).to.equal('Success');
-                expect(bot.counter.fulfilled).to.equal(6);
-            })
-            .catch((err) => {
-                log(err);
-            });
+        await bot.loginGetEditToken(loginCredentials.valid);
+        await bot.edit('Test Page', '=Some more Wikitext=', 'Test Upload');
+        const response = await bot.update('Test Page', '=Some more Wikitext=');
+
+        expect(response.edit.result).to.equal('Success');
+        expect(bot.counter.fulfilled).to.equal(6);
     });
 });
