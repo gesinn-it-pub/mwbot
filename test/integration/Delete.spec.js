@@ -5,17 +5,8 @@ const MWBot = require('../../src/');
 
 const chai = require('chai');
 const expect = chai.expect;
-const assert = chai.assert;
 
-let loginCredentials = require('../mocking/loginCredentials.json');
-
-// use local login credentials if available
-try {
-    const loginCredentialsLocal = require('../mocking/loginCredentials.local.json');
-    if (loginCredentialsLocal) loginCredentials = loginCredentialsLocal;
-} catch {
-    //ignore
-}
+const loginCredentials = require('../helpers/credentials');
 
 describe('MWBot Delete', function () {
     'use strict';
@@ -28,14 +19,10 @@ describe('MWBot Delete', function () {
         await bot.loginGetEditToken(loginCredentials.valid);
         await bot.create(title, 'Test Page to be deleted.', 'Test');
 
-        try {
-            const r3 = await bot.delete('Page To Be Deleted', 'Delete Test');
-            expect(r3.delete.title).to.equal(title);
-            expect(r3.delete.logid).to.be.above(0);
-            expect(JSON.stringify(r3.warnings)).to.not.exist;
-        } catch (err) {
-            assert.fail(err, 'Success', err);
-        }
+        const r3 = await bot.delete('Page To Be Deleted', 'Delete Test');
+        expect(r3.delete.title).to.equal(title);
+        expect(r3.delete.logid).to.be.above(0);
+        expect(r3.warnings).to.equal(undefined);
     });
 
     it('rejects deleting a non-existing page with delete()', async function () {
@@ -43,13 +30,10 @@ describe('MWBot Delete', function () {
 
         await bot.loginGetEditToken(loginCredentials.valid);
 
-        try {
-            await bot.delete('Non-Existing Page', 'Delete Test');
-            throw new Error('other error');
-        } catch (err) {
-            const expected = 'missingtitle';
-            assert.equal(err.code, expected, err.code + ': ' + err.info + '\n\n' + err.response + '\n');
-        }
+        await expect(bot.delete('Non-Existing Page', 'Delete Test')).to.be.rejected.and.eventually.have.property(
+            'code',
+            'missingtitle'
+        );
     });
 
     it('rejects deleting a Special page with delete()', async function () {
@@ -57,12 +41,9 @@ describe('MWBot Delete', function () {
 
         await bot.loginGetEditToken(loginCredentials.valid);
 
-        try {
-            await bot.delete('Special:RecentChanges', 'Delete Test');
-            throw new Error('other error');
-        } catch (err) {
-            const expected = 'pagecannotexist';
-            assert.equal(err.code, expected, err.code + ': ' + err.info + '\n\n' + err.response + '\n');
-        }
+        await expect(bot.delete('Special:RecentChanges', 'Delete Test')).to.be.rejected.and.eventually.have.property(
+            'code',
+            'pagecannotexist'
+        );
     });
 });

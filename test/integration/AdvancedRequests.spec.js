@@ -6,7 +6,7 @@ const log = require('semlog').log;
 const chai = require('chai');
 const expect = chai.expect;
 
-const loginCredentials = require('../mocking/loginCredentials.json');
+const loginCredentials = require('../helpers/credentials');
 
 describe('MWBot advanced requests', function () {
     'use strict';

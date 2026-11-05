@@ -4,17 +4,8 @@ const MWBot = require('../../src/');
 
 const chai = require('chai');
 const expect = chai.expect;
-const assert = chai.assert;
 
-let loginCredentials = require('../mocking/loginCredentials.json');
-
-// use local login credentials if available
-try {
-    const loginCredentialsLocal = require('../mocking/loginCredentials.local.json');
-    if (loginCredentialsLocal) loginCredentials = loginCredentialsLocal;
-} catch {
-    //ignore
-}
+const loginCredentials = require('../helpers/credentials');
 
 describe('MWBot Request', function () {
     'use strict';
@@ -29,18 +20,14 @@ describe('MWBot Request', function () {
 
         await bot.loginGetEditToken(loginCredentials.valid);
 
-        try {
-            const r2 = await bot.request({
-                action: 'edit',
-                title: 'Main_Page',
-                text: '=Some Wikitext 2=',
-                summary: 'Test Edit',
-                token: bot.editToken,
-            });
-            expect(r2.edit.result).to.equal('Success');
-        } catch (err) {
-            assert.fail(err, 'Success', err);
-        }
+        const r2 = await bot.request({
+            action: 'edit',
+            title: 'Main_Page',
+            text: '=Some Wikitext 2=',
+            summary: 'Test Edit',
+            token: bot.editToken,
+        });
+        expect(r2.edit.result).to.equal('Success');
     });
 
     it('successfully updates a page with update()', async function () {

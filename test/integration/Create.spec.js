@@ -7,17 +7,8 @@ const semver = require('semver');
 
 const chai = require('chai');
 const expect = chai.expect;
-const assert = chai.assert;
 
-let loginCredentials = require('../mocking/loginCredentials.json');
-
-// use local login credentials if available
-try {
-    const loginCredentialsLocal = require('../mocking/loginCredentials.local.json');
-    if (loginCredentialsLocal) loginCredentials = loginCredentialsLocal;
-} catch {
-    //ignore
-}
+const loginCredentials = require('../helpers/credentials');
 
 describe('MWBot Create', function () {
     'use strict';
@@ -28,17 +19,13 @@ describe('MWBot Create', function () {
 
         await bot.loginGetEditToken(loginCredentials.valid);
 
-        try {
-            const r = await bot.create(
-                crypto.randomBytes(20).toString('hex'),
-                '=Some more Wikitext= [[Category:Test Page]]',
-                'Test'
-            );
-            expect(r.edit.result).to.equal('Success');
-            expect(JSON.stringify(r.warnings)).to.not.exist;
-        } catch (err) {
-            assert.fail(err, 'Success', err);
-        }
+        const r = await bot.create(
+            crypto.randomBytes(20).toString('hex'),
+            '=Some more Wikitext= [[Category:Test Page]]',
+            'Test'
+        );
+        expect(r.edit.result).to.equal('Success');
+        expect(r.warnings).to.equal(undefined);
     });
 
     it('rejects creating an existing page with create()', async function () {
@@ -47,25 +34,14 @@ describe('MWBot Create', function () {
         await bot.loginGetEditToken(loginCredentials.valid);
         const title = crypto.randomBytes(20).toString('hex');
 
-        try {
-            const r1 = await bot.create(title, 'Create Test', 'Test');
-            expect(r1.edit.result).to.equal('Success');
-            expect(JSON.stringify(r1.warnings)).to.not.exist;
-        } catch (err) {
-            assert.fail(err, 'Success', err);
-        }
+        const r1 = await bot.create(title, 'Create Test', 'Test');
+        expect(r1.edit.result).to.equal('Success');
+        expect(r1.warnings).to.equal(undefined);
 
-        try {
-            await bot.create(title, 'Create Test', 'Test');
-            throw new Error('other error');
-        } catch (err) {
-            let expected;
-            if (semver.gte(bot.mwversion, '1.43.0')) {
-                expected = 'articleexists: The page you tried to create has been created already.';
-            } else {
-                expected = 'articleexists: The article you tried to create has been created already.';
-            }
-            assert.equal(err.message, expected);
-        }
+        const expected = semver.gte(bot.mwversion, '1.43.0')
+            ? 'articleexists: The page you tried to create has been created already.'
+            : 'articleexists: The article you tried to create has been created already.';
+
+        await expect(bot.create(title, 'Create Test', 'Test')).to.be.rejectedWith(expected);
     });
 });

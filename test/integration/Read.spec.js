@@ -1,21 +1,11 @@
 'use strict';
 
 const MWBot = require('../../src/');
-const log = require('semlog').log;
 
 const chai = require('chai');
 const expect = chai.expect;
-const assert = chai.assert;
 
-let loginCredentials = require('../mocking/loginCredentials.json');
-
-// use local login credentials if available
-try {
-    const loginCredentialsLocal = require('../mocking/loginCredentials.local.json');
-    if (loginCredentialsLocal) loginCredentials = loginCredentialsLocal;
-} catch {
-    //ignore
-}
+const loginCredentials = require('../helpers/credentials');
 
 describe('MWBot Read', function () {
     'use strict';
@@ -26,20 +16,15 @@ describe('MWBot Read', function () {
 
         await bot.login(loginCredentials.valid);
 
-        try {
-            const r2 = await bot.read('Main Page');
-            // log(r2);
-            expect(r2).to.have.any.keys('query');
-            expect(r2.query).to.have.any.keys('pages');
-            expect(Object.keys(r2.query.pages).length).to.equal(1);
-            expect(r2.query.pages).to.have.any.keys('1');
-            expect(r2.query.pages['1']).to.have.any.keys('revisions');
-            expect(JSON.stringify(r2.warnings)).to.not.exist;
-            // log('Fetched Content:\n' + r2.query.pages['1']['revisions'][0]['*']);
-        } catch (err) {
-            log(err);
-            assert.fail(err, 'Success', err);
-        }
+        const r2 = await bot.read('Main Page');
+        // log(r2);
+        expect(r2).to.have.any.keys('query');
+        expect(r2.query).to.have.any.keys('pages');
+        expect(Object.keys(r2.query.pages).length).to.equal(1);
+        expect(r2.query.pages).to.have.any.keys('1');
+        expect(r2.query.pages['1']).to.have.any.keys('revisions');
+        expect(r2.warnings).to.equal(undefined);
+        // log('Fetched Content:\n' + r2.query.pages['1']['revisions'][0]['*']);
     });
 
     it('successfully reads a page read() with a custom timeout', async function () {
@@ -58,20 +43,15 @@ describe('MWBot Read', function () {
 
         await bot.login(loginCredentials.valid);
 
-        try {
-            const r2 = await bot.readFromID(1);
-            // log(r2);
-            expect(r2).to.have.any.keys('query');
-            expect(r2.query).to.have.any.keys('pages');
-            expect(Object.keys(r2.query.pages).length).to.equal(1);
-            expect(r2.query.pages).to.have.any.keys('1');
-            expect(r2.query.pages['1']).to.have.any.keys('revisions');
-            expect(JSON.stringify(r2.warnings)).to.not.exist;
-            // log('Fetched Content:\n' + r2.query.pages['1']['revisions'][0]['*']);
-        } catch (err) {
-            log(err);
-            assert.fail(err, 'Success', err);
-        }
+        const r2 = await bot.readFromID(1);
+        // log(r2);
+        expect(r2).to.have.any.keys('query');
+        expect(r2.query).to.have.any.keys('pages');
+        expect(Object.keys(r2.query.pages).length).to.equal(1);
+        expect(r2.query.pages).to.have.any.keys('1');
+        expect(r2.query.pages['1']).to.have.any.keys('revisions');
+        expect(r2.warnings).to.equal(undefined);
+        // log('Fetched Content:\n' + r2.query.pages['1']['revisions'][0]['*']);
     });
 
     it('successfully reads multiple pages with read()', async function () {
@@ -79,15 +59,11 @@ describe('MWBot Read', function () {
 
         await bot.login(loginCredentials.valid);
 
-        try {
-            const r2 = await bot.read('Main_Page|MediaWiki:Sidebar');
-            expect(r2).to.have.any.keys('query');
-            expect(r2.query).to.have.any.keys('pages');
-            expect(Object.keys(r2.query.pages).length).to.equal(2);
-            expect(JSON.stringify(r2.warnings)).to.not.exist;
-        } catch (err) {
-            assert.fail(err, 'Success', err);
-        }
+        const r2 = await bot.read('Main_Page|MediaWiki:Sidebar');
+        expect(r2).to.have.any.keys('query');
+        expect(r2.query).to.have.any.keys('pages');
+        expect(Object.keys(r2.query.pages).length).to.equal(2);
+        expect(r2.warnings).to.equal(undefined);
     });
 
     it('rejects reading a non-existing page with read()', async function () {
@@ -95,16 +71,11 @@ describe('MWBot Read', function () {
 
         await bot.login(loginCredentials.valid);
 
-        try {
-            const r2 = await bot.read('Non-Existing Page');
-            expect(r2).to.have.any.keys('query');
-            expect(r2.query).to.have.any.keys('pages');
-            expect(Object.keys(r2.query.pages).length).to.equal(1);
-            expect(r2.query.pages).to.have.any.keys('-1');
-            expect(JSON.stringify(r2.warnings)).to.not.exist;
-        } catch (err) {
-            log(err);
-            assert.fail(err, 'Success', err);
-        }
+        const r2 = await bot.read('Non-Existing Page');
+        expect(r2).to.have.any.keys('query');
+        expect(r2.query).to.have.any.keys('pages');
+        expect(Object.keys(r2.query.pages).length).to.equal(1);
+        expect(r2.query.pages).to.have.any.keys('-1');
+        expect(r2.warnings).to.equal(undefined);
     });
 });

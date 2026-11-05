@@ -5,17 +5,8 @@ const MWBot = require('../../src/');
 
 const chai = require('chai');
 const expect = chai.expect;
-const assert = chai.assert;
 
-let loginCredentials = require('../mocking/loginCredentials.json');
-
-// use local login credentials if available
-try {
-    const loginCredentialsLocal = require('../mocking/loginCredentials.local.json');
-    if (loginCredentialsLocal) loginCredentials = loginCredentialsLocal;
-} catch {
-    //ingore
-}
+const loginCredentials = require('../helpers/credentials');
 
 describe('MWBot Upload', function () {
     'use strict';
@@ -34,25 +25,28 @@ describe('MWBot Upload', function () {
         }
 
         // upload
-        try {
-            const r3 = await bot.uploadOverwrite(
-                'ExampleImage.png',
-                __dirname + '/../mocking/example2.png',
-                'Test Reasons'
-            );
-            expect(r3.upload.result).to.equal('Success');
-            expect(JSON.stringify(r3.warnings)).to.not.exist;
-        } catch (err) {
-            assert.fail(err, 'Success', err);
-        }
+        const r3 = await bot.uploadOverwrite(
+            'ExampleImage.png',
+            __dirname + '/../mocking/example2.png',
+            'Test Reasons'
+        );
+        expect(r3.upload.result).to.equal('Success');
+        expect(r3.warnings).to.equal(undefined);
 
         // upload again expecting 'fileexists-no-change'
+        // (depending on the MediaWiki version, this is either an error or a plain success)
+        let result;
+        let error;
         try {
-            const r4 = await bot.upload('ExampleImage.png', __dirname + '/../mocking/example2.png', 'Test Reasons');
-            expect(r4.upload.result).to.equal('Success');
-            expect(JSON.stringify(r4.warnings)).to.not.exist;
+            result = await bot.upload('ExampleImage.png', __dirname + '/../mocking/example2.png', 'Test Reasons');
         } catch (err) {
-            expect(err.code).to.equal('fileexists-no-change');
+            error = err;
+        }
+        if (error) {
+            expect(error.code).to.equal('fileexists-no-change');
+        } else {
+            expect(result.upload.result).to.equal('Success');
+            expect(result.warnings).to.equal(undefined);
         }
     });
 
@@ -70,13 +64,9 @@ describe('MWBot Upload', function () {
         }
 
         // upload
-        try {
-            const r4 = await bot.upload(false, __dirname + '/../mocking/example2.png', 'Test Reasons');
-            expect(r4.upload.result).to.equal('Success');
-            expect(JSON.stringify(r4.warnings)).to.not.exist;
-        } catch (err) {
-            assert.fail(err, 'Success', err);
-        }
+        const r4 = await bot.upload(false, __dirname + '/../mocking/example2.png', 'Test Reasons');
+        expect(r4.upload.result).to.equal('Success');
+        expect(r4.warnings).to.equal(undefined);
     });
 
     it('rejects to upload a non-existing file with upload()', async function () {
@@ -85,11 +75,8 @@ describe('MWBot Upload', function () {
         await bot.loginGetEditToken(loginCredentials.valid);
 
         // upload
-        try {
-            await bot.upload(false, __dirname + '/../mocking/non-existing-file.png', 'Test Reasons');
-        } catch (err) {
-            expect(err).to.be.an.instanceof(Error);
-            expect(err.message).to.include('ENOENT');
-        }
+        await expect(
+            bot.upload(false, __dirname + '/../mocking/non-existing-file.png', 'Test Reasons')
+        ).to.be.rejectedWith('ENOENT');
     });
 });

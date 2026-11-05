@@ -36,6 +36,9 @@
     "test:coverage": "c8 mocha 'test/unit/**/*.spec.js' 'test/integration/**/*.spec.js'"
   },
   "mocha": {
+    "require": [
+      "test/helpers/setup.js"
+    ],
     "timeout": 16000,
     "reporter": "spec"
   },

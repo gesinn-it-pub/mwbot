@@ -6,17 +6,8 @@ const crypto = require('crypto');
 
 const chai = require('chai');
 const expect = chai.expect;
-const assert = chai.assert;
 
-let loginCredentials = require('../mocking/loginCredentials.json');
-
-// use local login credentials if available
-try {
-    const loginCredentialsLocal = require('../mocking/loginCredentials.local.json');
-    if (loginCredentialsLocal) loginCredentials = loginCredentialsLocal;
-} catch {
-    //ignore
-}
+const loginCredentials = require('../helpers/credentials');
 
 describe('MWBot Edit', function () {
     'use strict';
@@ -28,13 +19,9 @@ describe('MWBot Edit', function () {
         await bot.loginGetEditToken(loginCredentials.valid);
         const title = crypto.randomBytes(20).toString('hex');
 
-        try {
-            const r2 = await bot.edit(title, '=Some Wikitext= [[Category:Test Page]]', 'Test');
-            expect(r2.edit.result).to.equal('Success');
-            expect(JSON.stringify(r2.warnings)).to.not.exist;
-        } catch (err) {
-            assert.fail(err, 'Success', err);
-        }
+        const r2 = await bot.edit(title, '=Some Wikitext= [[Category:Test Page]]', 'Test');
+        expect(r2.edit.result).to.equal('Success');
+        expect(r2.warnings).to.equal(undefined);
     });
 
     it('successfully edits an existing page with edit()', async function () {
@@ -43,31 +30,18 @@ describe('MWBot Edit', function () {
         await bot.loginGetEditToken(loginCredentials.valid);
         const title = crypto.randomBytes(20).toString('hex');
 
-        try {
-            const r2 = await bot.edit(title, 'Edit Test', 'Test');
-            expect(r2.edit.result).to.equal('Success');
-            expect(JSON.stringify(r2.warnings)).to.not.exist;
-        } catch (err) {
-            assert.fail(err, 'Success', err);
-        }
+        const r2 = await bot.edit(title, 'Edit Test', 'Test');
+        expect(r2.edit.result).to.equal('Success');
+        expect(r2.warnings).to.equal(undefined);
 
-        try {
-            const r3 = await bot.edit(title, 'Edit Test 2', 'Test');
-            expect(r3.edit.result).to.equal('Success');
-        } catch (err) {
-            assert.fail(err, 'Success', err);
-        }
+        const r3 = await bot.edit(title, 'Edit Test 2', 'Test');
+        expect(r3.edit.result).to.equal('Success');
     });
 
     it('rejects editing a page without providing API URL/login', async function () {
         const bot = new MWBot();
         const title = crypto.randomBytes(20).toString('hex');
 
-        try {
-            await bot.edit(title, 'Edit Test', 'Test');
-        } catch (err) {
-            expect(err).to.be.an.instanceof(Error);
-            expect(err.message).to.include('No URI');
-        }
+        await expect(bot.edit(title, 'Edit Test', 'Test')).to.be.rejectedWith('No URI');
     });
 });

@@ -1,20 +1,11 @@
 'use strict';
 
 const MWBot = require('../../src/');
-const log = require('semlog').log;
 
 const chai = require('chai');
 const expect = chai.expect;
 
-let loginCredentials = require('../mocking/loginCredentials.json');
-
-// use local login credentials if available
-try {
-    const loginCredentialsLocal = require('../mocking/loginCredentials.local.json');
-    if (loginCredentialsLocal) loginCredentials = loginCredentialsLocal;
-} catch {
-    //ignore
-}
+const loginCredentials = require('../helpers/credentials');
 
 describe('MWBot Batch Request', function () {
     this.timeout(50000);
@@ -139,30 +130,26 @@ describe('MWBot Batch Request', function () {
             // ignore
         }
 
-        try {
-            const response = await bot.batch(
-                [
-                    ['create', 'BatchRequestTestPage1', 'TestContent1', 'Batch Upload Reason'],
-                    ['create', 'BatchRequestTestPage2', 'TestContent2', 'Batch Upload Reason'],
-                    ['update', 'BatchRequestTestPage1', 'TestContent1-Update', 'Batch Upload Reason'],
-                    ['delete', 'BatchRequestTestPage2', 'Batch Upload Reason'],
-                    ['edit', 'BatchRequestTestPage2', 'TestContent2', 'Batch Upload Reason'],
-                ],
-                false,
-                1
-            );
+        const response = await bot.batch(
+            [
+                ['create', 'BatchRequestTestPage1', 'TestContent1', 'Batch Upload Reason'],
+                ['create', 'BatchRequestTestPage2', 'TestContent2', 'Batch Upload Reason'],
+                ['update', 'BatchRequestTestPage1', 'TestContent1-Update', 'Batch Upload Reason'],
+                ['delete', 'BatchRequestTestPage2', 'Batch Upload Reason'],
+                ['edit', 'BatchRequestTestPage2', 'TestContent2', 'Batch Upload Reason'],
+            ],
+            false,
+            1
+        );
 
-            expect(response).to.be.instanceof(Object);
-            expect(response.create).to.be.instanceof(Object);
-            expect(response.create.BatchRequestTestPage1).to.be.instanceof(Object);
-            expect(response.create.BatchRequestTestPage1.edit.result).to.equal('Success');
-            expect(response.update.BatchRequestTestPage1.edit.result).to.equal('Success');
-            expect(response.delete).to.be.instanceof(Object);
-            expect(response.delete.BatchRequestTestPage2.delete.title).to.equal('BatchRequestTestPage2');
-            expect(response.edit).to.be.instanceof(Object);
-            expect(response.create.BatchRequestTestPage2.edit.result).to.equal('Success');
-        } catch (err) {
-            log(err);
-        }
+        expect(response).to.be.instanceof(Object);
+        expect(response.create).to.be.instanceof(Object);
+        expect(response.create.BatchRequestTestPage1).to.be.instanceof(Object);
+        expect(response.create.BatchRequestTestPage1.edit.result).to.equal('Success');
+        expect(response.update.BatchRequestTestPage1.edit.result).to.equal('Success');
+        expect(response.delete).to.be.instanceof(Object);
+        expect(response.delete.BatchRequestTestPage2.delete.title).to.equal('BatchRequestTestPage2');
+        expect(response.edit).to.be.instanceof(Object);
+        expect(response.create.BatchRequestTestPage2.edit.result).to.equal('Success');
     });
 });
