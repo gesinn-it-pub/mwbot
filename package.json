@@ -19,7 +19,7 @@
     "@eslint/js": "^10.0.1",
     "c8": "^10.0.0",
     "chai": "^4.3.7",
-    "chai-as-promised": "^7.1.1",
+    "chai-as-promised": "^8.0.2",
     "eslint": "^10.14.0",
     "eslint-config-prettier": "^10.0.0",
     "globals": "^15.0.0",
