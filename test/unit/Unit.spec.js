@@ -429,6 +429,33 @@ describe('MWBot batch() operations', function () {
         await expect(bot.batch([['constructor', 'TestPage']])).to.be.rejectedWith('Unsupported operation: constructor');
     });
 
+    it('aborts the batch on a badtoken error without logging the edit token', async function () {
+        const bot = new MWBot({ apiUrl: API_URL, silent: true });
+        bot.editToken = 'secret-token+\\';
+        bot.edit = async () => {
+            const err = new Error('badtoken: Invalid CSRF token.');
+            err.response = { error: { code: 'badtoken', info: 'Invalid CSRF token.' } };
+            throw err;
+        };
+        const logged = [];
+        const originalLog = console.log;
+        console.log = (...args) => logged.push(args.join(' '));
+
+        let rejection;
+        try {
+            await bot.batch([['edit', 'TestPage', 'content']], undefined, 1);
+        } catch (err) {
+            rejection = err;
+        } finally {
+            console.log = originalLog;
+        }
+
+        // batch rejects with the (empty) results object, not with an Error
+        expect(rejection).to.not.be.instanceof(Error);
+        expect(rejection).to.deep.equal({});
+        expect(logged.join('\n')).to.not.include('secret-token');
+    });
+
     it('invokes a supported operation with the job arguments', async function () {
         const bot = new MWBot({ apiUrl: API_URL, silent: true });
         const calls = [];

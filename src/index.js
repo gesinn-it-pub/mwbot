@@ -1030,7 +1030,6 @@ class MWBot {
                         reason = 'already-protected';
                     } else if (code === 'badtoken') {
                         // in case of fatal errors, cancel further jobQueue processing
-                        console.log(this.editToken);
                         throw err;
                     }
                 }
