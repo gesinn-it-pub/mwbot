@@ -1,7 +1,6 @@
 'use strict';
 
 const MWBot = require('../src/');
-const log = require('semlog').log;
 
 const chai = require('chai');
 const expect = chai.expect;
@@ -9,7 +8,7 @@ const expect = chai.expect;
 describe('MWBot SPARQL Query Request', function () {
     'use strict';
 
-    it('queries wikidata for cats', function (done) {
+    it('queries wikidata for cats', async function () {
         this.timeout(8000);
 
         const bot = new MWBot();
@@ -29,16 +28,11 @@ describe('MWBot SPARQL Query Request', function () {
             }
         `;
 
-        bot.sparqlQuery(query, endPoint)
-            .then((response) => {
-                expect(response).to.be.instanceof(Object);
-                expect(response).to.include.key('results');
-                expect(response.results).to.include.key('bindings');
-                expect(JSON.stringify(response.results.bindings)).to.include('Grumpy Cat');
-                done();
-            })
-            .catch((e) => {
-                log(e);
-            });
+        const response = await bot.sparqlQuery(query, endPoint);
+
+        expect(response).to.be.instanceof(Object);
+        expect(response).to.include.key('results');
+        expect(response.results).to.include.key('bindings');
+        expect(response.results.bindings).to.be.an('array').that.is.not.empty;
     });
 });

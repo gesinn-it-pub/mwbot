@@ -15,27 +15,18 @@ describe('MWBot Request', function () {
     // SUCESSFULL                           //
     //////////////////////////////////////////
 
-    it('combines reading, changing and uploading a wiki page', function (done) {
+    it('combines reading, changing and uploading a wiki page', async function () {
         const bot = new MWBot();
-        bot.loginGetEditToken(loginCredentials.valid)
-            .then(() => {
-                return bot.read('Main Page');
-            })
-            .then((response) => {
-                let pageContent = response.query.pages['1']['revisions'][0]['*'];
-                pageContent += ' Appendix';
-                return bot.update('Main Page', pageContent);
-            })
-            .then((response) => {
-                expect(response.edit.result).to.equal('Success');
-                done();
-            })
-            .catch((err) => {
-                log(err);
-            });
+        await bot.loginGetEditToken(loginCredentials.valid);
+
+        const readResponse = await bot.read('Main Page');
+        const pageContent = readResponse.query.pages['1']['revisions'][0]['*'] + ' Appendix';
+
+        const response = await bot.update('Main Page', pageContent);
+        expect(response.edit.result).to.equal('Success');
     });
 
-    it('concurrent jobs with bluebird.js Promise.map', function (done) {
+    it('concurrent jobs with p-map (MWBot.map)', async function () {
         const bot = new MWBot();
 
         const pages = ['Main Page', 'Test Page'];
@@ -43,46 +34,37 @@ describe('MWBot Request', function () {
         const pagesTotal = pages.length || 0;
         let pageCounter = 0;
 
-        bot.loginGetEditToken(loginCredentials.valid)
-            .then(() => {
-                return MWBot.map(
-                    pages,
-                    (page) => {
-                        pageCounter += 1;
+        await bot.loginGetEditToken(loginCredentials.valid);
 
-                        return bot
-                            .request({
-                                action: 'purge',
-                                titles: page,
-                                forcelinkupdate: true,
-                            })
-                            .then((response) => {
-                                // Use MWBot.logStatus helper function
-                                if (response.error) {
-                                    MWBot.logStatus('[E] ', pageCounter, pagesTotal, 'PURGE', response.purge[0].title);
-                                } else {
-                                    MWBot.logStatus('[=] ', pageCounter, pagesTotal, 'PURGE', response.purge[0].title);
-                                }
-                            })
-                            .catch((err) => {
-                                MWBot.logStatus('[E] ', pageCounter, pagesTotal, 'PURGE', page);
-                                log(err);
-                            });
-                    },
-                    {
-                        concurrency: 2,
+        await MWBot.map(
+            pages,
+            async (page) => {
+                pageCounter += 1;
+
+                try {
+                    const response = await bot.request({
+                        action: 'purge',
+                        titles: page,
+                        forcelinkupdate: true,
+                    });
+                    // Use MWBot.logStatus helper function
+                    if (response.error) {
+                        MWBot.logStatus('[E] ', pageCounter, pagesTotal, 'PURGE', response.purge[0].title);
+                    } else {
+                        MWBot.logStatus('[=] ', pageCounter, pagesTotal, 'PURGE', response.purge[0].title);
                     }
-                );
-            })
-            .then(() => {
-                done();
-            })
-            .catch((err) => {
-                log(err);
-            });
+                } catch (err) {
+                    MWBot.logStatus('[E] ', pageCounter, pagesTotal, 'PURGE', page);
+                    log(err);
+                }
+            },
+            {
+                concurrency: 2,
+            }
+        );
     });
 
-    it('sequential jobs with bluebird.js Promise.mapSeries', function (done) {
+    it('sequential jobs with MWBot.mapSeries', async function () {
         const bot = new MWBot();
 
         const pages = ['Main Page', 'Test Page'];
@@ -90,37 +72,28 @@ describe('MWBot Request', function () {
         const pagesTotal = pages.length || 0;
         let pageCounter = 0;
 
-        bot.loginGetEditToken(loginCredentials.valid)
-            .then(() => {
-                return MWBot.mapSeries(pages, (page) => {
-                    pageCounter += 1;
+        await bot.loginGetEditToken(loginCredentials.valid);
 
-                    return bot
-                        .request({
-                            action: 'purge',
-                            titles: page,
-                            forcelinkupdate: true,
-                        })
-                        .then((response) => {
-                            // Use MWBot.logStatus helper function
-                            if (response.error) {
-                                MWBot.logStatus('[E] ', pageCounter, pagesTotal, 'PURGE', response.purge[0].title);
-                            } else {
-                                MWBot.logStatus('[=] ', pageCounter, pagesTotal, 'PURGE', response.purge[0].title);
-                            }
-                        })
-                        .catch((err) => {
-                            MWBot.logStatus('[E] ', pageCounter, pagesTotal, 'PURGE', page);
-                            log(err);
-                        });
+        await MWBot.mapSeries(pages, async (page) => {
+            pageCounter += 1;
+
+            try {
+                const response = await bot.request({
+                    action: 'purge',
+                    titles: page,
+                    forcelinkupdate: true,
                 });
-            })
-            .then(() => {
-                done();
-            })
-            .catch((err) => {
+                // Use MWBot.logStatus helper function
+                if (response.error) {
+                    MWBot.logStatus('[E] ', pageCounter, pagesTotal, 'PURGE', response.purge[0].title);
+                } else {
+                    MWBot.logStatus('[=] ', pageCounter, pagesTotal, 'PURGE', response.purge[0].title);
+                }
+            } catch (err) {
+                MWBot.logStatus('[E] ', pageCounter, pagesTotal, 'PURGE', page);
                 log(err);
-            });
+            }
+        });
     });
 
     //////////////////////////////////////////
