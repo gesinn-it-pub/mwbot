@@ -218,13 +218,13 @@ class MWBot {
      *
      * @returns {Promise}
      */
-    rawRequest(requestOptions) {
+    async rawRequest(requestOptions) {
         this.counter.total += 1;
         this.counter.resolved += 1;
 
         if (!requestOptions.uri) {
             this.counter.rejected += 1;
-            return Promise.reject(new Error('No URI provided!'));
+            throw new Error('No URI provided!');
         }
 
         // Build URL, appending query-string parameters when present
@@ -256,34 +256,30 @@ class MWBot {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), requestOptions.timeout ?? 120000);
 
-        return fetch(url, {
-            method: requestOptions.method ?? 'POST',
-            headers,
-            body,
-            signal: controller.signal,
-        })
-            .then((response) => {
-                // Persist Set-Cookie headers from the response
-                for (const cookie of response.headers.getSetCookie()) {
-                    this.cookieJar.setCookieSync(cookie, url);
-                }
-                return response.text();
-            })
-            .then((text) => {
-                this.counter.fulfilled += 1;
-                try {
-                    return JSON.parse(text);
-                } catch {
-                    return text;
-                }
-            })
-            .catch((err) => {
-                this.counter.rejected += 1;
-                throw err;
-            })
-            .finally(() => {
-                clearTimeout(timeoutId);
+        try {
+            const response = await fetch(url, {
+                method: requestOptions.method ?? 'POST',
+                headers,
+                body,
+                signal: controller.signal,
             });
+            // Persist Set-Cookie headers from the response
+            for (const cookie of response.headers.getSetCookie()) {
+                this.cookieJar.setCookieSync(cookie, url);
+            }
+            const text = await response.text();
+            this.counter.fulfilled += 1;
+            try {
+                return JSON.parse(text);
+            } catch {
+                return text;
+            }
+        } catch (err) {
+            this.counter.rejected += 1;
+            throw err;
+        } finally {
+            clearTimeout(timeoutId);
+        }
     }
 
     /**
@@ -294,41 +290,35 @@ class MWBot {
      *
      * @returns {Promise}
      */
-    request(params, customRequestOptions) {
-        return new Promise((resolve, reject) => {
-            this.globalRequestOptions.uri = this.options.apiUrl;
+    async request(params, customRequestOptions) {
+        this.globalRequestOptions.uri = this.options.apiUrl;
 
-            const requestOptions = MWBot.merge(this.globalRequestOptions, customRequestOptions);
-            requestOptions.form = MWBot.merge(requestOptions.form, params);
+        const requestOptions = MWBot.merge(this.globalRequestOptions, customRequestOptions);
+        requestOptions.form = MWBot.merge(requestOptions.form, params);
 
-            this.rawRequest(requestOptions)
-                .then((response) => {
-                    if (typeof response !== 'object') {
-                        const err = new Error('invalidjson: No valid JSON response');
-                        err.code = 'invalidjson';
-                        err.info = 'No valid JSON response';
-                        err.response = response;
-                        return reject(err);
-                    }
+        const response = await this.rawRequest(requestOptions);
 
-                    if (response.error) {
-                        // See https://www.mediawiki.org/wiki/API:Errors_and_warnings#Errors
-                        const err = new Error(response.error.code + ': ' + response.error.info);
-                        // Enhance error object with additional information
-                        err.errorResponse = true;
-                        err.code = response.error.code;
-                        err.info = response.error.info;
-                        err.response = response;
-                        err.request = requestOptions;
-                        return reject(err);
-                    }
+        if (typeof response !== 'object') {
+            const err = new Error('invalidjson: No valid JSON response');
+            err.code = 'invalidjson';
+            err.info = 'No valid JSON response';
+            err.response = response;
+            throw err;
+        }
 
-                    return resolve(response);
-                })
-                .catch((err) => {
-                    reject(err);
-                });
-        });
+        if (response.error) {
+            // See https://www.mediawiki.org/wiki/API:Errors_and_warnings#Errors
+            const err = new Error(response.error.code + ': ' + response.error.info);
+            // Enhance error object with additional information
+            err.errorResponse = true;
+            err.code = response.error.code;
+            err.info = response.error.info;
+            err.response = response;
+            err.request = requestOptions;
+            throw err;
+        }
+
+        return response;
     }
 
     //////////////////////////////////////////
@@ -345,62 +335,51 @@ class MWBot {
      * @returns {Promise}
      */
     login(loginOptions) {
-        this.loginPromise = new Promise((resolve, reject) => {
-            this.options = MWBot.merge(this.options, loginOptions);
-
-            if (!this.options.username || !this.options.password || !this.options.apiUrl) {
-                return reject(new Error('Incomplete login credentials!'));
-            }
-
-            const loginString = this.options.username + '@' + this.options.apiUrl.split('/api.php').join('');
-
-            // Step 1: fetch login token via tokens API (MW 1.27+)
-            this.request({
-                action: 'query',
-                meta: 'tokens',
-                type: 'login',
-            })
-                .then((response) => {
-                    if (!response.query?.tokens?.logintoken) {
-                        const err = new Error('Invalid response from API');
-                        err.response = response;
-                        if (!this.options.silent) log('[E] [MWBOT] Login failed with invalid response: ' + loginString);
-                        return reject(err);
-                    }
-                    // Step 2: login with token
-                    return this.request({
-                        action: 'login',
-                        lgname: this.options.username,
-                        lgpassword: this.options.password,
-                        lgtoken: response.query.tokens.logintoken,
-                    });
-                })
-                .then((response) => {
-                    if (response.login && response.login.result === 'Success') {
-                        this.state = MWBot.merge(this.state, response.login);
-                        this.loggedIn = true;
-                    } else {
-                        let reason = 'Unknown reason';
-                        if (response.login && response.login.result) {
-                            reason = response.login.result;
-                        }
-                        const err = new Error('Could not login: ' + reason);
-                        err.response = response;
-                        if (!this.options.silent) log('[E] [MWBOT] Login failed: ' + loginString);
-                        return reject(err);
-                    }
-                })
-                .then(() => {
-                    this._ensureMwVersion()
-                        .then(() => resolve(this.state))
-                        .catch((err) => reject(err));
-                })
-                .catch((err) => {
-                    reject(err);
-                });
-        });
-
+        this.loginPromise = this._login(loginOptions);
         return this.loginPromise;
+    }
+
+    async _login(loginOptions) {
+        this.options = MWBot.merge(this.options, loginOptions);
+
+        if (!this.options.username || !this.options.password || !this.options.apiUrl) {
+            throw new Error('Incomplete login credentials!');
+        }
+
+        const loginString = this.options.username + '@' + this.options.apiUrl.split('/api.php').join('');
+
+        // Step 1: fetch login token via tokens API (MW 1.27+)
+        const tokenResponse = await this.request({
+            action: 'query',
+            meta: 'tokens',
+            type: 'login',
+        });
+        if (!tokenResponse.query?.tokens?.logintoken) {
+            const err = new Error('Invalid response from API');
+            err.response = tokenResponse;
+            if (!this.options.silent) log('[E] [MWBOT] Login failed with invalid response: ' + loginString);
+            throw err;
+        }
+
+        // Step 2: login with token
+        const response = await this.request({
+            action: 'login',
+            lgname: this.options.username,
+            lgpassword: this.options.password,
+            lgtoken: tokenResponse.query.tokens.logintoken,
+        });
+        if (response.login?.result === 'Success') {
+            this.state = MWBot.merge(this.state, response.login);
+            this.loggedIn = true;
+        } else {
+            const err = new Error('Could not login: ' + (response.login?.result || 'Unknown reason'));
+            err.response = response;
+            if (!this.options.silent) log('[E] [MWBOT] Login failed: ' + loginString);
+            throw err;
+        }
+
+        await this._ensureMwVersion();
+        return this.state;
     }
 
     /**
@@ -409,16 +388,15 @@ class MWBot {
      *
      * @returns {Promise}
      */
-    _ensureMwVersion() {
+    async _ensureMwVersion() {
         if (semver.valid(this.mwversion)) {
-            return Promise.resolve();
+            return;
         }
-        return this.getSiteinfo().then(() => {
-            this.mwversion = semver.coerce(this.state.generator);
-            if (!semver.valid(this.mwversion)) {
-                throw new Error('Invalid MediaWiki version: ' + JSON.stringify(this.mwversion));
-            }
-        });
+        await this.getSiteinfo();
+        this.mwversion = semver.coerce(this.state.generator);
+        if (!semver.valid(this.mwversion)) {
+            throw new Error('Invalid MediaWiki version: ' + JSON.stringify(this.mwversion));
+        }
     }
 
     /**
@@ -426,27 +404,19 @@ class MWBot {
      *
      * @returns {Promise}
      */
-    getSiteinfo() {
-        return new Promise((resolve, reject) => {
-            this.request({
-                action: 'query',
-                meta: 'siteinfo',
-                siprop: 'general',
-            })
-                .then((response) => {
-                    if (response.query && response.query.general) {
-                        this.state = MWBot.merge(this.state, response.query.general);
-                        return resolve(this.state);
-                    } else {
-                        const err = new Error('[E] [MWBOT] Could not get siteinfo');
-                        err.response = response;
-                        return reject(err);
-                    }
-                })
-                .catch((err) => {
-                    return reject(err);
-                });
+    async getSiteinfo() {
+        const response = await this.request({
+            action: 'query',
+            meta: 'siteinfo',
+            siprop: 'general',
         });
+        if (!response.query?.general) {
+            const err = new Error('[E] [MWBOT] Could not get siteinfo');
+            err.response = response;
+            throw err;
+        }
+        this.state = MWBot.merge(this.state, response.query.general);
+        return this.state;
     }
 
     /**
@@ -454,32 +424,24 @@ class MWBot {
      *
      * @returns {Promise}
      */
-    getEditToken() {
-        return new Promise((resolve, reject) => {
-            if (this.editToken) {
-                return resolve(this.state);
-            }
+    async getEditToken() {
+        if (this.editToken) {
+            return this.state;
+        }
 
-            this.request({
-                action: 'query',
-                meta: 'tokens',
-                type: 'csrf',
-            })
-                .then((response) => {
-                    if (response.query && response.query.tokens && response.query.tokens.csrftoken) {
-                        this.editToken = response.query.tokens.csrftoken;
-                        this.state = MWBot.merge(this.state, response.query.tokens);
-                        return resolve(this.state);
-                    } else {
-                        const err = new Error('Could not get edit token');
-                        err.response = response;
-                        return reject(err);
-                    }
-                })
-                .catch((err) => {
-                    return reject(err);
-                });
+        const response = await this.request({
+            action: 'query',
+            meta: 'tokens',
+            type: 'csrf',
         });
+        if (!response.query?.tokens?.csrftoken) {
+            const err = new Error('Could not get edit token');
+            err.response = response;
+            throw err;
+        }
+        this.editToken = response.query.tokens.csrftoken;
+        this.state = MWBot.merge(this.state, response.query.tokens);
+        return this.state;
     }
 
     /**
@@ -487,32 +449,24 @@ class MWBot {
      *
      * @returns {Promise}
      */
-    getCreateaccountToken() {
-        return new Promise((resolve, reject) => {
-            if (this.createaccountToken) {
-                return resolve(this.state);
-            }
+    async getCreateaccountToken() {
+        if (this.createaccountToken) {
+            return this.state;
+        }
 
-            this.request({
-                action: 'query',
-                meta: 'tokens',
-                type: 'createaccount',
-            })
-                .then((response) => {
-                    if (response.query && response.query.tokens && response.query.tokens.createaccounttoken) {
-                        this.createaccountToken = response.query.tokens.createaccounttoken;
-                        this.state = MWBot.merge(this.state, response.query.tokens);
-                        return resolve(this.state);
-                    } else {
-                        const err = new Error('Could not get createaccount token');
-                        err.response = response;
-                        return reject(err);
-                    }
-                })
-                .catch((err) => {
-                    return reject(err);
-                });
+        const response = await this.request({
+            action: 'query',
+            meta: 'tokens',
+            type: 'createaccount',
         });
+        if (!response.query?.tokens?.createaccounttoken) {
+            const err = new Error('Could not get createaccount token');
+            err.response = response;
+            throw err;
+        }
+        this.createaccountToken = response.query.tokens.createaccounttoken;
+        this.state = MWBot.merge(this.state, response.query.tokens);
+        return this.state;
     }
 
     /**
@@ -522,10 +476,9 @@ class MWBot {
      *
      * @returns {Promise}
      */
-    loginGetEditToken(loginOptions) {
-        return this.login(loginOptions).then(() => {
-            return this.getEditToken();
-        });
+    async loginGetEditToken(loginOptions) {
+        await this.login(loginOptions);
+        return this.getEditToken();
     }
 
     /**
@@ -535,10 +488,9 @@ class MWBot {
      *
      * @returns {Promise}
      */
-    loginGetCreateaccountToken(loginOptions) {
-        return this.login(loginOptions).then(() => {
-            return this.getCreateaccountToken();
-        });
+    async loginGetCreateaccountToken(loginOptions) {
+        await this.login(loginOptions);
+        return this.getCreateaccountToken();
     }
 
     /**
@@ -548,21 +500,15 @@ class MWBot {
      *
      * @returns {Promise}
      */
-    logout() {
-        const doLogout = (token) =>
-            this.request({ action: 'logout', token }).then(() => {
-                this.loggedIn = false;
-                this.editToken = false;
-                this.createaccountToken = false;
-                this.state = {};
-                this.mwversion = {};
-                this.cookieJar = new CookieJar();
-            });
-
-        if (this.editToken) {
-            return doLogout(this.editToken);
-        }
-        return this.getEditToken().then(() => doLogout(this.editToken));
+    async logout() {
+        await this.getEditToken();
+        await this.request({ action: 'logout', token: this.editToken });
+        this.loggedIn = false;
+        this.editToken = false;
+        this.createaccountToken = false;
+        this.state = {};
+        this.mwversion = {};
+        this.cookieJar = new CookieJar();
     }
 
     //////////////////////////////////////////
