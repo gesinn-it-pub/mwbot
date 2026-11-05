@@ -7,8 +7,11 @@ This project adheres to [Semantic Versioning](https://semver.org/) and
 ## [Unreleased]
 
 ### Breaking Changes
-- mwbot is now an ES module (`import MWBot from 'mwbot'`). `require('mwbot')` keeps returning the class on Node.js 22.13 and later
-- Require Node.js 22.13 or later (was 20)
+- mwbot is now an ES module (`import MWBot from 'mwbot'`). `require('mwbot')` keeps returning the class on Node.js 22.13 and later [`657bb79`](https://github.com/gesinn-it-pub/mwbot/commit/657bb79) ([#84](https://github.com/gesinn-it-pub/mwbot/issues/84))
+- Require Node.js 22.13 or later (was 20) [`657bb79`](https://github.com/gesinn-it-pub/mwbot/commit/657bb79) ([#84](https://github.com/gesinn-it-pub/mwbot/issues/84))
+
+### Changed
+- Bump p-map from 4.0.0 to 7.1.1; it is exposed as `MWBot.map`
 
 ## [2.4.0] - 2026-11-05
 

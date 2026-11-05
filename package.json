@@ -15,7 +15,7 @@
     "node": ">=22.13.0"
   },
   "dependencies": {
-    "p-map": "^4.0.0",
+    "p-map": "^7.1.1",
     "semlog": "^0.7.0",
     "semver": "^7.3.8",
     "tough-cookie": "^6.0.2"
@@ -24,7 +24,7 @@
     "@eslint/js": "^10.0.1",
     "c8": "^10.0.0",
     "chai": "^4.3.7",
-    "chai-as-promised": "^7.1.1",
+    "chai-as-promised": "^8.0.2",
     "eslint": "^10.14.0",
     "eslint-config-prettier": "^10.0.0",
     "globals": "^15.0.0",
