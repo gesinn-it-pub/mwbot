@@ -1,6 +1,6 @@
 'use strict';
 
-const MWBot = require('../src/');
+const MWBot = require('../../src/');
 
 const chai = require('chai');
 const expect = chai.expect;

@@ -1,16 +1,16 @@
 'use strict';
 
-const MWBot = require('../src/');
+const MWBot = require('../../src/');
 const log = require('semlog').log;
 
 const chai = require('chai');
 const expect = chai.expect;
 
-let loginCredentials = require('./mocking/loginCredentials.json');
+let loginCredentials = require('../mocking/loginCredentials.json');
 
 // use local login credentials if available
 try {
-    const loginCredentialsLocal = require('./mocking/loginCredentials.local.json');
+    const loginCredentialsLocal = require('../mocking/loginCredentials.local.json');
     if (loginCredentialsLocal) loginCredentials = loginCredentialsLocal;
 } catch {
     //ignore
@@ -102,15 +102,15 @@ describe('MWBot Batch Request', function () {
 
         const response = await bot.batch({
             upload: [
-                __dirname + '/mocking/example1.png',
-                __dirname + '/mocking/example2.png',
-                __dirname + '/mocking/example3.png',
-                __dirname + '/mocking/NonExistingImage.png',
+                __dirname + '/../mocking/example1.png',
+                __dirname + '/../mocking/example2.png',
+                __dirname + '/../mocking/example3.png',
+                __dirname + '/../mocking/NonExistingImage.png',
             ],
             uploadOverwrite: {
-                'ExampleImage1.png': __dirname + '/mocking/example1.png',
-                'ExampleImage2.png': __dirname + '/mocking/example2.png',
-                'ExampleImage3.png': __dirname + '/mocking/example3.png',
+                'ExampleImage1.png': __dirname + '/../mocking/example1.png',
+                'ExampleImage2.png': __dirname + '/../mocking/example2.png',
+                'ExampleImage3.png': __dirname + '/../mocking/example3.png',
             },
         });
 

@@ -1,17 +1,17 @@
 'use strict';
 
-const MWBot = require('../src/');
+const MWBot = require('../../src/');
 const log = require('semlog').log;
 const chai = require('chai');
 const expect = chai.expect;
 const assert = chai.assert;
 const semver = require('semver');
 
-let loginCredentials = require('./mocking/loginCredentials.json');
+let loginCredentials = require('../mocking/loginCredentials.json');
 
 // use local login credentials if available
 try {
-    const loginCredentialsLocal = require('./mocking/loginCredentials.local.json');
+    const loginCredentialsLocal = require('../mocking/loginCredentials.local.json');
     if (loginCredentialsLocal) loginCredentials = loginCredentialsLocal;
 } catch {
     //ignore

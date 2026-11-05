@@ -1,14 +1,14 @@
 'use strict';
 
-const MWBot = require('../src/');
+const MWBot = require('../../src/');
 const log = require('semlog').log;
 
 const chai = require('chai');
 const expect = chai.expect;
 
-const loginCredentials = require('./mocking/loginCredentials.json');
+const loginCredentials = require('../mocking/loginCredentials.json');
 
-describe('MWBot Request', function () {
+describe('MWBot advanced requests', function () {
     'use strict';
 
     //////////////////////////////////////////

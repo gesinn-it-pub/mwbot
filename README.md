@@ -514,3 +514,12 @@ $ make bash
 # and shutdown the wiki again 
 $ make down
 ```
+
+The tests are split by what they need:
+
+| Script | Directory | Needs |
+|---|---|---|
+| `npm run test:unit` | `test/unit` | nothing (mocked requests) |
+| `npm run test:integration` | `test/integration` | the test wiki (`make up`) |
+| `npm run test:external` | `test/external` | internet access to third-party endpoints, not part of CI |
+| `npm test` | unit and integration | the test wiki |

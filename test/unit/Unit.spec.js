@@ -5,7 +5,7 @@ const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-const MWBot = require('../src/');
+const MWBot = require('../../src/');
 
 const API_URL = 'http://example.com/api.php';
 

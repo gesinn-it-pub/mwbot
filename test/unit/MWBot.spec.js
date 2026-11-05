@@ -1,6 +1,6 @@
 'use strict';
 
-const MWBot = require('../src/');
+const MWBot = require('../../src/');
 const expect = require('chai').expect;
 
 describe('MWBot', function () {

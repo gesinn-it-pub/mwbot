@@ -1,17 +1,17 @@
 'use strict';
 
-const MWBot = require('../src/');
+const MWBot = require('../../src/');
 //const log = require('semlog').log;
 
 const chai = require('chai');
 const expect = chai.expect;
 const assert = chai.assert;
 
-let loginCredentials = require('./mocking/loginCredentials.json');
+let loginCredentials = require('../mocking/loginCredentials.json');
 
 // use local login credentials if available
 try {
-    const loginCredentialsLocal = require('./mocking/loginCredentials.local.json');
+    const loginCredentialsLocal = require('../mocking/loginCredentials.local.json');
     if (loginCredentialsLocal) loginCredentials = loginCredentialsLocal;
 } catch {
     //ingore
@@ -37,7 +37,7 @@ describe('MWBot Upload', function () {
         try {
             const r3 = await bot.uploadOverwrite(
                 'ExampleImage.png',
-                __dirname + '/mocking/example2.png',
+                __dirname + '/../mocking/example2.png',
                 'Test Reasons'
             );
             expect(r3.upload.result).to.equal('Success');
@@ -48,7 +48,7 @@ describe('MWBot Upload', function () {
 
         // upload again expecting 'fileexists-no-change'
         try {
-            const r4 = await bot.upload('ExampleImage.png', __dirname + '/mocking/example2.png', 'Test Reasons');
+            const r4 = await bot.upload('ExampleImage.png', __dirname + '/../mocking/example2.png', 'Test Reasons');
             expect(r4.upload.result).to.equal('Success');
             expect(JSON.stringify(r4.warnings)).to.not.exist;
         } catch (err) {
@@ -71,7 +71,7 @@ describe('MWBot Upload', function () {
 
         // upload
         try {
-            const r4 = await bot.upload(false, __dirname + '/mocking/example2.png', 'Test Reasons');
+            const r4 = await bot.upload(false, __dirname + '/../mocking/example2.png', 'Test Reasons');
             expect(r4.upload.result).to.equal('Success');
             expect(JSON.stringify(r4.warnings)).to.not.exist;
         } catch (err) {
@@ -86,7 +86,7 @@ describe('MWBot Upload', function () {
 
         // upload
         try {
-            await bot.upload(false, __dirname + '/mocking/non-existing-file.png', 'Test Reasons');
+            await bot.upload(false, __dirname + '/../mocking/non-existing-file.png', 'Test Reasons');
         } catch (err) {
             expect(err).to.be.an.instanceof(Error);
             expect(err.message).to.include('ENOENT');
