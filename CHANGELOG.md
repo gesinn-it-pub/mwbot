@@ -6,6 +6,9 @@ This project adheres to [Semantic Versioning](https://semver.org/) and
 
 ## [Unreleased]
 
+### Changed
+- Bump semlog from 1.0.0 to 1.0.1 [`59c197c`](https://github.com/gesinn-it-pub/mwbot/commit/59c197c)
+
 ## [3.0.0] - 2026-11-05
 
 mwbot is now an ES module and requires Node.js 22.13 or later. `require('mwbot')` keeps working on Node.js 22.13 and later. Version 2.x stays available on the `2.x` branch and receives security fixes.
