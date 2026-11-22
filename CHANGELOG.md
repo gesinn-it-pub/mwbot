@@ -6,6 +6,9 @@ This project adheres to [Semantic Versioning](https://semver.org/) and
 
 ## [Unreleased]
 
+### Changed
+- Bump semlog from 1.0.1 to 2.0.0 [`779df53`](https://github.com/gesinn-it-pub/mwbot/commit/779df53)
+
 ## [3.0.1] - 2026-11-17
 
 ### Changed
