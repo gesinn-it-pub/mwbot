@@ -6,6 +6,8 @@ This project adheres to [Semantic Versioning](https://semver.org/) and
 
 ## [Unreleased]
 
+## [3.0.2] - 2026-11-22
+
 ### Changed
 - Bump semlog from 1.0.1 to 2.0.0 [`779df53`](https://github.com/gesinn-it-pub/mwbot/commit/779df53)
 
@@ -36,7 +38,8 @@ Release candidate for 3.0.0. mwbot is now an ES module and requires Node.js 22.1
 ### Changed
 - Bump p-map from 4.0.0 to 7.1.1; it is exposed as `MWBot.map` [`34c7545`](https://github.com/gesinn-it-pub/mwbot/commit/34c7545)
 
-[Unreleased]: https://github.com/gesinn-it-pub/mwbot/compare/3.0.1...HEAD
+[Unreleased]: https://github.com/gesinn-it-pub/mwbot/compare/3.0.2...HEAD
+[3.0.2]: https://github.com/gesinn-it-pub/mwbot/compare/3.0.1...3.0.2
 [3.0.1]: https://github.com/gesinn-it-pub/mwbot/compare/3.0.0...3.0.1
 [3.0.0]: https://github.com/gesinn-it-pub/mwbot/compare/2.4.0...3.0.0
 [3.0.0-rc.1]: https://github.com/gesinn-it-pub/mwbot/compare/2.4.0...3.0.0-rc.1
