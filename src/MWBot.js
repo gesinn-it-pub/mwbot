@@ -2,7 +2,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import pMap from 'p-map';
 import { CookieJar } from 'tough-cookie';
-import semlog from 'semlog';
+import * as semlog from 'semlog';
+import { pad } from 'semlog/utils';
 import semver from 'semver';
 import packageJson from '../package.json' with { type: 'json' };
 import BATCH_OPERATIONS from './batchOperations.js';
@@ -1104,9 +1105,9 @@ class MWBot {
         log(
             status +
                 '[' +
-                semlog.pad(currentCounter, 4) +
+                pad(currentCounter, 4) +
                 '/' +
-                semlog.pad(totalCounter, 4) +
+                pad(totalCounter, 4) +
                 ']' +
                 operation +
                 pageName +

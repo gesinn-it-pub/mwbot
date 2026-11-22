@@ -1,5 +1,5 @@
 import MWBot from '../../src/index.js';
-import semlog from 'semlog';
+import * as semlog from 'semlog';
 const log = semlog.log;
 
 import * as chai from 'chai';
